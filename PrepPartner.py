@@ -64,7 +64,6 @@ def main():
 
     user_input=""
     while user_input != "quit":
-        system('clear')
         prompt = prompt_template.replace("current_data_state", data_state).replace("conversation_thread",json.dumps(chat_history))
         ask_gpt(prompt)
         #print(json.dumps(data_state))
