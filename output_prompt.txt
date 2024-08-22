@@ -1,0 +1,55 @@
+You now must carefully choose your response.
+
+First, use all of the information provided in the entire conversation to determine your data state.  It's important to keep track of everything the negotiator mentions—even trivial unimportant topics are useful to remember.  Keep in mind, that's why you have an EXPANSIVE_TOPICS_LIST as well as a NARROW_TOPICS_LIST.  Move the important things to the NARROW_TOPICS_LIST and keep the EXPANSIVE_TOPICS_LIST in your data state in case you want it for future reference.  Note also that the EXPANSIVE_TOPICS_LIST tracks the values and positions associated with each topic—-those are important.
+
+Then, determine which action to perform.
+
+Then, determine the action_data i.e. details for that action.  For example, you might need many details for a structured reflection or just a text string for a process map.
+
+Finally, you will put that together into an actual textual response to the user.  We will extract that response and show it to the user.
+
+Your output should contain the following format:
+### EXAMPLE OUTPUT ###
+{
+	"data_state" : {
+	"expansive_topics" : {
+		"chair" : {
+			"values" : ["comfort", "style", "sturdiness", "back support"],
+			"position" : "i want a $1000 budget to purchase a top of the line desk chair"
+		},
+		"salary": {
+			"values" : []
+			, "position": ""
+		},
+		"benefits": {
+			"values" : []
+			, "position": ""
+		},
+		"travel": {
+			"values" : []
+			, "position": "i want to travel at most 30% of my time"
+		}, 
+		"corporate_culture" : {
+			"values" : ["friendliness", "openness", "honesty", "high quality of work"]
+			, "position": ""
+		},
+		"business_cards" : {
+			"values" : ["status", "convenience"]
+			, "position": "i want the company to provide business cards"
+		},
+
+}, 
+"narrow_topics": ["salary", "benefits"]
+},
+	"action" : "reflection",
+	"action_data" : { 
+		"structured_elements" : {
+    "feelings": ["excited", "nervous"]
+    , "values": ["job security", "saving for retirement"]
+    , "topics": ["salary", "benefits", "job opportunity"]
+},
+"composed_structured_reflection" : "details of composed structured reflection goes here"
+ },
+	"response_to_user" : "response goes here}"
+}
+### END EXAMPLE OUTPUT###

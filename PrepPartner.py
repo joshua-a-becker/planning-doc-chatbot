@@ -13,6 +13,9 @@ data_state = """
     "narrow_topics": []
 }
 """
+f = open("content_history.txt", "w")
+f.write("")
+f.close()
 
 
 
@@ -34,9 +37,13 @@ def ask_gpt(prompt: str):
     )
     content = completion.choices[0].message.content
     content = json.loads(content)
-    response = content['response_to_user']
 
-    
+    f = open("content_history.txt", "a")
+    f.write(json.dumps(content)+"\n\n###\n\n")
+    f.close()
+
+
+    response = content['response_to_user']
     chat_history.append({"role": "Negotiation Coach", "content": response})
     data_state = json.dumps(content['data_state'])
     
@@ -64,6 +71,11 @@ def main():
 
     user_input=""
     while user_input != "quit":
+
+        ### allow live editing of prompt
+        with open('prompt_template.txt', 'r') as file:
+            prompt_template  = file.read()
+
         prompt = prompt_template.replace("current_data_state", data_state).replace("conversation_thread",json.dumps(chat_history))
         ask_gpt(prompt)
         #print(json.dumps(data_state))
