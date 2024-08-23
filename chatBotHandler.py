@@ -10,12 +10,6 @@ with open('prompt_template.txt', 'r') as file:
 
 client = OpenAI(api_key=my_key)
 
-data_state = """
-{
-    "expansive_topics" : { }, 
-    "narrow_topics": []
-}
-"""
 
 def ask_gpt(prompt: str):
     user_prompt =  {
@@ -24,8 +18,8 @@ def ask_gpt(prompt: str):
             }
     
     completion = client.chat.completions.create(
-        #model="gpt-4o",
-        model="gpt-4o-mini",
+        model="gpt-4o",
+        # model="gpt-4o-mini",
         response_format={"type": "json_object"},
         messages=[
             user_prompt
@@ -39,12 +33,17 @@ def ask_gpt(prompt: str):
     # extract data state
     data_state = json.dumps(content['data_state'])
 
-    print(content['action'])
+    print("Action: " + content['action'])
 
     # save data state to file
     f = open("data_state.txt", "w")
     f.write(json.dumps(data_state))
     f.close()
+
+    f = open("content_history.txt", "a")
+    f.write(json.dumps(content)+"\n\n###\n\n")
+    f.close()
+
 
     return response
     
@@ -72,11 +71,17 @@ def main():
     with open('ux/chatTranscript.json', 'r') as file:
         chat_history = json.load(file)['messages']
     
+    ### load instructions prompt
+    with open('instructions_prompt_1_intro.txt', 'r') as file:
+        instrutions_prompt = file.read()
+
+    with open('data_state.txt', 'r') as file:
+        data_state = json.load(file)
+
     
     
     # update chat history
     chat_history.append({"role": "Client Negotiator", "content": user_input})
-    print("user input: " + user_input)
 
     # save chat history to file
     f = open("ux/chatTranscript.json", "w")
@@ -88,8 +93,13 @@ def main():
         replace("{current_data_state}", data_state). \
         replace("{conversation_thread}",json.dumps(chat_history)). \
         replace("{data_state_prompt_component}", data_state_prompt_component). \
-        replace("{output_prompt_component}", output_prompt_component)
-    
+        replace("{output_prompt_component}", output_prompt_component). \
+        replace("{current_instructions_prompt}", instrutions_prompt)
+        
+    f = open("last_prompt.txt", "w")
+    f.write(prompt)
+    f.close()
+
     response = ask_gpt(prompt)
 
 
@@ -107,7 +117,6 @@ def main():
     f.close()
     
 
-    print("Program terminated!")
 
 if __name__ == "__main__":
     main()

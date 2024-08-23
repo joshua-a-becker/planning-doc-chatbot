@@ -17,7 +17,7 @@ const userInputPath = path.join(__dirname, 'user-input.txt');
 
 let clients = [];
 
-app.get('/events', (req, res) => {
+app.get('/events', async (req, res) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -32,8 +32,26 @@ app.get('/events', (req, res) => {
     clients = clients.filter(client => client.id !== clientId);
   });
 
+  // Send initial data to the client
+  const initialData = await getInitialData();
+  res.write(`data: ${JSON.stringify(initialData)}\n\n`);
+
   res.write('data: connected\n\n');
 });
+
+async function getInitialData() {
+  try {
+    const [formData, chatTranscript, userInput] = await Promise.all([
+      readFileJSON(dataFilePath),
+      readFileJSON(chatTranscriptPath),
+      readFileText(userInputPath)
+    ]);
+    return { formData, chatTranscript: chatTranscript?.messages, userInput };
+  } catch (error) {
+    console.error('Error reading initial data:', error);
+    return { formData: null, chatTranscript: null, userInput: '' };
+  }
+}
 
 function sendEventsToAll(data) {
   clients.forEach(client => client.res.write(`data: ${JSON.stringify(data)}\n\n`));
@@ -75,6 +93,7 @@ chokidar.watch([dataFilePath, chatTranscriptPath, userInputPath])
   .on('change', sendUpdates);
 
 app.post('/save', async (req, res) => {
+  console.log(req.body)
   try {
     await fs.writeFile(dataFilePath, JSON.stringify(req.body, null, 2));
     res.status(200).send('Data saved successfully');
@@ -103,6 +122,18 @@ app.post('/runChatBot', (req, res) => {
     console.log(`stdout: ${stdout}`);
     console.error(`stderr: ${stderr}`);
     res.status(200).send('ChatBot script executed successfully');
+  });
+});
+
+app.post('/reset', (req, res) => {
+  exec('python3 ../reset.py', { detached: true }, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return res.status(500).send('Error running reset script');
+    }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+    res.status(200).send('reset script executed successfully');
   });
 });
 

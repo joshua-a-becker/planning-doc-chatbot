@@ -12,44 +12,43 @@ Your output should contain the following format:
 ### EXAMPLE OUTPUT ###
 {
 	"data_state" : {
-	"expansive_topics" : {
-		"chair" : {
-			"values" : ["comfort", "style", "sturdiness", "back support"],
-			"position" : "i want a $1000 budget to purchase a top of the line desk chair"
-		},
-		"salary": {
-			"values" : []
-			, "position": ""
-		},
-		"benefits": {
-			"values" : []
-			, "position": ""
-		},
-		"travel": {
-			"values" : []
-			, "position": "i want to travel at most 30% of my time"
+		"expansive_topics" : {
+			"chair" : {
+				"values" : ["comfort", "style", "sturdiness", "back support"],
+				"position" : "i want a $1000 budget to purchase a top of the line desk chair"
+			},
+			"salary": {
+				"values" : []
+				, "position": ""
+			},
+			"benefits": {
+				"values" : []
+				, "position": ""
+			},
+			"travel": {
+				"values" : []
+				, "position": "i want to travel at most 30% of my time"
+			}, 
+			"corporate_culture" : {
+				"values" : ["friendliness", "openness", "honesty", "high quality of work"]
+				, "position": ""
+			},
+			"business_cards" : {
+				"values" : ["status", "convenience"]
+				, "position": "i want the company to provide business cards"
+			},
 		}, 
-		"corporate_culture" : {
-			"values" : ["friendliness", "openness", "honesty", "high quality of work"]
-			, "position": ""
-		},
-		"business_cards" : {
-			"values" : ["status", "convenience"]
-			, "position": "i want the company to provide business cards"
-		},
-
-}, 
-"narrow_topics": ["salary", "benefits"]
-},
-	"action" : "reflection",
+		"narrow_topics": ["salary", "benefits"]
+	},
+	"action" : "some_action_goes_here",
 	"action_data" : { 
-		"structured_elements" : {
-    "feelings": ["excited", "nervous"]
-    , "values": ["job security", "saving for retirement"]
-    , "topics": ["salary", "benefits", "job opportunity"]
-},
-"composed_structured_reflection" : "details of composed structured reflection goes here"
- },
-	"response_to_user" : "response goes here}"
+		"justification" : "i have chosen this action becuase i am not yet ready to move on and they are still talking",
+		"example_data_header" : {
+			"feelings": ["excited", "nervous"]
+			, "values": ["job security", "saving for retirement"]
+			, "topics": ["salary", "benefits", "job opportunity"]
+		},
+ 	},
+	"response_to_user" : "response goes here"
 }
 ### END EXAMPLE OUTPUT###

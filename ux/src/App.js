@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Trash2, Send } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, Send } from 'lucide-react';
 
-
+const SERVER_URL = "http://localhost:3001"
 
 const colors = {
   primary: '#3498db',
@@ -12,24 +12,85 @@ const colors = {
 };
 
 const styles = {
+
+  toggleButton_open: {
+    position: 'absolute',
+    top: '50%',
+    left: 'calc(40% - 30px)', // Adjust based on your layout
+    width: '30px',
+    height: '30px',
+    borderRadius: '50%',
+    backgroundColor: colors.primary,
+    color: 'white',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer',
+    border: 'none',
+    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+    zIndex: 10,
+  },
+
+
+  toggleButton_closed: {
+    position: 'absolute',
+    top: '50%',
+    left: 'calc(80% - 15px)', // Adjust based on your layout
+    width: '30px',
+    height: '30px',
+    borderRadius: '50%',
+    backgroundColor: colors.primary,
+    color: 'white',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer',
+    border: 'none',
+    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+    zIndex: 10,
+  },
+
+
   app: {
     display: 'flex',
     height: '100vh',
+    width: '100%',
+    overflowX: 'hidden',
     fontFamily: "'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
     color: colors.text,
     backgroundColor: colors.background,
   },
-  chatSection: {
-    flex: 1,
+
+  chatSection_closed: {
+    flex: '0 0 80%',
     borderRight: `1px solid ${colors.border}`,
     display: 'flex',
     flexDirection: 'column',
   },
-  formSection: {
-    flex: 1,
+
+  formSection_closed: {
+    flex: '0 0 30%',
     overflowY: 'auto',
+    minWidth: '50%',
+    padding: '20px',
+    overflowX: 'visible',
+    filter: 'blur(2px) brightness(0.7)',
+  },
+
+  chatSection_open: {
+    flex: '1 1 40%',
+    borderRight: `1px solid ${colors.border}`,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+
+  formSection_open: {
+    flex: '1 1 60%',
+    overflowY: 'auto',
+    minWidth: '50%',
     padding: '20px',
   },
+
   heading: {
     color: colors.primary,
     borderBottom: `2px solid ${colors.primary}`,
@@ -160,22 +221,24 @@ const PersonForm = ({ personNumber, data, updateData }) => {
   const person = `person${personNumber}`;
 
   const updateField = (field, value) => {
-    updateData(prevData => ({
-      ...prevData,
-      [person]: { ...prevData[person], [field]: value }
-    }));
+    const newData = {
+      ...data,
+      [person]: { ...data[person], [field]: value }
+    };
+    updateData(newData);
   };
 
   const updateTopic = (index, field, value) => {
-    updateData(prevData => ({
-      ...prevData,
+    const newData = {
+      ...data,
       [person]: {
-        ...prevData[person],
-        topics: prevData[person].topics.map((item, i) => 
+        ...data[person],
+        topics: data[person].topics.map((item, i) => 
           i === index ? { ...item, [field]: value } : item
         )
       }
-    }));
+    };
+    updateData(newData);
   };
 
   const addTopic = () => {
@@ -335,16 +398,19 @@ const App = () => {
   const [chatTranscript, setChatTranscript] = useState([]);
   const [userInput, setUserInput] = useState('');
 
+  const [formClosed, setFormClosed] = useState(0);
+
+  
   useEffect(() => {
-    const eventSource = new EventSource('http://localhost:3001/events');
+    const eventSource = new EventSource(SERVER_URL+'/events');
     eventSource.onmessage = (event) => {
       if (event.data !== 'connected') {
         const newData = JSON.parse(event.data);
-        //if (newData.formData) setFormData(newData.formData);
+        if (newData.formData) setFormData(newData.formData);
         if (newData.chatTranscript) setChatTranscript(newData.chatTranscript);
         if (newData.userInput) {
           if(newData.userInput===" ") setUserInput("")
-        //  else  setUserInput(newData.userInput);
+          else  setUserInput(newData.userInput);
         }
         
       }
@@ -352,25 +418,43 @@ const App = () => {
     return () => eventSource.close();
   }, []);
 
-  useEffect(() => {
-    const saveFormData = async () => {
-      try {
-        await fetch('http://localhost:3001/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        });
-      } catch (error) {
-        console.error('Error saving form data:', error);
-      }
-    };
-    saveFormData();
-  }, [formData]);
+
+  const saveFormData = async (newData) => {
+    try {
+      await fetch(SERVER_URL+'/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newData),
+      });
+    } catch (error) {
+      console.error('Error saving form data:', error);
+    }
+  };
+
+  const updateData = (newData) => {
+    setFormData(newData);
+    saveFormData(newData);
+  }
+
+  // useEffect(() => {
+  //   const saveFormData = async () => {
+  //     try {
+  //       await fetch(SERVER_URL+'/save', {
+  //         method: 'POST',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: JSON.stringify(formData),
+  //       });
+  //     } catch (error) {
+  //       console.error('Error saving form data:', error);
+  //     }
+  //   };
+  //   saveFormData();
+  // }, [formData]);
 
   const handleUserInputChange = (e) => {
     const newInput = e.target.value;
     setUserInput(newInput);
-    fetch('http://localhost:3001/saveUserInput', {
+    fetch(SERVER_URL+'/saveUserInput', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userInput: newInput }),
@@ -378,13 +462,23 @@ const App = () => {
   };
 
   const handleSendMessage = () => {
-    fetch('http://localhost:3001/runChatBot', { method: 'POST' });
+    fetch(SERVER_URL+'/runChatBot', { method: 'POST' });
     setUserInput("");
   };
 
+  const handleResetSystem = () => {
+    fetch(SERVER_URL+'/reset', { method: 'POST' });
+    console.log("reset")
+  }
+
+  const handleSetForm = () => {
+    setFormClosed(prevState => prevState === 0 ? 1 : 0);
+  }
+
+
   return (
     <div style={styles.app}>
-      <div style={styles.chatSection}>
+      <div style={formClosed===0 ? styles.chatSection_open : styles.chatSection_closed}>
         <ChatTranscript 
           messages={chatTranscript} 
           userInput={userInput}
@@ -392,10 +486,17 @@ const App = () => {
           onSendMessage={handleSendMessage}
         />
       </div>
-      <div style={styles.formSection}>
-        <h1 style={styles.heading}>Planning Doc</h1>
-        <PersonForm personNumber={1} data={formData} updateData={setFormData} />
-        <PersonForm personNumber={2} data={formData} updateData={setFormData} />
+      <button 
+        style={formClosed===0 ? styles.toggleButton_open : styles.toggleButton_closed} 
+        onClick={handleSetForm}
+        aria-label={formClosed === 0 ? "Close form" : "Open form"}
+      >
+        {formClosed === 0 ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+      </button>
+      <div style={formClosed===0 ? styles.formSection_open : styles.formSection_closed}>
+        <h1 style={styles.heading}>Planning Doc <button onClick={handleResetSystem}>reset system</button></h1> 
+        <PersonForm personNumber={1} data={formData} updateData={updateData} />
+        <PersonForm personNumber={2} data={formData} updateData={updateData} />
       </div>
     </div>
   );
