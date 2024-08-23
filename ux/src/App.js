@@ -482,6 +482,11 @@ const App = () => {
 
 
   const handleSendMessage = () => {
+    fetch(SERVER_URL+'/saveUserInput', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userInput: userInput }),
+    });
     fetch(SERVER_URL+'/runChatBot', { method: 'POST' });
   };
 

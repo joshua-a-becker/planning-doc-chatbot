@@ -106,3 +106,23 @@
 
 ###
 
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "I have chosen to ask an open-ended question because we need to start gathering information about the client's situation and what they are looking to discuss."}, "response_to_user": "Great! To start with, can you tell me a bit about the context of your negotiation? What are the main things you would like to address or discuss?"}
+
+###
+
+{"data_state": {"expansive_topics": {"context": {"values": [], "position": "DEFINITELY things go here?"}}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "I need to gather more context and specifics about the negotiation from the client.", "question": "Thank you for sharing that! Could you please elaborate on the 'DEFINITELY things go here?' What specific topics or concerns do you have in mind for this negotiation?"}, "response_to_user": "Thank you for sharing that! Could you please elaborate on the 'DEFINITELY things go here?' What specific topics or concerns do you have in mind for this negotiation?"}
+
+###
+
+{"data_state": {"expansive_topics": {"context": {"values": [], "position": "DEFINITELY things go here?"}, "broad_concerns": {"values": [], "position": "this is updating a bit better now"}}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "Since the client is beginning to open up, it's advantageous to keep the conversation going with an open-ended question to gather more context.", "example_data_header": {"feelings": [], "values": [], "topics": []}}, "response_to_user": "That's great to hear! Could you tell me a bit more about the specific things you'd like to focus on for your negotiation? For instance, what are the key areas that are most important to you in this process?"}
+
+###
+
+{"data_state": {"expansive_topics": {"context": {"values": [], "position": "DEFINITELY things go here?"}, "broad_concerns": {"values": [], "position": "this is updating a bit better now"}}, "narrow_topics": []}, "action": "process_mapping", "action_data": {"justification": "The client seems hesitant to provide details. It's important to gently explain the value of sharing such information for effective negotiation coaching.", "advice": {"importance_of_details": "This process works best when you share information about your situation. Understanding the details helps us tailor advice and support to your specific needs. Let's focus on discussing what's most important to you in this negotiation."}}, "response_to_user": "I understand if you're feeling hesitant to share details right now, and that's perfectly okay. Just to let you know, this process is designed to provide the best support when we have a clearer picture of your situation. It helps to know more about what's important to you and what you hope to achieve in the negotiation. Is there any specific area you feel ready to start discussing?"}
+
+###
+
+{"data_state": {"expansive_topics": {"context": {"values": [], "position": "DEFINITELY things go here?"}, "broad_concerns": {"values": [], "position": "this is updating a bit better now"}, "readiness": {"values": [], "position": "noooo i won't talk"}, "general_approval": {"values": [], "position": "ok things seem to be OK"}}, "narrow_topics": []}, "action": "structured_reflection", "action_data": {"action_justification": "I have chosen this action to facilitate deeper understanding and encourage the client to open up more about their specific concerns.", "reflection": "I understand that you're feeling hesitant and cautious right now but you also mentioned that things seem to be OK. My goal is to support you through this process to ensure you're fully prepared for your negotiation. Could you share a bit more about what specifically makes you feel that things are OK or any particular concerns you might have?"}, "response_to_user": "I understand that you're feeling hesitant and cautious right now but you also mentioned that things seem to be OK. My goal is to support you through this process to ensure you're fully prepared for your negotiation. Could you share a bit more about what specifically makes you feel that things are OK or any particular concerns you might have?"}
+
+###
+
