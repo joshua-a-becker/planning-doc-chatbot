@@ -305,7 +305,7 @@ const PersonForm = ({ personNumber, data, updateData }) => {
       ))}
       <button style={styles.button} onClick={addTopic}>
         <Plus size={14} />
-        Add Row
+        Add Topic
       </button>
       <br/><br/>
       <div style={styles.row}>
@@ -365,7 +365,7 @@ const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage 
 
   return (
     <div style={styles.chatTranscript}>
-      <h2>Chat Transcript</h2>
+      <h2>Chat With Negotiation Coach</h2>
       <div 
         ref={messagesContainerRef} 
         style={styles.messagesContainer}
