@@ -19,8 +19,8 @@ def ask_gpt(prompt: str):
             }
     
     completion = client.chat.completions.create(
-        model="gpt-4o",
-        # model="gpt-4o-mini",
+        # model="gpt-4o",
+        model="gpt-4o-mini",
         response_format={"type": "json_object"},
         messages=[
             user_prompt
@@ -106,6 +106,7 @@ def main():
 
     ### get chat history with new user input into prompt    
     prompt = prompt_template. \
+        replace("{instructions_prompt_file}", instructions_prompt_file). \
         replace("{current_data_state}", json.dumps(data_state)). \
         replace("{conversation_thread}",json.dumps(chat_history)). \
         replace("{data_state_prompt_component}", data_state_prompt_component). \

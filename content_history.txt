@@ -402,3 +402,139 @@
 
 ###
 
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "process_mapping", "action_data": {"justification": "The client has just provided the initial input, and I'll encourage them to start filling out their planning document while reflecting on the topics we discussed.", "step_selection": ""}, "response_to_user": "Let's get started with your planning document. Please open it on the right by clicking the expansion tab. You can begin by adding the topics you mentioned, starting with 'how fast can you respond?' and any other topics that come to mind. This will help us understand everything that needs to be negotiated."}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "process_mapping", "action_data": {"justification": "We're still exploring the topics for negotiation, and the client hasn't yet filled out the planning doc.", "example_data_header": {"feelings": [], "values": [], "topics": []}}, "response_to_user": "I appreciate your enthusiasm! Let's focus on getting started with identifying the topics you'd like to discuss. Can you think of any topics that are important for your upcoming negotiation? You might want to think about areas like salary, benefits, or anything specific that has come to mind."}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "process_mapping", "action_data": {"justification": "The client hasn't started filling out their planning doc yet, so I'm guiding them to begin this process by discussing potential topics.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "I understand your curiosity! Let's keep the focus on the negotiation. Could you share any topics you're thinking about discussing in your upcoming negotiation? Topics like salary or benefits might be a good start."}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "process_mapping", "action_data": {"justification": "I want to guide you in developing the topics for negotiation and ensure they are well-defined.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Let's refocus on discussing the topics for your negotiation. Can you try listing any topics that are important for you, perhaps thinking about salary, benefits, or other aspects that matter to you?"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "process_mapping", "action_data": {"justification": "The client hasn't acknowledged or begun filling out the planning doc. By guiding them to focus on specific topics, it can help clarify their thoughts.", "example_data_header": {"topics": []}}, "response_to_user": "Let's take a moment to focus on the planning document on the right. Could you please try adding some specific topics you want to discuss in your negotiation? You might consider mentioning things like salary, benefits, or any other areas that are important to you."}
+
+###
+
+{"data_state": {"expansive_topics": {"salary": {"values": [], "position": ""}}, "narrow_topics": ["salary"]}, "action": "process_mapping", "action_data": {"justification": "I am encouraging the client to utilize the planning document more actively by adding their thoughts.", "example_data_header": {}}, "response_to_user": "Great, I see you've already started with the topic of salary! Can you share what your position is regarding salary? Also, are there any other topics you feel are important to include? Feel free to add them to the planning doc on the right."}
+
+###
+
+{"data_state": {"expansive_topics": {"dinner_location": {"values": ["cuisine preferences", "budget", "distance", "dietary restrictions"], "position": "I want to choose between Italian or Mexican food."}, "friends_arrangement": {"values": ["who's joining", "time of dinner"], "position": "We need to coordinate with everyone else's schedule."}, "restaurant_quality": {"values": ["ambiance", "service", "reviews"], "position": "I want to go to a place that has good reviews."}}, "narrow_topics": ["dinner_location", "friends_arrangement"]}, "action": "open ended question", "action_data": {"justification": "I want to gather more information about their preferences and the situation before moving on.", "example_data_header": {"feelings": ["excited", "nervous"], "values": ["friendship", "good food"], "topics": ["dinner_location", "friends_arrangement", "restaurant_quality"]}}, "response_to_user": "That's a great start! Can you tell me more about what specific cuisines you and your friends enjoy or if there are any other preferences you have for this dinner?"}
+
+###
+
+{"data_state": {"expansive_topics": {"dinner_location": {"values": ["cuisine preferences", "budget", "distance", "dietary restrictions"], "position": "I want to choose between Italian or Mexican food."}, "friends_arrangement": {"values": ["who's joining", "time of dinner"], "position": "We need to coordinate with everyone else's schedule."}, "restaurant_quality": {"values": ["ambiance", "service", "reviews"], "position": "I want to go to a place that has good reviews."}, "spiciness": {"values": ["not too spicy", "easy on the stomach"], "position": "I want the food to be mild and not heavy."}, "location": {"values": ["closeness to the show"], "position": "The restaurant needs to be close to where our show is."}}, "narrow_topics": ["dinner_location", "friends_arrangement", "restaurant_quality"]}, "action": "open ended question", "action_data": {"justification": "I want to gather more information about the client's needs and preferences for the dinner negotiation.", "example_data_header": {}}, "response_to_user": "You mentioned wanting to choose between Italian or Mexican food. What do you and your friends usually enjoy about these cuisines? Are there any particular restaurants you have in mind?"}
+
+###
+
+{"data_state": {"expansive_topics": {"catering_restaurant": {"values": [], "position": ""}, "menu_options": {"values": [], "position": ""}, "cost": {"values": [], "position": ""}, "dietary_restrictions": {"values": [], "position": ""}, "reunion_size": {"values": [], "position": ""}, "service_style": {"values": [], "position": ""}}, "narrow_topics": []}, "action": "open ended question", "action_data": {}, "response_to_user": "That sounds interesting! Can you share more about what you have in mind for the restaurant? What kind of food options or styles are you considering?"}
+
+###
+
+{"data_state": {"expansive_topics": {"catering_restaurant": {"values": [], "position": "local hoagie place"}, "menu_options": {"values": ["healthier options"], "position": ""}, "cost": {"values": [], "position": ""}, "dietary_restrictions": {"values": [], "position": ""}, "reunion_size": {"values": [], "position": ""}, "service_style": {"values": [], "position": ""}}, "narrow_topics": ["catering_restaurant", "menu_options"]}, "action": "open ended question", "action_data": {"justification": "I want to gather more details about the needs and interests surrounding the catering discussion.", "example_data_header": {"feelings": [], "values": [], "topics": ["catering_restaurant", "menu_options"]}}, "response_to_user": "That's a great start! Can you tell me more about why you prefer the local hoagie place? What are the key aspects that are important to you and others in choosing a restaurant for this event?"}
+
+###
+
+{"data_state": {"expansive_topics": {"catering_restaurant": {"values": ["represents local culture"], "position": "local hoagie place"}, "menu_options": {"values": ["healthier options"], "position": ""}, "cost": {"values": [], "position": ""}, "dietary_restrictions": {"values": [], "position": ""}, "reunion_size": {"values": [], "position": ""}, "service_style": {"values": [], "position": ""}}, "narrow_topics": ["catering_restaurant", "menu_options"]}, "action": "open_ended_question", "action_data": {}, "response_to_user": "It's great to hear your thoughts on the local hoagie place! Can you tell me more about any specific dietary restrictions or requirements from your guests that you might need to consider in your negotiation?"}
+
+###
+
+{"data_state": {"expansive_topics": {"catering_restaurant": {"values": ["represents local culture"], "position": "local hoagie place"}, "menu_options": {"values": ["healthier options"], "position": ""}, "cost": {"values": [], "position": ""}, "dietary_restrictions": {"values": [], "position": ""}, "reunion_size": {"values": [], "position": ""}, "service_style": {"values": [], "position": ""}}, "narrow_topics": ["catering_restaurant", "menu_options"]}, "action": "open ended question", "action_data": {}, "response_to_user": "You've made some great points about the restaurant choice and menu options! What other factors are influencing your decision on catering for the reunion? For instance, how important is the cost, or the service style? Any thoughts?"}
+
+###
+
+{"data_state": {"expansive_topics": {"catering_restaurant": {"values": ["represents local culture"], "position": "local hoagie place"}, "menu_options": {"values": ["healthier options"], "position": ""}, "cost": {"values": [], "position": "shouldn't be too expensive"}, "dietary_restrictions": {"values": [], "position": ""}, "reunion_size": {"values": [], "position": ""}, "service_style": {"values": [], "position": ""}}, "narrow_topics": ["catering_restaurant", "menu_options", "cost"]}, "action": "change_step", "action_data": {"justification": "We've gathered a solid understanding of the key topics and values. It's time to explore the perspectives of all parties involved.", "step_selection": "step_two_topics_validating"}, "response_to_user": "Great! We have a good grasp of your perspective on the catering options for your reunion. Let's move on to consider the perspectives of the other parties involved in the negotiation. Please hold on a moment while I prepare for the next step."}
+
+###
+
+{"data_state": {"expansive_topics": {"catering_restaurant": {"values": ["represents local culture"], "position": "local hoagie place"}, "menu_options": {"values": ["healthier options"], "position": ""}, "cost": {"values": [], "position": "shouldn't be too expensive"}, "dietary_restrictions": {"values": [], "position": ""}, "reunion_size": {"values": [], "position": ""}, "service_style": {"values": [], "position": ""}}, "narrow_topics": ["catering_restaurant", "menu_options", "cost"]}, "action": "change_step", "action_data": {"justification": "I feel that we've made good progress in listing and discussing your negotiation topics.", "step_selection": "step_two_topics_validating"}, "response_to_user": "Great! Now, let's fill out your planning doc. I suggest starting with the topics we've discussed so far. You might want to add: 'catering restaurant,' 'menu options,' and 'cost.' Please open the planning doc on the right and start adding those topics. Once you're ready, we can continue!"}
+
+###
+
+{"data_state": {"expansive_topics": {"catering_restaurant": {"values": ["represents local culture"], "position": "local hoagie place"}, "menu_options": {"values": ["healthier options"], "position": ""}, "cost": {"values": [], "position": "shouldn't be too expensive"}, "dietary_restrictions": {"values": [], "position": ""}, "reunion_size": {"values": [], "position": ""}, "service_style": {"values": [], "position": ""}}, "narrow_topics": ["catering_restaurant", "menu_options", "cost"]}, "action": "process_mapping", "action_data": {"justification": "Encouraging the client to fill out the planning doc so we have a clear structure for the negotiation.", "step_selection": "step_two_topics_validating"}, "response_to_user": "Let's open the planning doc on the right by clicking the expansion tab. Can you start adding the topics we discussed? I suggest adding 'catering restaurant,' 'menu options,' and 'cost.' Once you add those, we can move forward!"}
+
+###
+
+{"data_state": {"expansive_topics": {"catering_restaurant": {"values": ["represents local culture"], "position": "local hoagie place"}, "menu_options": {"values": ["healthier options"], "position": ""}, "cost": {"values": [], "position": "shouldn't be too expensive"}, "dietary_restrictions": {"values": [], "position": ""}, "reunion_size": {"values": [], "position": ""}, "service_style": {"values": [], "position": ""}}, "narrow_topics": ["catering_restaurant", "menu_options", "cost"]}, "action": "change_step", "action_data": {"justification": "The topics have been identified and are ready to be validated in the planning doc.", "step_selection": "step_three_topics_values"}, "response_to_user": "Now that you've started creating your planning doc, please ensure to include the topics we've discussed: 'catering restaurant,' 'menu options,' and 'cost.' Let me know if you've added them, and we can proceed!"}
+
+###
+
+{"data_state": {"expansive_topics": {"catering_restaurant": {"values": ["represents local culture"], "position": "local hoagie place"}, "menu_options": {"values": ["healthier options", "cheesesteaks"], "position": ""}, "cost": {"values": [], "position": "shouldn't be too expensive"}, "dietary_restrictions": {"values": [], "position": ""}, "reunion_size": {"values": [], "position": ""}, "service_style": {"values": [], "position": ""}}, "narrow_topics": ["catering_restaurant", "menu_options", "cost"]}, "action": "change_step", "action_data": {"justification": "I've gathered essential information about your perspective on the negotiation topics and it's time to explore the counterpart's perspective.", "step_selection": "step_two_topics_validating"}, "response_to_user": "I understand the planning doc can seem a bit confusing, but you've made great progress! Let's move to the next step where we'll look at the perspectives of others involved in this negotiation. Ready?"}
+
+###
+
+{"data_state": {"expansive_topics": {"catering_restaurant": {"values": ["represents local culture"], "position": "local hoagie place"}, "menu_options": {"values": ["healthier options", "cheesesteaks"], "position": ""}, "cost": {"values": [], "position": "shouldn't be too expensive"}, "dietary_restrictions": {"values": [], "position": ""}, "reunion_size": {"values": [], "position": ""}, "service_style": {"values": [], "position": ""}}, "narrow_topics": ["catering_restaurant", "menu_options", "cost"]}, "action": "process_mapping", "action_data": {"justification": "I am encouraging you to fully articulate the topics in your planning doc and to ensure they align with standard negotiation principles.", "planning_doc": {"person1": {"topics": [{"topic": "Menu Options", "position": "I want cheesesteaks", "needsInterests": "local culture"}, {"topic": "Price", "position": "must be affordable", "needsInterests": "fits in budget"}], "alternative": "", "bottomLine": ""}, "person2": {"topics": [{"topic": "", "position": "", "needsInterests": ""}], "alternative": "", "bottomLine": ""}}}, "response_to_user": "Let's focus on ensuring that your topics in the planning doc reflect everything we've discussed. Have you had a chance to add 'catering restaurant,' 'menu options,' and 'cost' as topics? What are your thoughts on including 'dietary restrictions' or 'service style' as well?"}
+
+###
+
+{"data_state": {"expansive_topics": {"catering_restaurant": {"values": ["represents local culture"], "position": "local hoagie place"}, "menu_options": {"values": ["healthier options", "cheesesteaks"], "position": ""}, "cost": {"values": [], "position": "shouldn't be too expensive"}, "dietary_restrictions": {"values": [], "position": ""}, "service_style": {"values": [], "position": ""}}, "narrow_topics": ["catering_restaurant", "menu_options", "cost"]}, "action": "process_mapping", "action_data": {"justification": "The topics are coming together nicely, and we're ready to refine them for clarity.", "topics_check": {"existing_topics": [{"topic": "Menu Options", "position": "I want cheesesteaks", "needsInterests": "local culture"}, {"topic": "Price", "position": "must be affordable", "needsInterests": "fits in budget"}], "suggested_additions": [{"topic": "Catering Restaurant", "position": "local hoagie place"}, {"topic": "Service Style", "position": ""}]}}, "response_to_user": "It looks like we have a solid start! I see you've mentioned 'Menu Options' and 'Price' in your planning doc. We might want to add 'Catering Restaurant' and 'Service Style' into the mix as well. Can you take a moment to add those in? Once you\u2019ve added these topics, I\u2019m excited to help you refine them further!"}
+
+###
+
+{"data_state": {"expansive_topics": {"catering_restaurant": {"values": ["represents local culture"], "position": "local hoagie place"}, "menu_options": {"values": ["healthier options", "cheesesteaks"], "position": ""}, "cost": {"values": [], "position": "shouldn't be too expensive"}, "dietary_restrictions": {"values": [], "position": ""}, "service_style": {"values": [], "position": ""}}, "narrow_topics": ["catering_restaurant", "menu_options", "cost", "dietary_restrictions", "service_style"]}, "action": "process_mapping", "action_data": {"justification": "I want you to ensure all topics have been fully captured and accurately reflect your negotiation goals.", "planning_doc": {"person1": {"topics": [{"topic": "Menu Options", "position": "I want cheesesteaks", "needsInterests": "local culture"}, {"topic": "Price", "position": "must be affordable", "needsInterests": "fits in budget"}, {"topic": "Catering Restaurant", "position": "local hoagie place", "needsInterests": "represents local culture"}, {"topic": "Dietary Restrictions", "position": "", "needsInterests": ""}, {"topic": "Service Style", "position": "", "needsInterests": ""}], "alternative": "", "bottomLine": ""}, "person2": {"topics": [{"topic": "", "position": "", "needsInterests": ""}], "alternative": "", "bottomLine": ""}}}, "response_to_user": "Great! You've made a clear start with your planning doc. I suggest you add 'Catering Restaurant', 'Dietary Restrictions', and 'Service Style' to the mix. Let\u2019s make sure it\u2019s comprehensive. Please take a moment to add those, and then we can finalize the topics!"}
+
+###
+
+{"data_state": {"expansive_topics": {"catering_restaurant": {"values": ["represents local culture"], "position": "local hoagie place"}, "menu_options": {"values": ["healthier options", "cheesesteaks"], "position": ""}, "cost": {"values": [], "position": "shouldn't be too expensive"}, "dietary_restrictions": {"values": [], "position": ""}, "service_style": {"values": [], "position": ""}}, "narrow_topics": ["catering_restaurant", "menu_options", "cost", "dietary_restrictions", "service_style"]}, "action": "process_mapping", "action_data": {"justification": "I'm guiding you to ensure all topics are included and validated in the planning doc.", "example_data_header": {"topics": ["catering_restaurant", "menu_options", "cost", "dietary_restrictions", "service_style"]}}, "response_to_user": "You've made great progress with your topics! I see 'Menu Options' and 'Price' listed, but we should also include 'Catering Restaurant' and 'Service Style' to complete the picture. Please add these topics to the planning doc so that we can ensure everything is covered!"}
+
+###
+
+{"data_state": {"expansive_topics": {"catering_restaurant": {"values": ["represents local culture"], "position": "local hoagie place"}, "menu_options": {"values": ["healthier options", "cheesesteaks"], "position": ""}, "cost": {"values": [], "position": "shouldn't be too expensive"}, "dietary_restrictions": {"values": [], "position": ""}, "service_style": {"values": [], "position": ""}}, "narrow_topics": ["catering_restaurant", "menu_options", "cost", "dietary_restrictions", "service_style"]}, "action": "process_mapping", "action_data": {"justification": "I want to ensure your planning doc contains relevant topics before we move forward.", "example_data_header": {"topics": ["catering restaurant", "menu options", "cost", "dietary restrictions", "service style"], "client_topics": [{"topic": "Menu Options", "position": "I want cheesesteaks", "needsInterests": "local culture"}, {"topic": "Price", "position": "must be affordable", "needsInterests": "fits in budget"}]}}, "response_to_user": "You've got a good start on your planning doc! I see 'Menu Options' and 'Price' listed. You might want to add 'Catering Restaurant', 'Dietary Restrictions', and 'Service Style' as well. Could you integrate those topics? This will help ensure we have a comprehensive view before moving to the next step!"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open ended question", "action_data": {"justification": "I'm still gathering information about the client's situation and needs.", "example_data_header": {}}, "response_to_user": "Great! Let's dive deeper. Can you tell me more about the negotiation you're preparing for? What is the context, and who are the parties involved?"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open ended question", "action_data": {}, "response_to_user": "Thanks for your patience! Let's get started. Can you tell me a bit about the negotiation you're preparing for? What are the main goals you hope to achieve?"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "I want to gather more information about the client's negotiation situation and background.", "example_data_header": {"feelings": [], "values": [], "topics": []}}, "response_to_user": "Great! To get started, could you share a bit about the negotiation context? What is the main negotiation about, and who are the parties involved? Any background info you think is relevant would be really helpful!"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "I want to gather more background information to understand the context of the negotiation better.", "example_data_header": {}}, "response_to_user": "Great! Let\u2019s dive into the details of your upcoming negotiation. Can you start by telling me a bit about the context? What\u2019s the situation, and who will you be negotiating with?"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "I'm trying to gather background information about the negotiation in order to better understand the topics and needs at play.", "example_data_header": {}}, "response_to_user": "Great! To kick things off, can you tell me a bit about the context of your negotiation? What are you negotiating about, and who are the other parties involved?"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "I'm starting the process by gathering background information which is essential for understanding the negotiation context.", "example_data_header": {}}, "response_to_user": "Great! Let's dive into your situation. Can you tell me a bit about the negotiation you have in mind? What are the main objectives or points that you're hoping to address in this negotiation?"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "I want to gather more information about the negotiation context and the specific details surrounding it.", "example_data_header": {}}, "response_to_user": "Great! Let's dive in a bit more. To get started, could you share some background about the negotiation? What are you negotiating about, and what are the key players involved?"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "I want to gather more background information to understand the situation better.", "example_data_header": {"feelings": [], "values": [], "topics": []}}, "response_to_user": "Great! To kick things off, could you tell me a bit about the negotiation you're preparing for? What\u2019s the context, who are the parties involved, and what are you hoping to achieve?"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "I want to gather more background information about the negotiation, so open-ended questions will encourage the client to elaborate on their situation.", "example_data_header": {"feelings": [], "values": [], "topics": []}}, "response_to_user": "Great! Now that we're on the same page about the process, let's dive into the details of your upcoming negotiation. Can you start by telling me a bit about what the negotiation is regarding and who the other party involved is?"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "general_comment", "action_data": {"justification": "I want to clarify the process and make sure the client understands it before we delve into the details.", "process_info": "The process we follow has four main steps: First, I'll help you share background information and context for your negotiation. Next, we\u2019ll identify and validate the key topics you'll be discussing. Then, we\u2019ll explore your needs and interests related to those topics. Finally, we\u2019ll determine your Best Alternative to a Negotiated Agreement (BATNA) so you know your options."}, "response_to_user": "Thanks for your patience! The process we follow has four main steps. First, I'll help you share background information and context for your negotiation. Next, we\u2019ll identify and validate the key topics you'll be discussing. Then, we\u2019ll explore your needs and interests related to those topics. Finally, we\u2019ll determine your Best Alternative to a Negotiated Agreement (BATNA) so you know your options. Can you start by telling me a bit about what the negotiation is regarding and who the other party involved is?"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "I'm trying to gather more background information about the client's negotiation situation.", "example_data_header": {"feelings": [], "values": [], "topics": []}}, "response_to_user": "The screen you're seeing on the right is your planning document, which will help us organize our thoughts during the negotiation process. It may look a bit blurry, but don\u2019t worry, it will become clearer as we fill it out together. Now, let\u2019s dive into your negotiation! Can you share what the negotiation is about and who you'll be negotiating with?"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "The client seems to be hesitant to engage with the planning document. I will encourage them to share some background information first.", "example_data_header": {"feelings": [], "values": [], "topics": []}}, "response_to_user": "You're right, we don't need to focus on the planning document just yet. Let's start with the negotiation itself. Can you tell me about what the negotiation is about and who you'll be negotiating with? This will help us build a solid foundation for the discussion."}
+
+###
+

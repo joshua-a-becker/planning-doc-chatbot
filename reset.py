@@ -33,6 +33,10 @@ f = open("ux/formData.json", "w")
 f.write(json.dumps(form_data))
 f.close()
 
+# reset prompt file to step_one_intro_discovery
+f = open("instructionsPromptFile.txt", "w")
+f.write("step_one_intro_discovery")
+f.close()
 
 # clear user input
 f = open("ux/user-input.txt", "w")
