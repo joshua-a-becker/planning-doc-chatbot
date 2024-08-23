@@ -2,8 +2,8 @@ import debounce from 'lodash/debounce';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Send } from 'lucide-react';
 
-const SERVER_URL = "http://167.99.10.184:3001"
-//const SERVER_URL = "http://localhost:3001"
+// const SERVER_URL = "http://167.99.10.184:3001"
+const SERVER_URL = "http://localhost:3001"
 
 const colors = {
   primary: '#3498db',
@@ -244,23 +244,26 @@ const PersonForm = ({ personNumber, data, updateData }) => {
   };
 
   const addTopic = () => {
-    updateData(prevData => ({
-      ...prevData,
+
+    const newData = {
+      ...data,
       [person]: {
-        ...prevData[person],
-        topics: [...prevData[person].topics, { topic: '', position: '', needsInterests: '' }]
+        ...data[person],
+        topics: [...(data[person].topics || []), { topic: '', position: '', needsInterests: '' }]
       }
-    }));
+    };
+    updateData(newData);
   };
 
   const deleteTopic = (index) => {
-    updateData(prevData => ({
-      ...prevData,
+    const newData = {
+      ...data,
       [person]: {
-        ...prevData[person],
-        topics: prevData[person].topics.filter((_, i) => i !== index)
+        ...data[person],
+        topics: data[person].topics.filter((_, i) => i !== index)
       }
-    }));
+    }
+    updateData(newData);
   };
 
   return (
@@ -441,6 +444,7 @@ const App = () => {
 
 
   const updateData = (newData) => {
+    console.log("here")
     setFormData(newData);
     debouncedSaveFormData(newData);
   }
@@ -465,11 +469,14 @@ const App = () => {
 
   const debouncedSaveUserInput = useCallback(
     debounce((input) => {
-      fetch(SERVER_URL+'/saveUserInput', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userInput: input }),
-      });
+      
+      if(input===userInput){
+        fetch(SERVER_URL+'/saveUserInput', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userInput: input }),
+        });
+      }
     }, 1000),
     []
   );

@@ -1,6 +1,6 @@
 import os
-#os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
-os.chdir("/root/planning-doc-chatbot")
+os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
+# os.chdir("/root/planning-doc-chatbot")
 
 from openai import OpenAI
 import json
@@ -33,23 +33,9 @@ def ask_gpt(prompt: str):
     f = open("content_history.txt", "a")
     f.write(json.dumps(content)+"\n\n###\n\n")
     f.close()
-
-    # extract response
-    response = content['response_to_user']
-
-    # extract data state
-    data_state = json.dumps(content['data_state'])
-
-    # display action
-    print("Action: " + content['action'])
-
-    # save data state to file
-    f = open("data_state.txt", "w")
-    f.write(json.dumps(data_state))
-    f.close()
-
+    
     # return response
-    return response
+    return content
     
 
 
@@ -74,9 +60,20 @@ def main():
     ### load chat history
     with open('ux/chatTranscript.json', 'r') as file:
         chat_history = json.load(file)['messages']
+
+    ### load planning doc data
+    with open('ux/formData.json', 'r') as file:
+        plannign_doc_data = json.load(file)
     
+    
+    ### load instructions prompt file
+    with open("instructionsPromptFile.txt", 'r') as file:
+        instructions_prompt_file = file.read()
+
+    print(instructions_prompt_file)
+
     ### load instructions prompt
-    with open('instructions_prompt_1_intro.txt', 'r') as file:
+    with open((instructions_prompt_file+".txt"), 'r') as file:
         instrutions_prompt = file.read()
 
     
@@ -100,7 +97,8 @@ def main():
     f.write(json.dumps({"messages": chat_history}))
     f.close()
 
-    
+    print("Received user input.")
+
     # clear user input
     f = open("ux/user-input.txt", "w")
     f.write(" ")
@@ -113,14 +111,31 @@ def main():
         replace("{conversation_thread}",json.dumps(chat_history)). \
         replace("{data_state_prompt_component}", data_state_prompt_component). \
         replace("{output_prompt_component}", output_prompt_component). \
-        replace("{current_instructions_prompt}", instrutions_prompt)
+        replace("{current_instructions_prompt}", instrutions_prompt). \
+        replace("{planning_doc_data}", json.dumps(plannign_doc_data))
         
     f = open("last_prompt.txt", "w")
     f.write(prompt)
     f.close()
 
-    response = ask_gpt(prompt)
+    content = ask_gpt(prompt)
 
+    # extract response
+    response = content['response_to_user']
+
+    # exctract action
+    action = content['action']
+
+    # extract data state
+    data_state = json.dumps(content['data_state'])
+
+    # display action
+    print("Action: " + action)
+
+    # save data state to file
+    f = open("data_state.txt", "w")
+    f.write(json.dumps(data_state))
+    f.close()
 
     # update chat history
     chat_history.append({"role": "Negotiation Coach", "content": response})
@@ -129,6 +144,15 @@ def main():
     f = open("ux/chatTranscript.json", "w")
     f.write(json.dumps({"messages": chat_history}))
     f.close()
+
+    if(action=="change_step"): 
+        new_step = content['action_data']['step_selection']
+        # update instructions prompt file
+        f = open("instructionsPromptFile.txt", "w")
+        f.write(new_step)
+        f.close()
+
+        print("new_step: "+new_step)
 
 
 

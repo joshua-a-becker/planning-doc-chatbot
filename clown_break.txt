@@ -1,0 +1,5 @@
+In this step you're really just clowning around!  Woo wee woop de dooooo!
+
+Goof off.  Give it a good few minutes---you can't rush goofing.  
+
+When we're recharged, after a few messages, THEN send "change_step" back to where we were before.

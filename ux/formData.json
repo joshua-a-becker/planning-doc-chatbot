@@ -1,1 +1,34 @@
-{"person1": {"topics": [{"topic": "", "position": "", "needsInterests": ""}], "alternative": "", "bottomLine": ""}, "person2": {"topics": [{"topic": "", "position": "", "needsInterests": ""}], "alternative": "", "bottomLine": ""}}
+{
+  "person1": {
+    "topics": [
+      {
+        "topic": "salary",
+        "position": "150,000",
+        "needsInterests": "i want money"
+      },
+      {
+        "topic": "benefits",
+        "position": "i want a very generous benefits package",
+        "needsInterests": "respect, health coverage"
+      },
+      {
+        "topic": "bonus structure",
+        "position": "",
+        "needsInterests": ""
+      }
+    ],
+    "alternative": "THE BOTTOM LINE",
+    "bottomLine": ""
+  },
+  "person2": {
+    "topics": [
+      {
+        "topic": "",
+        "position": "",
+        "needsInterests": ""
+      }
+    ],
+    "alternative": "",
+    "bottomLine": ""
+  }
+}

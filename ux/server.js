@@ -93,7 +93,7 @@ chokidar.watch([dataFilePath, chatTranscriptPath, userInputPath])
   .on('change', sendUpdates);
 
 app.post('/save', async (req, res) => {
-  console.log(req.body)
+  
   try {
     await fs.writeFile(dataFilePath, JSON.stringify(req.body, null, 2));
     res.status(200).send('Data saved successfully');

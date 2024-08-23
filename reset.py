@@ -1,6 +1,6 @@
 import os
-#os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
-os.chdir("/root/planning-doc-chatbot")
+os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
+# os.chdir("/root/planning-doc-chatbot")
 
 import json
 
