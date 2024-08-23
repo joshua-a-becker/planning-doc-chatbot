@@ -3,21 +3,21 @@
     "topics": [
       {
         "topic": "salary",
-        "position": "150,000",
-        "needsInterests": "i want money"
+        "position": "get at least $220,000",
+        "needsInterests": ""
       },
       {
-        "topic": "benefits",
-        "position": "i want a very generous benefits package",
-        "needsInterests": "respect, health coverage"
+        "topic": "equity",
+        "position": "1.5% stake",
+        "needsInterests": ""
       },
       {
-        "topic": "bonus structure",
-        "position": "",
+        "topic": "health benefits",
+        "position": "comprehensive health insurance including dental and vision with low deductibles",
         "needsInterests": ""
       }
     ],
-    "alternative": "THE BOTTOM LINE",
+    "alternative": "",
     "bottomLine": ""
   },
   "person2": {

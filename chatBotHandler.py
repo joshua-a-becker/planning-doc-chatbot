@@ -77,15 +77,14 @@ def main():
         instrutions_prompt = file.read()
 
     
-    data_state = """
-    {
-        "expansive_topics" : { }, 
-        "narrow_topics": []
-    }
-    """
+    
+
 
     if(os.path.isfile("data_state.txt")) :
         with open('data_state.txt', 'r') as file:
+            data_state = json.load(file)
+    else: 
+        with open('data_state_blank.txt', 'r') as file:
             data_state = json.load(file)
         
     
@@ -107,7 +106,7 @@ def main():
 
     ### get chat history with new user input into prompt    
     prompt = prompt_template. \
-        replace("{current_data_state}", data_state). \
+        replace("{current_data_state}", json.dumps(data_state)). \
         replace("{conversation_thread}",json.dumps(chat_history)). \
         replace("{data_state_prompt_component}", data_state_prompt_component). \
         replace("{output_prompt_component}", output_prompt_component). \
