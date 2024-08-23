@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import debounce from 'lodash/debounce';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Send } from 'lucide-react';
 
-const SERVER_URL = "http://localhost:3001"
+const SERVER_URL = "http://167.99.10.184:3001"
+//const SERVER_URL = "http://localhost:3001"
 
 const colors = {
   primary: '#3498db',
@@ -398,7 +400,7 @@ const App = () => {
   const [chatTranscript, setChatTranscript] = useState([]);
   const [userInput, setUserInput] = useState('');
 
-  const [formClosed, setFormClosed] = useState(0);
+  const [formClosed, setFormClosed] = useState(1);
 
   
   useEffect(() => {
@@ -431,9 +433,16 @@ const App = () => {
     }
   };
 
+
+  const debouncedSaveFormData = useCallback(
+    debounce(saveFormData, 500),
+    []
+  );
+
+
   const updateData = (newData) => {
     setFormData(newData);
-    saveFormData(newData);
+    debouncedSaveFormData(newData);
   }
 
   // useEffect(() => {
@@ -451,19 +460,29 @@ const App = () => {
   //   saveFormData();
   // }, [formData]);
 
+
+
+
+  const debouncedSaveUserInput = useCallback(
+    debounce((input) => {
+      fetch(SERVER_URL+'/saveUserInput', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userInput: input }),
+      });
+    }, 1000),
+    []
+  );
+
   const handleUserInputChange = (e) => {
     const newInput = e.target.value;
     setUserInput(newInput);
-    fetch(SERVER_URL+'/saveUserInput', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userInput: newInput }),
-    });
+    debouncedSaveUserInput(newInput);
   };
+
 
   const handleSendMessage = () => {
     fetch(SERVER_URL+'/runChatBot', { method: 'POST' });
-    setUserInput("");
   };
 
   const handleResetSystem = () => {

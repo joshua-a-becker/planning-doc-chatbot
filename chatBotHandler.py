@@ -1,5 +1,6 @@
 import os
-os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
+#os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
+os.chdir("/root/planning-doc-chatbot")
 
 from openai import OpenAI
 import json
@@ -28,11 +29,18 @@ def ask_gpt(prompt: str):
 
     content = json.loads(completion.choices[0].message.content)
 
+    # save content history
+    f = open("content_history.txt", "a")
+    f.write(json.dumps(content)+"\n\n###\n\n")
+    f.close()
+
+    # extract response
     response = content['response_to_user']
 
     # extract data state
     data_state = json.dumps(content['data_state'])
 
+    # display action
     print("Action: " + content['action'])
 
     # save data state to file
@@ -40,11 +48,7 @@ def ask_gpt(prompt: str):
     f.write(json.dumps(data_state))
     f.close()
 
-    f = open("content_history.txt", "a")
-    f.write(json.dumps(content)+"\n\n###\n\n")
-    f.close()
-
-
+    # return response
     return response
     
 
@@ -75,10 +79,18 @@ def main():
     with open('instructions_prompt_1_intro.txt', 'r') as file:
         instrutions_prompt = file.read()
 
-    with open('data_state.txt', 'r') as file:
-        data_state = json.load(file)
-
     
+    data_state = """
+    {
+        "expansive_topics" : { }, 
+        "narrow_topics": []
+    }
+    """
+
+    if(os.path.isfile("data_state.txt")) :
+        with open('data_state.txt', 'r') as file:
+            data_state = json.load(file)
+        
     
     # update chat history
     chat_history.append({"role": "Client Negotiator", "content": user_input})
@@ -87,6 +99,13 @@ def main():
     f = open("ux/chatTranscript.json", "w")
     f.write(json.dumps({"messages": chat_history}))
     f.close()
+
+    
+    # clear user input
+    f = open("ux/user-input.txt", "w")
+    f.write(" ")
+    f.close()
+    
 
     ### get chat history with new user input into prompt    
     prompt = prompt_template. \
@@ -110,12 +129,7 @@ def main():
     f = open("ux/chatTranscript.json", "w")
     f.write(json.dumps({"messages": chat_history}))
     f.close()
-    
-    # clear user input
-    f = open("ux/user-input.txt", "w")
-    f.write(" ")
-    f.close()
-    
+
 
 
 if __name__ == "__main__":

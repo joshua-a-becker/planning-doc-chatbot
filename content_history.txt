@@ -90,3 +90,19 @@
 
 ###
 
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "process_mapping", "action_data": {"justification": "The client has not yet provided relevant details about the upcoming job negotiation and seems to be distracted. We need to guide them back to providing more specific information.", "steps": ["1. Discussing the negotiation scenario", "2. Identifying key topics and positions", "3. Delving into detailed values and positions for each topic", "4. Streamlining the expansive list to core negotiation topics", "5. Developing a negotiation strategy"]}, "response_to_user": "It looks like there might be some excitement or distraction. Let's refocus on the upcoming job negotiation. Could you share more details about your goals and primary concerns related to the negotiation? For example, what do you hope to achieve in this new role and how do you see work-life balance fitting into your new job?"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "i have chosen this action to gather initial broad information about the negotiation situation, which is essential to understanding the context and specific concerns of the client.", "question": "Could you share more details about your goals and primary concerns related to the upcoming job negotiation? What are the key aspects you want to discuss and get clarity on?"}, "response_to_user": "Could you share more details about your goals and primary concerns related to the upcoming job negotiation? What are the key aspects you want to discuss and get clarity on?"}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "The client has not yet shared detailed information about their upcoming job negotiation. It is crucial to explore their goals and concerns to build a comprehensive understanding.", "question": "Can you tell me more about what you hope to achieve in your upcoming job negotiation? What are your primary goals and concerns?"}, "response_to_user": "Can you tell me more about what you hope to achieve in your upcoming job negotiation? What are your primary goals and concerns? Understanding these details will help us identify the key aspects to focus on."}
+
+###
+
+{"data_state": {"expansive_topics": {}, "narrow_topics": []}, "action": "open_ended_question", "action_data": {"justification": "I have chosen this action because I need to gather more information and understand the context of the negotiation.", "example_data_header": {"feelings": [], "values": [], "topics": []}}, "response_to_user": "Hello! Great to have you here. Can you please tell me broadly what you would like to discuss today? Any specific areas or issues on your mind?"}
+
+###
+

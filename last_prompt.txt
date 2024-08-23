@@ -138,12 +138,12 @@ Your output should contain the following format:
 
 
 #### 3. CONVERSATION HISTORY ####
-[{"role": "Negotiation Coach", "content": "Please get us started by telling me broadly:  what would you like to discuss"}, {"role": "Client Negotiator", "content": "i want to discuss an upcoming job negotiation"}]
+[{"role": "Negotiation Coach", "content": "Please get us started by telling me broadly:  what would you like to discuss"}, {"role": "Client Negotiator", "content": "hello"}]
 #### END CONVERSATION HISTORY ####
 
 
 #### 4. CURRENT DATA STATE ####
-{"expansive_topics": {"salary": {"values": [], "position": "I want $150k to reflect a raise from my current salary of $140k."}, "justification": {"values": ["qualifications", "leadership responsibilities"], "position": "I am qualified and taking on more leadership responsibilities."}, "general_interests": {"values": ["potential concerns"], "position": "things and whatnot"}, "cats": {"values": [], "position": ""}, "work_life_balance": {"values": [], "position": ""}}, "narrow_topics": ["salary"]}
+{"expansive_topics": {}, "narrow_topics": []}
 #### END CURRENT DATA STATE ####
 
 #### 5. INSTRUCTIONS ####
