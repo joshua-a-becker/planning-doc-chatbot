@@ -2,8 +2,8 @@ import debounce from 'lodash/debounce';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Send } from 'lucide-react';
 
-// const SERVER_URL = "http://167.99.10.184:3001"
-const SERVER_URL = "http://localhost:3001"
+const SERVER_URL = "http://167.99.10.184:3001"
+// const SERVER_URL = "http://localhost:3001"
 
 const colors = {
   primary: '#3498db',
@@ -336,7 +336,7 @@ const PersonForm = ({ personNumber, data, updateData }) => {
   );
 };
 
-const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage }) => {
+const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage, handleResetSystem }) => {
   const messagesContainerRef = useRef(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
 
@@ -365,7 +365,7 @@ const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage 
 
   return (
     <div style={styles.chatTranscript}>
-      <h2>Chat With Negotiation Coach</h2>
+      <h2>Chat With Negotiation Coach  <button onClick={handleResetSystem}>reset system</button></h2>
       <div 
         ref={messagesContainerRef} 
         style={styles.messagesContainer}
@@ -373,7 +373,7 @@ const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage 
       >
         {messages.map((message, index) => (
           <div key={index} style={styles.message}>
-            <strong>{message.role}:</strong> {message.content}
+            <strong>{message.role}:</strong> <div dangerouslySetInnerHTML={{__html: message.content}}/>
           </div>
         ))}
       </div>
@@ -515,6 +515,7 @@ const App = () => {
           userInput={userInput}
           onUserInputChange={handleUserInputChange}
           onSendMessage={handleSendMessage}
+          handleResetSystem={handleResetSystem}
         />
       </div>
       <button 
@@ -525,7 +526,7 @@ const App = () => {
         {formClosed === 0 ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
       </button>
       <div style={formClosed===0 ? styles.formSection_open : styles.formSection_closed}>
-        <h1 style={styles.heading}>Planning Doc <button onClick={handleResetSystem}>reset system</button></h1> 
+        <h1 style={styles.heading}>Planning Doc</h1> 
         <PersonForm personNumber={1} data={formData} updateData={updateData} />
         <PersonForm personNumber={2} data={formData} updateData={updateData} />
       </div>

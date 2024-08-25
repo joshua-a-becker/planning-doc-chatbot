@@ -1,6 +1,6 @@
 import os
-os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
-# os.chdir("/root/planning-doc-chatbot")
+# os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
+os.chdir("/root/planning-doc-chatbot")
 
 from openai import OpenAI
 import json
@@ -19,8 +19,8 @@ def ask_gpt(prompt: str):
             }
     
     completion = client.chat.completions.create(
-        # model="gpt-4o",
-        model="gpt-4o-mini",
+        model="gpt-4o",
+        # model="gpt-4o-mini",
         response_format={"type": "json_object"},
         messages=[
             user_prompt
