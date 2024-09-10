@@ -2,8 +2,8 @@ import debounce from 'lodash/debounce';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Send } from 'lucide-react';
 
-const SERVER_URL = "http://167.99.10.184:3001"
-// const SERVER_URL = "http://localhost:3001"
+// const SERVER_URL = "http://167.99.10.184:3001"
+const SERVER_URL = "http://localhost:3001"
 
 const colors = {
   primary: '#3498db',
@@ -357,6 +357,13 @@ const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage,
   };
 
   const handleKeyPress = (event) => {
+    // console.log("pressed")
+    // fetch(SERVER_URL+'/saveUserInput', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ userInput: userInput }),
+    // });
+    
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       onSendMessage();
@@ -413,10 +420,10 @@ const App = () => {
         const newData = JSON.parse(event.data);
         if (newData.formData) setFormData(newData.formData);
         if (newData.chatTranscript) setChatTranscript(newData.chatTranscript);
-        if (newData.userInput) {
-          if(newData.userInput===" ") setUserInput("")
-          else  setUserInput(newData.userInput);
-        }
+        // if (newData.userInput) {
+        //   if(newData.userInput===" ") setUserInput("")
+        //   else  setUserInput(newData.userInput);
+        // }
         
       }
     };
@@ -489,6 +496,8 @@ const App = () => {
 
 
   const handleSendMessage = () => {
+    
+    setUserInput("")
     fetch(SERVER_URL+'/saveUserInput', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

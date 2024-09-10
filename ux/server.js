@@ -89,8 +89,10 @@ async function sendUpdates() {
   }
 }
 
-chokidar.watch([dataFilePath, chatTranscriptPath, userInputPath])
-  .on('change', sendUpdates);
+chokidar.watch([dataFilePath, chatTranscriptPath, userInputPath], {
+  usePolling: true,
+  interval: 500 // Poll every 100ms (10 times per second)
+}).on('change', sendUpdates);
 
 app.post('/save', async (req, res) => {
   
