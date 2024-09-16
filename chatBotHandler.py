@@ -1,106 +1,11 @@
-import os
-import json
-import time
-from openai import OpenAI
+from askGpt import *
 
-os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
-# os.chdir("/root/planning-doc-chatbot")
 
-my_key = open('key_to_gpt.txt','r').readline()
-client = OpenAI(api_key=my_key)
-
-def update_data_state(data_state_updates):
-    # Read the current full data state
-    with open("data_state.txt", "r") as f:
-        current_data_state = json.load(f)
-    
-    # Perform a deep merge of the updates into the current state
-    def deep_merge(base, updates):
-        for key, value in updates.items():
-            if isinstance(value, dict) and key in base and isinstance(base[key], dict):
-                deep_merge(base[key], value)
-            elif value is None:
-                # If the value is None, remove the key
-                base.pop(key, None)
-            else:
-                base[key] = value
-    
-    deep_merge(current_data_state, data_state_updates)
-    
+def update_data_state(data_state):
     # Write the updated state back to the file
     with open("data_state.txt", "w") as f:
-        json.dump(current_data_state, f, indent=2)
+        json.dump(data_state, f, indent=2)
 
-def update_chat_transcript(message, is_initial=True):
-    with open('ux/chatTranscript.json', 'r+') as file:
-        chat_history = json.load(file)
-        if is_initial:
-            # Add a new message
-            chat_history['messages'].append({"role": "Negotiation Coach", "content": message})
-        else:
-            # Replace the last message with the final response
-            chat_history['messages'][-1] = {"role": "Negotiation Coach", "content": message}
-        file.seek(0)
-        json.dump(chat_history, file)
-        file.truncate()
-
-def ask_gpt(prompt: str):
-    user_prompt = {
-        "role": "user",
-        "content": prompt
-    }
-    
-    update_chat_transcript("Thinking", is_initial=True)
-    
-    stream = client.chat.completions.create(
-        model="gpt-4-0125-preview",
-        messages=[user_prompt],
-        stream=True
-    )
-
-    full_response = ""
-    dot_count = 0
-    for chunk in stream:
-        if chunk.choices[0].delta.content is not None:
-            full_response += chunk.choices[0].delta.content
-            dot_count += 1
-            if dot_count % 5 == 0:  # Update every 5 chunks
-                update_chat_transcript(f"Thinking{'.' * (dot_count // 5)}", is_initial=False)
-
-    # Try to parse the full response as JSON
-    try:
-        content = json.loads(full_response)
-    except json.JSONDecodeError:
-        print("Error: Failed to parse the full response as JSON")
-        content = {"response_to_user": full_response, "action": "", "data_state": {}}
-
-    # Save content history
-    with open("content_history.txt", "a") as f:
-        f.write(json.dumps(content) + "\n\n###\n\n")
-    
-    return content
-
-def ask_gpt_data(prompt: str):
-    user_prompt = {
-        "role": "user",
-        "content": prompt
-    }
-    
-
-    
-    completion = client.chat.completions.create(
-        model="gpt-4o",
-        # model="gpt-4o-mini",
-        response_format={"type": "json_object"},
-        messages=[
-            user_prompt
-        ]
-    )
-
-    # content = json.loads(completion.choices[0].message.content)
-    content = completion.choices[0].message.content
-
-    return content
 
 def update_instructions_prompt_file(new_step):
     with open("instructionsPromptFile.txt", "w") as f:
@@ -181,7 +86,16 @@ def main():
     with open("last_prompt.txt", "w") as f:
         f.write(prompt)
 
+
+    # run user-response prompt
+    import time
+    start_time = time.time()
     content = ask_gpt(prompt)
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print(f"run_fn() took {execution_time:.4f} seconds to run.")
+
+    print(content)
 
     # Update chat transcript with final response
     update_chat_transcript(content['response_to_user'], is_initial=False)
@@ -198,11 +112,12 @@ def main():
     with open("last_datastate_prompt.txt", "w") as f:
         f.write(data_state_prompt)
 
-    datastate_content = ask_gpt_data(data_state_prompt)
+    # run data state prompt
+    data_state = ask_gpt_data(data_state_prompt)
 
     
     # Update data state
-    update_data_state(datastate_content['output']['json_update'])
+    update_data_state(data_state)
 
     # Handle action
     action = content['action']

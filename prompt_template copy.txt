@@ -216,13 +216,13 @@ Your output should contain the following format:
 Here is the conversation so far:
 
 ### CONVERSATION HISTORY###
-conversation_thread
+{conversation_thread}
 ### END CONVERSATION HISTORY###
 
 And here is the current data state for your coaching process.
 
 ### CURRENT DATA STATE ###
-current_data_state
+{current_data_state}
 ### END CURRENT DATA STATE###
 
 
