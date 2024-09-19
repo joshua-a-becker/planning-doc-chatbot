@@ -1,0 +1,29 @@
+You now must carefully choose your response.
+
+First, use all of the information provided in the entire conversation to consider the situation.  Explain yourself before making your final choice.
+
+Then, determine which action to perform.
+
+Then, note any relevant action_data i.e. details for that action.  For example, you might need details such as feelings/topics/values for a structured reflection or just a text note for a process map.
+
+Finally, you will put that together into an actual textual response to the user.  We will extract that response and show it to the user.
+
+One last step:  if you have instructions to output special notes, start by carefully following those instructions. Output "BLANK" for that section if you have no instruction.
+
+Your output should contain the following format:
+
+### EXAMPLE OUTPUT ###
+{
+	"special_notes" : "special_notes_instructions_for_here_or_BLANK",
+	"action_explanation" : "thought process goes here",
+	"action" : "some_action_goes_here",
+	"action_data" : { 
+		"example_data_header" : {
+			"feelings": ["excited", "nervous"]
+			, "values": ["job security", "saving for retirement"]
+			, "topics": ["salary", "benefits", "job opportunity"]
+		},
+ 	},
+	"response_to_user" : "response goes here"
+}
+### END EXAMPLE OUTPUT###

@@ -336,7 +336,7 @@ const PersonForm = ({ personNumber, data, updateData }) => {
   );
 };
 
-const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage, handleResetSystem }) => {
+const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage, handleResetSystem, autoChatOnce, autoChatRun, isAutoChatting }) => {
   const messagesContainerRef = useRef(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
 
@@ -372,7 +372,10 @@ const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage,
 
   return (
     <div style={styles.chatTranscript}>
-      <h2>Chat With Negotiation Coach  <button onClick={handleResetSystem}>reset system</button></h2>
+      <h2>Chat With Negotiation Coach  
+        <button onClick={handleResetSystem}>reset system</button>
+        <button onClick={autoChatRun}>autochat {isAutoChatting ? "stop" : "start"}</button>
+        <button onClick={autoChatOnce}>autochat once</button></h2>
       <div 
         ref={messagesContainerRef} 
         style={styles.messagesContainer}
@@ -412,6 +415,7 @@ const App = () => {
 
   const [formClosed, setFormClosed] = useState(1);
 
+  const [isAutoChatting, setIsAutoChatting] = useState(false);
   
   useEffect(() => {
     const eventSource = new EventSource(SERVER_URL+'/events');
@@ -429,6 +433,59 @@ const App = () => {
     };
     return () => eventSource.close();
   }, []);
+
+
+  const autoChatOnce = async () => {
+    
+      try {
+        console.log("Running auto chat once...");
+        const response = await fetch(SERVER_URL + '/auto-chat', { method: 'POST' });
+        if (!response.ok) {
+          throw new Error('Auto-chat request failed');
+        }
+        console.log("Auto-chat complete");
+      
+      } catch (error) {
+        console.error('Error in auto-chat:', error);
+        setIsAutoChatting(false);
+      }
+
+  }
+  
+  const autoChatRun = useCallback(() => {
+    setIsAutoChatting(prev => !prev);
+  }, []);
+  
+
+  useEffect(() => {
+    if (!isAutoChatting) return;
+  
+    const runAutoChat = async () => {
+      try {
+        console.log("Running auto chat...");
+        const response = await fetch(SERVER_URL + '/auto-chat', { method: 'POST' });
+        if (!response.ok) {
+          throw new Error('Auto-chat request failed');
+        }
+        console.log("Auto-chat complete");
+  
+        if (isAutoChatting) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          runAutoChat();
+        }
+      } catch (error) {
+        console.error('Error in auto-chat:', error);
+        setIsAutoChatting(false);
+      }
+    };
+  
+    runAutoChat();
+  
+    return () => {
+      console.log("Cleaning up auto-chat");
+      // Any cleanup code if needed
+    };
+  }, [isAutoChatting]);
 
 
   const saveFormData = async (newData) => {
@@ -511,6 +568,11 @@ const App = () => {
     console.log("reset")
   }
 
+  // const autoChatOnce = () => {
+  //   fetch(SERVER_URL+'/auto-chat', { method: 'POST' });
+  //   console.log("reset")
+  // }
+
   const handleSetForm = () => {
     setFormClosed(prevState => prevState === 0 ? 1 : 0);
   }
@@ -525,6 +587,9 @@ const App = () => {
           onUserInputChange={handleUserInputChange}
           onSendMessage={handleSendMessage}
           handleResetSystem={handleResetSystem}
+          autoChatOnce={autoChatOnce}
+          autoChatRun={autoChatRun}
+          isAutoChatting={isAutoChatting}
         />
       </div>
       <button 

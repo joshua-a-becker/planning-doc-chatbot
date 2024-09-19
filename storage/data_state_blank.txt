@@ -1,0 +1,8 @@
+{
+    "structured_notes" : {
+        "expansive_topics": {}, 
+        "narrow_topics": []
+    },
+    "additional_notes" : "additional narrative notes go here",
+    "unaddressed_questions" : ["list of?", "remaining questions?"]
+}

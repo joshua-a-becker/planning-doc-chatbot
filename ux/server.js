@@ -4,6 +4,7 @@ const path = require('path');
 const cors = require('cors');
 const chokidar = require('chokidar');
 const { exec } = require('child_process');
+const hljs = require('highlight.js');
 
 const app = express();
 const PORT = 3001;
@@ -115,6 +116,18 @@ app.post('/saveUserInput', async (req, res) => {
   }
 });
 
+app.post('/auto-chat', (req, res) => {
+  exec('python3 ../clientBot.py; python3 ../chatBotHandler.py', { detached: true }, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return res.status(500).send('Error running reset script');
+    }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+    res.status(200).send('autochat command executed successfully');
+  });
+});
+
 app.post('/runChatBot', (req, res) => {
   exec('python3 ../chatBotHandler.py', { detached: true }, (error, stdout, stderr) => {
     if (error) {
@@ -138,6 +151,43 @@ app.post('/reset', (req, res) => {
     res.status(200).send('reset script executed successfully');
   });
 });
+
+app.get('/data-state', async (req, res) => {
+  try {
+    const dataStatePath = path.join(__dirname, '../storage/data_state.txt');
+    const dataStateText = await fs.readFile(dataStatePath, 'utf8');
+    
+    // Parse the text content as JSON
+    const dataState = JSON.parse(dataStateText);
+
+
+    res.setHeader('Content-Type', 'application/json');
+    res.send(dataState);
+  } catch (error) {
+    console.error('Error reading data_state.txt:', error);
+    res.status(500).send('Error reading data state');
+  }
+});
+
+
+app.get('/last-content', async (req, res) => {
+  try {
+    
+    const file_text = await fs.readFile(path.join(__dirname, '../storage/last_content.txt'), 'utf8');
+    
+    // Parse the text content as JSON
+    const display_json = JSON.parse(file_text);
+
+
+    res.setHeader('Content-Type', 'application/json');
+    res.send(display_json);
+  } catch (error) {
+    console.error('Error reading data_state.txt:', error);
+    res.status(500).send('Error reading data state');
+  }
+});
+
+
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

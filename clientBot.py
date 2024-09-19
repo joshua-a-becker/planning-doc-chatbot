@@ -1,9 +1,14 @@
+import os
+
+os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
+# os.chdir("/root/planning-doc-chatbot")
+
 import json
 from openai import OpenAI
 
 # File paths
 chat_history_file = 'ux/chatTranscript.json'
-prompt_template_file = 'client_prompt_template.txt'
+prompt_template_file = 'prompts/client_prompt_template.txt'
 api_key_file = 'key_to_gpt.txt'
 
 # Read API key and initialize OpenAI client
@@ -31,10 +36,14 @@ response = client.chat.completions.create(
 api_response = response.choices[0].message.content
 
 # Append response to chat history
-chat_history['messages'].append({"role": "Client Negotiator", "content": api_response})
+# chat_history['messages'].append({"role": "Client Negotiator", "content": api_response})
+
+with open("ux/user-input.txt", 'w') as f:
+    json.dump(api_response, f, indent=2)
 
 # Save updated chat history
-with open(chat_history_file, 'w') as f:
-    json.dump(chat_history, f, indent=2)
+# with open(chat_history_file, 'w') as f:
+#     json.dump(chat_history, f, indent=2)
 
-print("Response added to chat history.")
+# print("Response added to chat history.")
+print("Response saved to user input")

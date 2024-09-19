@@ -1,3 +1,4 @@
+import time
 import os
 from openai import OpenAI
 import json
@@ -9,30 +10,60 @@ my_key = open('key_to_gpt.txt','r').readline()
 client = OpenAI(api_key=my_key)
 
 
+def get_or_create_thread():
+    thread_file = "storage/thread_id.txt"
+    if os.path.exists(thread_file):
+        with open(thread_file, 'r') as f:
+            thread_id = f.read().strip()
+        return thread_id
+    else:
+        with open('ux/chatTranscript.json', 'r') as file:
+            message_history = json.load(file)['messages']
 
-def ask_gpt(prompt: str):
-    user_prompt = {
-        "role": "user",
-        "content": prompt
-    }
+        thread = client.beta.threads.create()
+
+
+        with open(thread_file, 'w') as f:
+            f.write(thread.id)
+
+        # Populate the thread with existing messages        
+        for message in message_history:
+            if message["content"]=="": 
+                continue 
+            client.beta.threads.messages.create(
+                thread_id=thread.id,
+                role="user" if message["role"] == "Client Negotiator" else "assistant",
+                content=message["content"]
+            )
+        return thread.id
+
+
+def ask_gpt(instructions_prompt, thread_id):
+    # Create or retrieve the assistant
+    assistant = client.beta.assistants.create(
+        name="Negotiation Coach",
+        instructions=instructions_prompt,
+        model="gpt-4-0125-preview"
+    )
     
-    update_chat_transcript("Thinking", is_initial=True)
-    
-    stream = client.chat.completions.create(
-        model="gpt-4-0125-preview",
-        messages=[user_prompt],
-        stream=True
+    # Run the assistant
+    run = client.beta.threads.runs.create(
+        thread_id=thread_id,
+        assistant_id=assistant.id
     )
 
-    full_response = ""
+    # Stream the response
+    update_chat_transcript("Thinking", is_initial=True)
     dot_count = 0
-    for chunk in stream:
-        if chunk.choices[0].delta.content is not None:
-            full_response += chunk.choices[0].delta.content
+    while run.status != "completed":
+        run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
+        if run.status == "in_progress":
             dot_count += 1
-            if dot_count % 10 == 0:  # Update every 10 chunks
-                update_chat_transcript(f"Thinking{'. ' * (dot_count // 5)}", is_initial=False)
+            update_chat_transcript(f"Thinking{'. ' * (dot_count // 1)}", is_initial=False)
 
+    
+    full_response = client.beta.threads.messages.list(thread_id=thread_id, order="desc", limit=1).data[0].content[0].text.value
+    
     # Try to parse the full response as JSON
     try:
         content = json.loads(full_response)
@@ -41,10 +72,17 @@ def ask_gpt(prompt: str):
         content = {"response_to_user": full_response, "action": "", "data_state": {}}
 
     # Save content history
-    with open("content_history.txt", "a") as f:
-        f.write(json.dumps(content) + "\n\n###\n\n")
+    # after getting the current step
+    with open("storage/instructionsPromptFile.txt", 'r') as file:
+        current_step = file.read()
+    with open("storage/content_history.txt", "a") as f:
+        f.write("current step: " + current_step + "\n\n" +json.dumps(content) + "\n\n###\n\n")
     
+    with open("storage/last_content.txt", "w") as f:
+        f.write(json.dumps(content))
+
     return content
+
 
 def ask_gpt_data(prompt: str):
     user_prompt = {
