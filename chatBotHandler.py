@@ -56,10 +56,10 @@ def main():
 
     if(os.path.isfile("storage/data_state.txt")) :
         with open('storage/data_state.txt', 'r') as file:
-            data_state = json.load(file)
+            data_state = file.read()
     else: 
         with open('storage/data_state_blank.txt', 'r') as file:
-            data_state = json.load(file)
+            data_state = file.read()
         
     
     # update chat history
@@ -89,7 +89,7 @@ def main():
 
     # Prepare prompt
     prompt = prompt_template.replace("{instructions_prompt_file}", instructions_prompt_file) \
-        .replace("{current_data_state}", json.dumps(data_state)) \
+        .replace("{current_data_state}", data_state) \
         .replace("{conversation_thread}", json.dumps(chat_history)) \
         .replace("{output_prompt_component}", output_prompt_component) \
         .replace("{current_instructions_prompt}", instructions_prompt) \
@@ -130,6 +130,8 @@ def main():
 
     # run data state prompt
     data_state = ask_gpt_data(datastate_prompt)
+    # print(isinstance(data_state, str))
+    # print(json.dumps(data_state))
 
     
     # Write the updated state back to the file

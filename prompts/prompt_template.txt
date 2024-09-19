@@ -22,6 +22,7 @@ Your process follows four steps, after which you will send a "terminate_program"
 - step_two_topics_validating
 - step_three_topics_values
 - step_four_batna
+- step_five_perspective_topics
 
 Here is what each step means.
 
@@ -32,6 +33,8 @@ Here is what each step means.
 - step_three_topics_values is a step where you will guide the client in considering their needs/interests/values for each topic.
 
 - step_four_batna is a step where you will ask the client to identify their Best Alternative, aka "BATNA".
+
+- step_five_perspective_topics is where you revisit the topics for needs/interests but a best guess for the other party.
 
 You are currently on step: {instructions_prompt_file}.
 

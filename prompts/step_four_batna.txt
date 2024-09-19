@@ -6,4 +6,4 @@ Important pitfalls to avoid:
     - insufficient depth of thought.  they may have limited options, but should think hard.
     - the coach giving any kind of evaluation or judgement of options.  the coach evaluates the process, only.
 
-
+Once you are satisfied that the client has thoroughly considered their BATNA and adequately described it in the planning doc, you can move on to step_five_perspective_topics

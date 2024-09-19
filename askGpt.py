@@ -64,6 +64,9 @@ def ask_gpt(instructions_prompt, thread_id):
     
     full_response = client.beta.threads.messages.list(thread_id=thread_id, order="desc", limit=1).data[0].content[0].text.value
     
+    print("FULL RESPONSE") 
+    print(full_response)
+
     # Try to parse the full response as JSON
     try:
         content = json.loads(full_response)
@@ -109,12 +112,15 @@ def ask_gpt_data(prompt: str):
 def update_chat_transcript(message, is_initial=True):
     with open('ux/chatTranscript.json', 'r+') as file:
         chat_history = json.load(file)
-        if is_initial:
-            # Add a new message
-            chat_history['messages'].append({"role": "Negotiation Coach", "content": message})
-        else:
-            # Replace the last message with the final response
-            chat_history['messages'][-1] = {"role": "Negotiation Coach", "content": message}
+        
+    if is_initial:
+        # Add a new message
+        chat_history['messages'].append({"role": "Negotiation Coach", "content": message})
+    else:
+        # Replace the last message with the final response
+        chat_history['messages'][-1] = {"role": "Negotiation Coach", "content": message}
+    
+    with open('ux/chatTranscript.json', 'r+') as file:
         file.seek(0)
         json.dump(chat_history, file)
         file.truncate()
