@@ -47,7 +47,7 @@ async function getInitialData() {
       readFileJSON(chatTranscriptPath),
       readFileText(userInputPath)
     ]);
-    return { formData, chatTranscript: chatTranscript, userInput };
+    return { formData, chatTranscript: chatTranscript?.messages, userInput };
   } catch (error) {
     console.error('Error reading initial data:', error);
     return { formData: null, chatTranscript: null, userInput: '' };
@@ -81,8 +81,7 @@ async function sendUpdates() {
   try {
     const [formData, chatTranscript, userInput] = await Promise.all([
       readFileJSON(dataFilePath),
-      //readFileJSON(chatTranscriptPath),
-      "asdf",
+      readFileJSON(chatTranscriptPath),
       readFileText(userInputPath)
     ]);
     sendEventsToAll({ formData, chatTranscript: chatTranscript?.messages, userInput });
