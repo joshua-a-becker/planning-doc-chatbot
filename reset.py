@@ -36,7 +36,7 @@ f.close()
 
 # reset prompt file to step_one_intro_discovery
 f = open("storage/instructionsPromptFile.txt", "w")
-f.write("step_one_intro_discovery")
+f.write("step_zero_explain_process")
 f.close()
 
 # clear user input

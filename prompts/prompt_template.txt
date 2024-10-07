@@ -80,16 +80,11 @@ Here are your notes so far, aka the "data state" in JSON format:
 <#### CURRENT CLIENT PLANNING DOC ####>
 Your client has a planning doc template open, and you can see what they write.  It starts blank by default.
 
-Here is your clients current planning doc:
+Here is your client's current planning doc:
 
 {planning_doc_data}
 </#### END PLANNING DOC ####>
 
-
-<#### CONVERSATION HISTORY ####>
-Here is your conversation so far:
-{conversation_thread}
-</#### END CONVERSATION HISTORY ####>
 
 Now.  Consider your instructions again, and choose your action/response carefully.
 

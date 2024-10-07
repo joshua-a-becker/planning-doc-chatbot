@@ -1,1 +1,1 @@
-{"topics":[{"topic":"visitor management","justification":"Focuses on strategies to handle the number of visitors effectively, which is neutral and can be planned around.","status":"included"},{"topic":"forest conservation","justification":"Centers on preserving the environmental quality of the forest, presenting a clear area for planning and agreement.","status":"included"}]}
+BLANK
