@@ -372,7 +372,7 @@ const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage,
 
   return (
     <div style={styles.chatTranscript}>
-      <h2>Chat With Negotiation Coach  <br/>
+      <h2>Chat With Negotiation Coach  
         <button onClick={handleResetSystem}>reset system</button>
         <button onClick={autoChatRun}>autochat {isAutoChatting ? "stop" : "start"}</button>
         <button onClick={autoChatOnce}>autochat once</button></h2>
@@ -428,6 +428,7 @@ const App = () => {
         //   if(newData.userInput===" ") setUserInput("")
         //   else  setUserInput(newData.userInput);
         // }
+        
       }
     };
     return () => eventSource.close();
