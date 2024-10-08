@@ -19,8 +19,9 @@ const userInputPath = (userId) => path.join(__dirname, `user-input_${userId}.txt
 let clients = [];
 let watcher = null;
 
-app.get('/events/:userId', async (req, res) => {
+app.get('/events/:userId/:sessionId', async (req, res) => {
   const userId = req.params.userId;
+  const sessionId = userId; //reqs.params.sessionId
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -42,17 +43,17 @@ app.get('/events/:userId', async (req, res) => {
 
 
   // Send initial data to the client
-  const initialData = await getInitialData(userId);
+  const initialData = await getInitialData(userId, sessionId);
   res.write(`data: ${JSON.stringify(initialData)}\n\n`);
 
   res.write('data: connected\n\n');
 });
 
-async function getInitialData(userId) {
+async function getInitialData(userId, sessionId) {
   try {
     const [formData, chatTranscript, userInput] = await Promise.all([
       readFileJSON(dataFilePath(userId)),
-      readFileJSON(chatTranscriptPath(userId)),
+      readFileJSON(chatTranscriptPath(sessionId)),
       readFileText(userInputPath(userId))
     ]);
     return { formData, chatTranscript: chatTranscript, userInput };
@@ -86,11 +87,11 @@ async function readFileText(filepath) {
   }
 }
 
-async function sendUpdates(userId) {
+async function sendUpdates(userId, sessionId) {
   try {
     const [formData, chatTranscript, userInput] = await Promise.all([
       readFileJSON(dataFilePath(userId)),
-      readFileJSON(chatTranscriptPath(userId)),
+      readFileJSON(chatTranscriptPath(sessionId)),
       readFileText(userInputPath(userId))
     ]);
     sendEventsToAll(userId, { formData, chatTranscript, userInput });
@@ -101,9 +102,10 @@ async function sendUpdates(userId) {
 
 
 
-app.post('/initialize/:userId', async (req, res) => {
+app.post('/initialize/:userId/:sessionId', async (req, res) => {
 
   const userId = req.params.userId;
+  const sessionId = userId; //req.params.sessionId TBD
   
   console.log("initializing " + userId)
 
@@ -116,7 +118,7 @@ app.post('/initialize/:userId', async (req, res) => {
     }
   }
 
-  const chatTranscriptExists = await fileExists(path.join(__dirname, `chatTranscript_${userId}.json`));
+  const chatTranscriptExists = await fileExists(path.join(__dirname, `chatTranscript_${sessionId}.json`));
 
   // console.log("file exists: " + chatTranscriptExists)
 
@@ -126,7 +128,7 @@ app.post('/initialize/:userId', async (req, res) => {
 
     console.log('Executing command:', command); // Debug output
 
-    exec(command, { detached: true }, (error, stdout, stderr) => {
+    await exec(command, { detached: true }, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error in initialization: ${error}`);
         return res.status(500).send('Error running reset script');
@@ -141,7 +143,7 @@ app.post('/initialize/:userId', async (req, res) => {
 
   const { dataFilePath, chatTranscriptPath, userInputPath } = {
     dataFilePath: path.join(__dirname, `formData_${userId}.json`),
-    chatTranscriptPath: path.join(__dirname, `chatTranscript_${userId}.json`),
+    chatTranscriptPath: path.join(__dirname, `chatTranscript_${sessionId}.json`),
     userInputPath: path.join(__dirname, `user-input_${userId}.txt`)
   }
 
@@ -158,7 +160,7 @@ app.post('/initialize/:userId', async (req, res) => {
   });
 
   watcher.on('change', (path) => {
-    sendUpdates(userId);
+    sendUpdates(userId, sessionId);
   });
 
   res.status(200).send('Initialization complete');
@@ -185,7 +187,7 @@ app.post('/saveUserInput/:userId', async (req, res) => {
   const command = `python3 "${scriptPath}" "${userId}" "${userInput}"`;
 
 
-  exec(command, { detached: true }, (error, stdout, stderr) => {
+  await exec(command, { detached: true }, (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       return res.status(500).send('Error running saveUserInput.py');
@@ -209,15 +211,16 @@ app.post('/auto-chat', (req, res) => {
   });
 });
 
-app.post('/runChatBot/:userId', (req, res) => {
+app.post('/runChatBot/:userId/:sessionId', (req, res) => {
 
   
 
   const userId = req.params.userId;
+  const sessionId = userId; // req.params.sessionId
   const userInput = req.body.userInput
   
   
-  const command = `python3 ../chatBotHandler.py ${userId} "${userInput}" &`;
+  const command = `python3 ../chatBotHandler.py ${userId} ${sessionId} "${userInput}" &`;
   // const command = "echo hello"
 
   console.log('Run chatbot Executing command:', command); // Debug output

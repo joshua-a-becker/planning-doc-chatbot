@@ -6,7 +6,8 @@ from db_handler import db
 print("startup chatbothandler")
 
 user_id = sys.argv[1]
-user_input = sys.argv[2]
+user_session_id = sys.argv[2]
+user_input = sys.argv[3]
 
 print("User: " + user_id)
 
@@ -90,7 +91,7 @@ def main():
     # run user-response prompt
     import time
     start_time = time.time()
-    content = ask_gpt(prompt, thread_id, instructions_prompt_file)
+    content = ask_gpt(prompt, thread_id, session_id, user_id, instructions_prompt_file)
     end_time = time.time()
     execution_time = end_time - start_time
     print(f"run_fn() took {execution_time:.4f} seconds to run.")

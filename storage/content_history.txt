@@ -364,3 +364,63 @@ current step: step_zero_explain_process
 
 ###
 
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user greeted in a casual, friendly manner, indicating a positive and receptive attitude towards the conversation. My response will continue with the explanation of the process to build upon this positive engagement, aiming to inform the client about the structured approach we will be taking during our conversation.", "action": "process_map", "action_data": {"text_note": {"explanation": "Our conversation will follow a very structured process. We'll start with an introductory discovery phase where I'll ask broad questions to learn more about the background of your negotiation. This will help us identify the primary topics for negotiation, as well as the needs, interests, and values of all parties involved. We'll then validate these topics and delve into understanding your needs/interests/values for each, followed by some strategic thinking, including identifying your Best Alternative (BATNA) and considering the perspective of the other party. Our goal is to help you prepare as thoroughly as possible for your negotiation."}}, "response_to_user": "Hey there! Great to have you. I'm going to walk you through our negotiation preparation process. We'll start by discussing your negotiation to understand it better, identify key topics, and then delve into both your and the other party's perspectives. Our structured approach is designed to ensure you're well-prepared. Do you have any specific questions about how we'll proceed?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user has acknowledged the explanation and seems ready to proceed, using casual language to express their readiness. Given this positive engagement, it's appropriate to move forward to the next step in the process without requiring further clarification at this stage.", "action": "change_step", "action_data": {"justification": "Given the user's understanding and acceptance of the process explanation, it's fitting to transition to the introductory discovery phase, where we start gathering background information about the negotiation.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Awesome, glad to hear you're ready to dive in! Let's move on to learning more about your negotiation. I'll be asking you some broad questions to start. Looking forward to it!"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's response indicates they're ready and comfortable with moving forward, using casual and affirmative language. At this point, communication acknowledges their readiness and initiates the transition to the next phase of the process.", "action": "change_step", "action_data": {"justification": "The user's response shows they're engaged and ready to proceed with the process. The transition has already been initiated to step_one_intro_discovery, and this response confirms the user is following along.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Great, let's get started with the introductory discovery phase. Could you share a bit about the negotiation you're preparing for? Who's involved, and what's at stake?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's response indicates they're ready and comfortable with moving forward, using casual and affirmative language. At this point, communication acknowledges their readiness and initiates the transition to the next phase of the process.", "action": "change_step", "action_data": {"justification": "The user's response shows they're engaged and ready to proceed with the process. The transition has already been initiated to step_one_intro_discovery, and this response confirms the user is following along.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Great, let's get started with the introductory discovery phase. Could you share a bit about the negotiation you're preparing for? Who's involved, and what's at stake?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's response, indicated by 'ok??', suggests a need for more specific guidance or clarification about what they're expected to share next. It's an opportunity to direct the conversation more pointedly towards gathering background information on their negotiation situation.", "action": "open_ended_question", "action_data": {"text_note": {"question": "To help us get started, could you describe the negotiation context you're facing? For instance, what is the negotiation about, who are the parties involved, and what are the main points or issues that need to be addressed?"}}, "response_to_user": "Absolutely, let's get into it. Could you describe the negotiation context you're facing? For example, what is the negotiation about, who are the parties involved, and what are the main points or issues that need to be addressed?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The client has repeated the same response, 'asdfasdf', which indicates either continued testing of the system, a misunderstanding of how to interact with the platform, or a placeholder without intent to communicate a specific question or topic. Considering the importance of keeping the session focused on negotiation preparation, it's crucial to remain patient and understanding, while also gently steering the conversation back towards the intended purpose of negotiation coaching.", "action": "general_comment", "action_data": {"comment_details": {"observation": ["It seems like we might be having a bit of difficulty with communication. I'm here to help and support you through your negotiation preparation."]}}, "response_to_user": "I see we're still facing a bit of a mix-up with the responses. Just a gentle reminder that I'm here to help you prep for your negotiation in any way that I can. If you have any questions about the negotiation process or if you're ready to discuss the details of your upcoming negotiation, I'm all ears!"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's response doesn't provide information relevant to the negotiation coaching process, nor does it ask a question related to our current step of explaining the negotiation preparation process. Given the nonsensical nature of the response, it's important to gently guide the conversation back on track. A process map action will be used here to reiterate the steps of the process, maintaining a conversational and inviting tone that encourages the user to engage meaningfully with the coaching session.", "action": "process_map", "action_data": {"text_note": {"guidance": "Let's focus on our negotiation preparation process."}}, "response_to_user": "I see your response, but let's try to stay on track with our negotiation preparation. I'm here to guide you through a structured process that we'll use to map out your negotiation planning. First, we'll learn about the negotiation's background. Then, we'll identify the key negotiation topics, uncover the needs and interests of all parties, consider your best alternatives, and finally, take a look at the negotiation from the other party's perspective. How does that sound to you?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's response 'here wego' indicates readiness to proceed with the explanation or the next steps of the negotiation coaching process. Given this indication of readiness, it's appropriate to move on to the first step of the negotiation preparation process. This transition will align with following the structured process of negotiation coaching, beginning with step one focused on introductory discovery. Moving to the next step will ensure that the user is guided through the process effectively, starting with gathering background information on the negotiation.", "action": "change_step", "action_data": {"justification": "The user indicated readiness to move forward with the process, making it appropriate to transition to the step focused on introductory discovery.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Great to hear you're ready to dive in! Let's start with some introductory discovery. Could you tell me a bit about the negotiation you're preparing for? What's the context, and who are the parties involved?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "Given the client continues with the same response despite the termination signal, it seems that further communication is not productive at this moment. However, since the response format requires an answer, acknowledging the situation respectfully while emphasizing the termination of the program is appropriate.", "action": "terminate_program", "action_data": {"termination_reason": {"reason": ["Repeated non-responsive behavior.", "Completion of the termination process."]}}, "response_to_user": "It appears we're at an impasse. I've noted your responses and have completed our session for now. Should you decide to engage with the negotiation preparation process in the future, feel free to start anew. Take care!"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user seems to be prompting for the next step or seeking clarity on how to proceed. This indicates a need to guide them to the next phase of the process directly.", "action": "change_step", "action_data": {"justification": "After explaining the process, it is appropriate to move forward to allow the user to begin discussing their negotiation. This transition is in line with guiding them through the structured negotiation preparation process.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Great, let's move into the first phase of our discussion. Tell me a bit about the negotiation you're preparing for. What's the context and who are the parties involved?"}
+
+###
+

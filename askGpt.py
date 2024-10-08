@@ -29,7 +29,7 @@ def get_or_create_thread(db_thread_id, message_history):
 
 
 
-def ask_gpt(instructions_prompt, thread_id, current_step):
+def ask_gpt(instructions_prompt, thread_id, session_id, user_id, current_step):
     # Create or retrieve the assistant
     assistant = client.beta.assistants.create(
         name="Negotiation Coach",
@@ -44,13 +44,13 @@ def ask_gpt(instructions_prompt, thread_id, current_step):
     )
 
     # Stream the response
-    update_chat_display("Thinking", is_initial=True)
+    update_chat_display("Thinking", user_id, is_initial=True)
     dot_count = 0
     while run.status != "completed":
         run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
         if run.status == "in_progress":
             dot_count += 1
-            update_chat_display(f"Thinking{'. ' * (dot_count // 1)}", is_initial=False)
+            update_chat_display(f"Thinking{'. ' * (dot_count // 1)}", user_id, is_initial=False)
 
     
     full_response = client.beta.threads.messages.list(thread_id=thread_id, order="desc", limit=1).data[0].content[0].text.value
@@ -97,8 +97,8 @@ def ask_gpt_data(prompt: str):
 
 
 
-def update_chat_display(message, is_initial=True):
-    with open('ux/chatTranscript.json', 'r+') as file:
+def update_chat_display(message, user_id, is_initial=True):
+    with open('ux/chatTranscript_'+user_id+'.json', 'r+') as file:
         chat_history = json.load(file)
         
     if is_initial:
@@ -108,7 +108,7 @@ def update_chat_display(message, is_initial=True):
         # Replace the last message with the final response
         chat_history[-1] = {"role": "Negotiation Coach", "content": message}
     
-    with open('ux/chatTranscript.json', 'r+') as file:
+    with open('ux/chatTranscript_'+user_id+'.json', 'r+') as file:
         file.seek(0)
         json.dump(chat_history, file)
         file.truncate()

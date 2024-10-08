@@ -427,7 +427,7 @@ const App = () => {
   const initialize = async () => {
     if(!initialized){
       try {
-        const response = await fetch(SERVER_URL+'/initialize/'+userId, { method: 'POST' }); 
+        const response = await fetch(SERVER_URL+'/initialize/'+userId+'/'+"sessionId", { method: 'POST' }); 
         setInitialized(true)
         console.log("initialized:" + initialized)
         console.log(response)
@@ -440,7 +440,7 @@ const App = () => {
   initialize()
 
   useEffect(() => {
-    const eventSource = new EventSource(SERVER_URL+'/events/'+userId);
+    const eventSource = new EventSource(SERVER_URL+'/events/'+userId+'/'+'sessionId');
     eventSource.onmessage = (event) => {
       if (event.data !== 'connected') {
         const newData = JSON.parse(event.data);
@@ -581,7 +581,7 @@ const App = () => {
     // }
     
     try {
-      await fetch(SERVER_URL+'/runChatBot/'+userId, {
+      await fetch(SERVER_URL+'/runChatBot/'+userId+'/'+'sessionId', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userInput: userInput }),
