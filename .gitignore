@@ -3,3 +3,10 @@ chat_history.txt
 data_state.txt
 .venv/
 .DS_Store
+message.log
+storage/content_history.txt
+storage/database.json
+storage/last_content.txt
+ux/chatTranscript*.json
+ux/formData*.json
+message.log

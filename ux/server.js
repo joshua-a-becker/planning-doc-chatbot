@@ -50,6 +50,7 @@ app.get('/events/:userId/:sessionId', async (req, res) => {
 });
 
 async function getInitialData(userId, sessionId) {
+
   try {
     const [formData, chatTranscript, userInput] = await Promise.all([
       readFileJSON(dataFilePath(userId)),
@@ -199,7 +200,11 @@ app.post('/saveUserInput/:userId', async (req, res) => {
   
 });
 
-app.post('/auto-chat', (req, res) => {
+app.post('/auto-chat/:userId/:sessionId', (req, res) => {
+
+  const userId = req.params.userId;
+  const sessionId = userId; // req.params.sessionId
+
   exec('python3 ../clientBot.py; python3 ../chatBotHandler.py', { detached: true }, (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
@@ -211,7 +216,7 @@ app.post('/auto-chat', (req, res) => {
   });
 });
 
-app.post('/runChatBot/:userId/:sessionId', (req, res) => {
+app.post('/runChatBot/:userId/:sessionId', async (req, res) => {
 
   
 
@@ -228,7 +233,7 @@ app.post('/runChatBot/:userId/:sessionId', (req, res) => {
   console.log("run command")
 
 
-  exec(command, { detached: true }, (error, stdout, stderr) => {
+  await exec(command, { detached: true }, (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       return res.status(500).send('Error running chatbothandler script');

@@ -45,7 +45,7 @@ def main():
 
     ### load planning doc data
     ### NEEDS UPDATING!!! not on the database.
-    planning_doc_data = db.load_planning_doc_data(session_id)
+    planning_doc_data = db.load_planning_doc_data(user_id) #TBD <- session_id
     
     ### load special notes
     special_notes = db.get_special_notes(session_id)
@@ -100,8 +100,10 @@ def main():
     chat_history = db.get_chat_history(session_id)
     with open('ux/chatTranscript_'+user_id+'.json', 'w') as file:
         json.dump(chat_history, file)
+
     # update last prompt
     db.update_last_prompt(session_id, prompt)
+    print("Propmpt:\n"+prompt)
 
     # update database with final response
     db.update_chat_history(session_id, {"role": "Negotiation Coach", "content": content['response_to_user']})
