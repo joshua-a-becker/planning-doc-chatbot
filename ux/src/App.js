@@ -1,6 +1,7 @@
 import debounce from 'lodash/debounce';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Send } from 'lucide-react';
+//import { useParams } from 'react-router-dom';
 
 // const SERVER_URL = "http://167.99.10.184:3001"
 const SERVER_URL = "http://localhost:3001"
@@ -410,25 +411,41 @@ const App = () => {
     person1: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
     person2: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' }
   });
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const userId  = urlParams.get('userId')
   const [chatTranscript, setChatTranscript] = useState([]);
   const [userInput, setUserInput] = useState('');
+
+  const [initialized, setInitialized] = useState(false);
 
   const [formClosed, setFormClosed] = useState(1);
 
   const [isAutoChatting, setIsAutoChatting] = useState(false);
   
+
+  const initialize = async () => {
+    if(!initialized){
+      try {
+        const response = await fetch(SERVER_URL+'/initialize/'+userId, { method: 'POST' }); 
+        setInitialized(true)
+        console.log("initialized:" + initialized)
+        console.log(response)
+        return response;
+      } catch (error) {
+        console.error('Error initializing:', error);
+      }  
+    }
+  }
+  initialize()
+
   useEffect(() => {
-    const eventSource = new EventSource(SERVER_URL+'/events');
+    const eventSource = new EventSource(SERVER_URL+'/events/'+userId);
     eventSource.onmessage = (event) => {
       if (event.data !== 'connected') {
         const newData = JSON.parse(event.data);
         if (newData.formData) setFormData(newData.formData);
         if (newData.chatTranscript) setChatTranscript(newData.chatTranscript);
-        // if (newData.userInput) {
-        //   if(newData.userInput===" ") setUserInput("")
-        //   else  setUserInput(newData.userInput);
-        // }
-        
       }
     };
     return () => eventSource.close();
@@ -490,7 +507,7 @@ const App = () => {
 
   const saveFormData = async (newData) => {
     try {
-      await fetch(SERVER_URL+'/save', {
+      await fetch(SERVER_URL+'/save/'+userId, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newData),
@@ -535,7 +552,7 @@ const App = () => {
     debounce((input) => {
       
       if(input===userInput){
-        fetch(SERVER_URL+'/saveUserInput', {
+        fetch(SERVER_URL+'/saveUserInput/'+userId, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userInput: input }),
@@ -551,21 +568,38 @@ const App = () => {
     debouncedSaveUserInput(newInput);
   };
 
-
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     
+    // try {
+    //   await fetch(SERVER_URL+'/saveUserInput/'+userId, {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ userInput: userInput }),
+    //   });
+    // } catch (error) {
+    //   console.error('Error saving user input:', error);
+    // }
+    
+    try {
+      await fetch(SERVER_URL+'/runChatBot/'+userId, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userInput: userInput }),
+      });
+    } catch (error) {
+      console.error('Error running chatbot:', error);
+    }
+
+    
+    
+    
+
     setUserInput("")
-    fetch(SERVER_URL+'/saveUserInput', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userInput: userInput }),
-    });
-    fetch(SERVER_URL+'/runChatBot', { method: 'POST' });
   };
 
   const handleResetSystem = () => {
-    fetch(SERVER_URL+'/reset', { method: 'POST' });
-    console.log("reset")
+    fetch(SERVER_URL+'/reset/'+userId, { method: 'POST' });
+    console.log("reset ok")
   }
 
   // const autoChatOnce = () => {
@@ -577,6 +611,10 @@ const App = () => {
     setFormClosed(prevState => prevState === 0 ? 1 : 0);
   }
 
+
+  if(userId===null) {
+    return("invalid URL")
+  }
 
   return (
     <div style={styles.app}>

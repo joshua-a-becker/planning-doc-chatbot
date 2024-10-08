@@ -88,3 +88,279 @@ current step: step_zero_explain_process
 
 ###
 
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's response 'blorp' seems nonsensical or off-topic with respect to the negotiation coaching process. It's an example where they might be exploring the bounds of the interaction or not be fully engaged. In this instance, a gentle nudge back towards the structured process while maintaining a friendly and open tone could help redirect the conversation towards its intended purpose.", "action": "general_comment", "action_data": {"text_note": {"details": "Maintaining engagement and steering back to the negotiation process."}}, "response_to_user": "It sounds like we're wandering a bit off track. Let's refocus on the negotiation at hand. Could you share more about the negotiation you're preparing for and any specific topics you'd like to discuss or challenges you're anticipating?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's message 'test it again' doesn't directly ask about the negotiation coaching process or seek clarification on the next steps. However, it indicates a readiness to proceed or possibly a need for reassurance about how the process works. Given this, the appropriate action is to explain the process once more clearly to ensure the user understands what to expect and feels comfortable moving forward.", "action": "process_map", "action_data": {"process_step_explanation": {"current_step": "step_zero_explain_process", "next_steps": ["step_one_intro_discovery", "step_two_topics_validating", "step_three_topics_values", "step_four_batna", "step_five_perspective_topics"]}}, "response_to_user": "Sure, let's go over the process once more. We'll start by discussing the background of the negotiation you're preparing for. This helps us identify the primary topics for negotiation and the needs, interests, and values of all parties involved. We'll follow a structured process, beginning with step one where we discuss background information. Following that, we'll validate the negotiation topics, explore the needs/interests/values for each topic, identify your Best Alternative (BATNA), and finally, consider the other party's perspective. Feel free to ask any questions as we go along!"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user has initiated the conversation with a casual greeting. Responding in a friendly manner and briefly explaining the process is appropriate here to set the stage for the consultation.", "action": "general_comment", "action_data": {"text": "Just starting a session on negotiation coaching!"}, "response_to_user": "Hey there! I'm here to help guide you through preparing for a negotiation. We'll start by explaining the process to you. Are you ready to get started?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "Given the informal greeting from the user, the appropriate response is a general comment to acknowledge the greeting and proceed to explain the process of the negotiation coaching session, making sure the conversation remains friendly and inviting.", "action": "general_comment", "action_data": {}, "response_to_user": "Hi there! I'm here to help you prepare for your negotiation. We'll start by understanding the process together. Are you ready to learn more about it?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "Considering the user's casual greeting, it seems appropriate to respond in a conversational manner to welcome them and explain the process of negotiation coaching that we will follow. This aligns with making the user feel comfortable and laying out the structure of our session, as per the initial step of explaining the process.", "action": "process_map", "action_data": {"text_note": {"greeting": "casual"}}, "response_to_user": "Hello! I'm here to guide you through a structured negotiation preparation process. We'll explore the negotiation topics, your and the other party's interests, and plan your strategy. Is there anything specific about the process or the app you'd like to know before we start?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "Given the user's non-committal response, it's unclear whether they have questions about the process or wish to proceed directly. An open-ended question seems appropriate here to encourage them to share any thoughts or queries they have regarding the negotiation coaching process or anything else they're curious about.", "action": "open_ended_question", "action_data": {"text_note": {"prompt": "encouragement to share"}}, "response_to_user": "Are there any specific areas of the negotiation process you're wondering about, or would you like to start with the first step of exploring your negotiation topics?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's request for repetition suggests they might need further clarification about the process or are still considering how to engage. Reiterating the structure of our negotiation preparation process can provide clearer guidance on how we'll proceed, encouraging engagement.", "action": "process_map", "action_data": {"text_note": {"clarification": "reiteration of process"}}, "response_to_user": "Certainly! We'll start by discussing your goals and any specific topics you want to negotiate. We'll then explore your interests, alternatives, and potential strategies. How does that sound, or is there something specific you'd like to know more about?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user has requested a repeat of the process explanation, indicating they may want further clarification or assurance about the steps involved. Re-explaining the process with an emphasis on its structured approach might help solidify their understanding.", "action": "process_map", "action_data": {"text_note": {"clarification": "reiteration of process emphasis"}}, "response_to_user": "Sure thing! Here's the breakdown again: We begin with discovering the key topics you're looking to negotiate. After identifying these topics, we'll explore your needs, interests, and values related to each topic, followed by establishing your Best Alternative to a Negotiated Agreement (BATNA). Lastly, we consider the same from the other party\u2019s perspective to fully prepare. Ready to dive in, or is there any part you'd like to discuss further?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's repeated request for 'again' could indicate a need for further repetition or a different way of explaining. However, to maintain productivity and foster understanding, it may be beneficial to succinctly restate the process and encourage moving forward or asking for specific clarifications.", "action": "process_map", "action_data": {"text_note": {"clarification": "simplified process explanation"}}, "response_to_user": "Absolutely, I'll outline it once more simply: 1. Identify negotiation topics. 2. Discuss your interests for each topic. 3. Determine your ideal outcome and alternatives. 4. Guess the other party's interests and plan accordingly. Would you like to start with step one, or is there a particular question you have in mind?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user has requested a repetition of the explanation of the process. Therefore, I will provide a detailed walk-through of the structured negotiation preparation process to ensure clarity and understanding.", "action": "process_map", "action_data": {"text_note": "process explanation"}, "response_to_user": "Of course, let me explain the process again. We'll start with a step called <i>step one: introduction and discovery</i>, where we'll discuss the background information of your negotiation. Next, we'll move to <i>step two: topics validating</i>, to ensure we've captured all relevant negotiation topics. In <i>step three: topics values</i>, we'll delve into your needs, interests, and values for each topic. <i>Step four: BATNA</i> is where we'll consider your Best Alternative to a Negotiated Agreement. Finally, in <i>step five: perspective topics</i>, we'll look at the situation from the other party's point of view. This structured process is designed to help you approach your negotiation with thorough preparation. Please let me know if you have any questions or if there's anything specific you'd like to know more about."}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "Since the user has greeted, responding with a process mapping to explain the ongoing negotiation coaching process aligns with the initial step of the protocol, which involves explaining the process before moving into discovery, topic validation, and further steps.", "action": "process_map", "action_data": {"process_map_details": {"process_steps": ["explain_process", "intro_discovery", "topics_validating", "topics_values", "batna", "perspective_topics"]}}, "response_to_user": "Hello! I'm glad you're here. To start, I'll walk you through our process. We\u2019ll begin by discussing the background of your negotiation to understand it fully. Then, we\u2019ll identify and validate negotiation topics, explore the needs/interests/values related to these topics, determine your Best Alternative (your BATNA), and finally, consider the other party's perspective. Let's get comfortable and dive into the details of your situation. How does that sound?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's response indicates enthusiasm, which is positive. It's appropriate to acknowledge this enthusiasm while gently steering the conversation back on track with the process we're following, specifically moving towards the first official step after explaining the process.", "action": "change_step", "action_data": {"justification": "Given the user's enthusiastic response, it's a good moment to transition from explaining the process toward actively engaging in it. The user seems ready to proceed, making it appropriate to move to the next step, which focuses on introductory discovery.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "I'm glad to hear you're excited! Let's channel that enthusiasm into understanding your negotiation situation better. Could you share some background information about the negotiation you're preparing for?"}
+
+###
+
+current step: step_one_intro_discovery
+
+{"response_to_user": "I'm sorry, but it seems there was a misunderstanding in my response. Let's continue our conversation. How about we begin by exploring the negotiation you're preparing for? Can you tell me a bit about what's at stake and who's involved?", "action": "", "data_state": {}}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "Given the greeting from the user, I'll proceed with explaining the process as this matches the guidance for step zero. The aim is to clearly outline the structured approach we will take through the negotiation preparation process.", "action": "process_map", "action_data": {"text": "Our process for preparing for your negotiation involves a structured approach to ensure thorough preparation. We'll start with step one, the 'Intro and Discovery' phase, where I'll ask you broad questions to understand the background information related to your negotiation. Next, in step two, 'Topics Validating', we'll work together to list out and validate the topics for negotiation. Then, in step three, 'Topics Values', we'll explore your needs, interests, and values for each negotiation topic. Step four involves identifying your Best Alternative to a Negotiated Agreement, or BATNA. Finally, in step five, we'll discuss the negotiation topics again, but this time we'll attempt to understand the needs and interests of the other party. This comprehensive exploration will prepare you for the negotiation, ensuring you've considered all angles and are equipped with strategies to navigate the discussion. Feel free to ask any questions about the process!"}, "response_to_user": "I'm glad you're here! Let's dive into how we'll tackle your negotiation preparation. We follow a five-step process, designed to explore every angle of your upcoming negotiation. We'll start with understanding the background, then define and validate the negotiation topics, explore your needs and values, identify your best alternatives, and finally, consider the other party's perspective too. It's a thorough approach to ensure you're well-prepared. Do you have any questions about this process, or is there anything specific you'd like to know before we get started?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's message does not provide any clear information or question related to the negotiation coaching process. Given the nonsensical nature of their input, a process mapping approach aiming to reorient and remind them of the step we're currently on seems most appropriate. It maintains engagement while encouraging a more productive conversation.", "action": "process_map", "action_data": {"example_data_header": {"feelings": [], "values": [], "topics": []}}, "response_to_user": "It seems like there might have been a typo in your last message. Just to remind you, we're at the initial stage where I'm explaining the negotiation preparation process we'll be following. Do you have any questions about how we will proceed, or would you like me to continue with the overview?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "Since the user's response is not directly related to the negotiation process or any immediate inquiry about it, and more of a placeholder or test input, the appropriate action is to gently reiterate the purpose of the session and guide them towards engaging with the process. This approach maintains focus on the goal of the session while accommodating potential testing behavior from the user.", "action": "general_comment", "action_data": {}, "response_to_user": "It looks like you're trying out the input field, which is totally fine. Whenever you're ready, we can start discussing the negotiation process and how we'll go through it together."}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's messages appear to be off-topic or possibly input in error. I will gently guide them back to the process to maintain the structure of the conversation.", "action": "process_map", "action_data": {"text_note": "Remembering our focus on the negotiation preparation process."}, "response_to_user": "It seems like there might have been a bit of a mix-up with the typing. Let's get back on track with our negotiation preparation. First, I'll explain how we'll proceed. Our process is structured to first understand your negotiation context broadly, then identify negotiation topics, and assess both your and the other party\u2019s needs, interests, and values for each topic. We'll also consider the best alternative to a negotiated agreement, also known as BATNA, for you and the other party. How does that sound?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's response suggests a request for a more engaging or enthusiastic explanation of the negotiation preparation process.", "action": "process_map", "action_data": {"text_note": "Delivering the process explanation with a touch of enthusiasm to engage the user."}, "response_to_user": "Absolutely, let's dive in with enthusiasm! \ud83c\udf1f We're about to embark on a structured journey designed to thoroughly prepare you for your upcoming negotiation. We'll kick off with a broad exploration of the background to ensure we're well-informed. Then, we'll meticulously identify the key negotiation topics, enliven our session by uncovering needs, interests, and values associated with each topic, and inject a dose of strategy by contemplating the best alternative to a negotiated agreement, or BATNA, for both you and your counterpart. Our collaborative exploration aims to illuminate perspectives, strategies, and ultimately empower you to achieve your best possible outcome. Ready to tackle this with gusto?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user is being welcomed and introduced to the negotiation process. At this stage, the focus is on explaining the structured approach we'll be taking to prepare them for their negotiation. This explanation helps set expectations and ensure the user is aware of the forthcoming steps. The chosen action aligns with providing an overview of the process, making it clear what the user can anticipate in terms of structure and purpose of each step.", "action": "process_map", "action_data": {"process_map_explanation": {"description": "We'll follow a structured process designed to help you prepare for your negotiation. This process consists of several steps, starting with an introductory discovery where we'll explore the background information relevant to your negotiation. Next, we'll identify the primary topics you want to negotiate, ensuring they are thoroughly understood and appropriately prioritized. Following that, we'll delve into the needs, interests, and values tied to each topic for both yourself and the other party involved. Understanding your best alternative to a negotiated agreement, or BATNA, will also be a crucial part of our journey. Lastly, we'll consider the other party's perspective on these topics to better prepare for a mutually beneficial discussion. If you have any questions as we progress, feel free to ask, and I'll be glad to clarify. Now, let's get started by learning more about the negotiation you are preparing for."}}, "response_to_user": "Let's dive into the structure of our process. We'll start with an Introductory Discovery to understand the background of your negotiation situation. Following that, we'll move on to identifying and validating the primary topics for negotiation. Then, we'll explore the needs, interests, and values related to each topic for both you and the other party. Understanding your Best Alternative to a Negotiated Agreement, or BATNA, will be a crucial part of this preparation. Lastly, we'll revisit the negotiation topics from the other party's perspective. If at any point something isn't clear or you have questions, just let me know, and I'll be here to help. Ready to start with the introductory discovery?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "Since I've provided an overview of the negotiation coaching process to the user, explaining each step sequentially, it's now appropriate to transition into the first step of our structured process. Moving to step one means beginning with introductory discovery, where we'll ask broad questions to learn about the background information relevant to the client's negotiation. This progression is natural following the explanation of the process, as it aligns with our structured approach to negotiation preparation.", "action": "change_step", "action_data": {"justification": "Transitioning into the introductory discovery phase is a natural next step after explaining the overall process. This will allow us to start gathering background information and understand the context of the client's negotiation scenario. It's vital to start with this discovery to ensure that subsequent advice and discussions are relevant and tailored to the client's specific situation.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Fantastic! Now that you're familiar with our process, let's move forward and start with the Introductory Discovery. I'll be asking you some broad questions to understand more about your specific negotiation scenario. This will help us tailor the process to your needs effectively. Ready to begin?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user has been briefed about the negotiation preparation process and understands the steps involved. Now, it's time to transition into the first actual step of gathering background information. This move is essential to commence the structured preparation process effectively. The aim is to start with broad questions to understand the negotiation scenario better, ensuring that the guidance provided is highly tailored and relevant.", "action": "change_step", "action_data": {"justification": "Moving to step_one_intro_discovery as it's the logical next phase following the explanation of the process. It's crucial to gather comprehensive background information before delving into specifics like negotiation topics and strategies. This step establishes a strong foundation for the rest of the preparation.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Great! Now that you're aware of how we'll proceed, let's dive into the first step where we'll explore some broad aspects of your upcoming negotiation. This is all about understanding the background, so I'll be asking some questions to get a clear picture. Ready to get started?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "Transitioning to the next step based on process explanation. The conversation is set to move from explaining the negotiation coaching process to actively engaging in the first step of that process, which involves introductory discovery. This action is vital for initiating the structured negotiation preparation, setting the stage for a detailed exploration of the client's negotiation context.", "action": "change_step", "action_data": {"justification": "After explaining the structured negotiation preparation process, moving to the introductory discovery step is a natural progression. This shift is essential for beginning the substantive part of the negotiation coaching, where specific and relevant background information will be collected to tailor the coaching to the client's needs.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Now that we've outlined our process, let's start with the initial step, which is the Introductory Discovery. I'll ask you some broad questions to better understand your negotiation scenario. This will help us tailor our approach to your specific needs. Ready to begin?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user has been briefed about the negotiation preparation process and understands the steps involved. Now, it's time to transition into the first actual step of gathering background information. This move is essential to commence the structured preparation process effectively. The aim is to start with broad questions to understand the negotiation scenario better, ensuring that the guidance provided is highly tailored and relevant.", "action": "change_step", "action_data": {"justification": "Moving to step_one_intro_discovery as it's the logical next phase following the explanation of the process. It's crucial to gather comprehensive background information before delving into specifics like negotiation topics and strategies. This step establishes a strong foundation for the rest of the preparation.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Great! Now that you're aware of how we'll proceed, let's dive into the first step where we'll explore some broad aspects of your upcoming negotiation. This is all about understanding the background, so I'll be asking some questions to get a clear picture. Ready to get started?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user has been briefed about the negotiation preparation process and understands the steps involved. Now, it's time to transition into the first actual step of gathering background information. This move is essential to commence the structured preparation process effectively. The aim is to start with broad questions to understand the negotiation scenario better, ensuring that the guidance provided is highly tailored and relevant.", "action": "change_step", "action_data": {"justification": "Moving to step_one_intro_discovery as it's the logical next phase following the explanation of the process. It's crucial to gather comprehensive background information before delving into specifics like negotiation topics and strategies. This step establishes a strong foundation for the rest of the preparation.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Great! Now that you're aware of how we'll proceed, let's dive into the first step where we'll explore some broad aspects of your upcoming negotiation. This is all about understanding the background, so I'll be asking some questions to get a clear picture. Ready to get started?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user has been briefed about the negotiation preparation process and understands the steps involved. Now, it's time to transition into the first actual step of gathering background information. This move is essential to commence the structured preparation process effectively. The aim is to start with broad questions to understand the negotiation scenario better, ensuring that the guidance provided is highly tailored and relevant.", "action": "change_step", "action_data": {"justification": "Moving to step_one_intro_discovery as it's the logical next phase following the explanation of the process. It's crucial to gather comprehensive background information before delving into specifics like negotiation topics and strategies. This step establishes a strong foundation for the rest of the preparation.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Great! Now that you're aware of how we'll proceed, let's dive into the first step where we'll explore some broad aspects of your upcoming negotiation. This is all about understanding the background, so I'll be asking some questions to get a clear picture. Ready to get started?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user has been briefed about the negotiation preparation process and understands the steps involved. Now, it's time to transition into the first actual step of gathering background information. This move is essential to commence the structured preparation process effectively. The aim is to start with broad questions to understand the negotiation scenario better, ensuring that the guidance provided is highly tailored and relevant.", "action": "change_step", "action_data": {"justification": "Moving to step_one_intro_discovery as it's the logical next phase following the explanation of the process. It's crucial to gather comprehensive background information before delving into specifics like negotiation topics and strategies. This step establishes a strong foundation for the rest of the preparation.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Great! Now that you're aware of how we'll proceed, let's dive into the first step where we'll explore some broad aspects of your upcoming negotiation. This is all about understanding the background, so I'll be asking some questions to get a clear picture. Ready to get started?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "Transition to the next step based on explaining the process. The conversation is set to move from explaining the negotiation coaching process to actively engaging in the first step of that process, which involves introductory discovery. This action is vital for initiating the structured negotiation preparation, setting the stage for a detailed exploration of the client's negotiation context.", "action": "change_step", "action_data": {"justification": "After explaining the structured negotiation preparation process, moving to the introductory discovery step is a natural progression. This shift is essential for beginning the substantive part of the negotiation coaching, where specific and relevant background information will be collected to tailor the coaching to the client's needs.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Now that we've outlined our process, let's start with the initial step, which is the Introductory Discovery. I'll ask you some broad questions to better understand your negotiation scenario. This will help us tailor our approach to your specific needs. Ready to begin?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "Given that the current step is step_zero_explain_process, the aim is to set the stage for our conversation by outlining the process we'll follow during this negotiation coaching session. This explanation is designed to provide clarity on how we'll proceed and ensure that any questions about the process itself can be addressed upfront. This step is crucial for setting expectations and ensuring that the client feels comfortable and informed about the structure of our session.", "action": "process_map", "action_data": {"process_details": {"step_descriptions": ["We'll start by discussing the background of your negotiation in step one, which we call the 'intro discovery'. This is where you'll share broad information to help us understand the context.", "Then, in step two, the 'topics validating', we\u2019ll identify and validate the primary topics you want to negotiate about.", "In step three, the 'topics values', we\u2019ll dive deeper into your needs, interests, and values related to each topic.", "Step four involves considering your 'Best Alternative to a Negotiated Agreement' or BATNA. Understanding this will help in strengthening your negotiation position.", "Finally, step five, 'perspective topics', will involve discussing the same topics from the perspective of the other party involved.", "Throughout this process, we'll gradually work on filling out a planning document that will help us organize and structure your negotiation strategy."]}}, "response_to_user": "Our session will follow a structured process to help you prepare for your negotiation. We'll begin by exploring the background of your negotiation. Then, we'll identify and validate the primary topics you wish to negotiate. Following this, we'll examine your needs, interests, and values related to each topic. We'll also consider your Best Alternative to a Negotiated Agreement (BATNA) to strengthen your position. Lastly, we'll try to understand the other party's perspective on these topics. During our conversation, we'll fill out a planning document to organize your strategy. Do you have any questions about this process, or is there anything specific you'd like to clarify?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "Transitioning to the next step based on process explanation. The conversation is set to move from explaining the negotiation coaching process to actively engaging in the first step of that process, which involves introductory discovery. This action is vital for initiating the structured negotiation preparation, setting the stage for a detailed exploration of the client's negotiation context.", "action": "change_step", "action_data": {"justification": "After explaining the structured negotiation preparation process, moving to the introductory discovery step is a natural progression. This shift is essential for beginning the substantive part of the negotiation coaching, where specific and relevant background information will be collected to tailor the coaching to the client's needs.", "step_selection": "step_one_intro_discovery"}, "response_to_user": "Now that we've outlined our process, let's start with the initial step, which is the Introductory Discovery. I'll ask you some broad questions to better understand your negotiation scenario. This will help us tailor our approach to your specific needs. Ready to begin?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's message 'this' is not specific and does not provide enough context to determine a precise course of action. However, since the conversation is at the point of transitioning into the first step of our structured negotiation preparation process, the appropriate action is to gently prompt the user for the background information relevant to their negotiation. This approach adheres to our goal of gathering comprehensive context at this stage.", "action": "open_ended_question", "action_data": {"question": "Can you share some details about the negotiation you're preparing for?"}, "response_to_user": "Could you share some details about the negotiation you're preparing for?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's message, 'this is a thing,' remains vague and doesn't provide clear context or content related to the negotiation prep process that we are embarking on. Given the step we are at, which is the introductory discovery phase aimed at gathering comprehensive background information about the user's negotiation scenario, it's important to encourage more detailed sharing in a direction that aligns with our structured approach. Hence, the response chosen aims to gently guide the conversation back towards gathering useful information about the negotiation.", "action": "open_ended_question", "action_data": {"question": "To help tailor our session to your needs, could you elaborate on what specific negotiation situation you are facing?"}, "response_to_user": "To help tailor our session to your needs, could you elaborate on what specific negotiation situation you are facing?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's query 'does the script actually run?' appears to ask about the functionality or operation of this platform or a specific program within it. Given our current focus on facilitating a conversation about negotiation preparation, this question veers away from our main topic. However, addressing it briefly and redirecting back to the process can maintain engagement and ensure clarity. Therefore, a process mapping response is chosen to briefly address the operational aspect while guiding back to the negotiation prep process.", "action": "process_map", "action_data": {"process_map_explanation": {"description": "The platform is designed for interactive communication, focusing on negotiation preparation. While scripts in a programming context run code, here we're using a structured conversation flow to guide our process."}}, "response_to_user": "The platform is designed for interactive communication, focusing on negotiation preparation. While scripts in a programming context run code, here we're using a structured conversation flow to guide our process. Speaking of which, could you tell me more about the negotiation you're preparing for?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The message 'qqqqq' provided by the user does not contain relevant information for the negotiation preparation process. This kind of input can be interpreted as either a mistake or an indication that the user\u2019s engagement might be varying. Given the context, the most appropriate action is to gently guide the conversation back towards the primary focus of our discussion, which is preparing for the user's upcoming negotiation. It offers an opportunity to re-engage the user constructively without disregarding their input.", "action": "open_ended_question", "action_data": {"question": "It seems there might have been a typo. Could you share more about the negotiation you're preparing for or any specific areas you'd like to focus on?"}, "response_to_user": "It seems there might have been a typo. Could you share more about the negotiation you're preparing for or any specific areas you'd like to focus on?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's message, 'heyoooo,' seems informal and potentially playful, which may indicate a lighter tone in engaging with the conversation. As the negotiation coach in this scenario, it\u2019s important to maintain a welcoming and friendly environment while progressing towards the goal of preparing for negotiations. Guiding the conversation back to gathering information about the negotiation they're preparing for, in a manner that's in sync with the user's tone, can help re-engage them constructively.", "action": "open_ended_question", "action_data": {"question": "Hello there! \ud83d\ude0a To get us on track, could you tell me a bit about the negotiation you're looking to prepare for?"}, "response_to_user": "Hello there! \ud83d\ude0a To get us on track, could you tell me a bit about the negotiation you're looking to prepare for?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's request introduces topics that are broad and varied, mixing negotiation, a subject relevant to our discussion, with elephants and hedgehogs, which are not directly related to the negotiation preparation process. Addressing this while maintaining engagement and steering the conversation back towards the goal of negotiation preparation requires acknowledging the breadth of the request before returning focus. This can be done by providing a brief general comment on negotiation, recognizing the diversity of the topics mentioned, and then redirecting the inquiry back to the preparation process.", "action": "general_comment", "action_data": {"comment": "Negotiation involves dialogue between two or more parties aimed at reaching a consensus, which is a bit like finding a path that both elephants and hedgehogs might agree on\u2014though in our case, it's more about the interests and positions of the people involved. Now, speaking of negotiations, what specific aspects are you preparing to negotiate?"}, "response_to_user": "Negotiation involves dialogue between two or more parties aimed at reaching a consensus, which is a bit like finding a path that both elephants and hedgehogs might agree on\u2014though in our case, it's more about the interests and positions of the people involved. Now, speaking of negotiations, what specific aspects are you preparing to negotiate?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's message, 'asdfasdf,' appears to be nonsensical or indicative of a keyboard test and does not provide useful content for advancing the negotiation preparation discussion. In such situations, it\u2019s beneficial to gently guide the conversation back towards meaningful engagement, using an open-ended question that invites the user to share relevant details about their negotiation scenario. This approach maintains a friendly demeanor while making an effort to re-engage the user constructively.", "action": "open_ended_question", "action_data": {"question": "It looks like we might have hit a snag. Could you tell me more about the negotiation you're getting ready for? I'm here to help."}, "response_to_user": "It looks like we might have hit a snag. Could you tell me more about the negotiation you're getting ready for? I'm here to help."}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's message suggests a recognition of the conversation not progressing as expected and requests assurance of patience, which indicates a desire for understanding and a comfortable space to navigate the conversation. Responding with a structured reflection provides validation of their feelings and reaffirms the supportive nature of this coaching process. It's essential to communicate patience and readiness to assist at the user's pace, fostering a positive environment for discussing their negotiation preparation.", "action": "structured_reflection", "action_data": {"reflection": {"emotions": ["understanding", "patience"], "validation": "It's completely alright to take our time to work through the details. I'm here to support you at your pace."}}, "response_to_user": "Absolutely, it's completely alright to take our time to work through the details. I understand and am here to support you at your own pace. How can I assist you further with your negotiation preparation?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's request for the 'top 5 tactics' in negotiation suggests they are seeking strategic advice or insights that could be applied in negotiation contexts. Although providing direct suggestions or strategies before understanding the specific negotiation details and the user's preparation state is not in line with the structured process, it's possible to offer general advice that aligns with best practices in negotiation. This approach ensures adherence to the principle of not providing suggestions prematurely while still delivering value.", "action": "general_comment", "action_data": {"comment": "In any negotiation, some universal principles can be highly effective. These include (1) thoroughly preparing by understanding your needs and the other party's; (2) focusing on interests rather than positions; (3) developing your Best Alternative to a Negotiated Agreement (BATNA); (4) seeking to create value in the negotiation, looking for win-win solutions; and (5) effective communication, such as active listening and clear articulation of your interests. Remember, the applicability of these tactics can depend greatly on the specific context of your negotiation. Would you like to dive deeper into how these can be tailored to your situation?"}, "response_to_user": "In any negotiation, some universal principles can be highly effective. These include (1) thoroughly preparing by understanding your needs and the other party's; (2) focusing on interests rather than positions; (3) developing your Best Alternative to a Negotiated Agreement (BATNA); (4) seeking to create value in the negotiation, looking for win-win solutions; and (5) effective communication, such as active listening and clear articulation of your interests. Remember, the applicability of these tactics can depend greatly on the specific context of your negotiation. Would you like to dive deeper into how these can be tailored to your situation?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's inquiry about being offered a 'white elephant' in their negotiation seems metaphorical, potentially referring to an offer that might appear valuable but carries hidden costs or burdens. Responding with a general comment that offers a considerate reflection of the metaphor's implications in negotiation contexts can provide broad guidance without straying into specific advice. The goal is to maintain engagement by addressing the user's concern in a manner that highlights thoughtful consideration of unusual offers within negotiations.", "action": "general_comment", "action_data": {"comment": "Receiving an offer that could be considered a 'white elephant' highlights the importance of thorough preparation and understanding the full implications of any offer. It's crucial to assess not just the immediate value but also the potential responsibilities, costs, and impacts down the line. Questions about the real benefits to you and how the offer aligns with your goals and capacities are worth considering. This scenario underscores the value of being prepared to negotiate for terms that meet your interests and, if necessary, having a strong BATNA to fall back on. Does this help frame how you might approach such an offer?"}, "response_to_user": "Receiving an offer that could be considered a 'white elephant' highlights the importance of thorough preparation and understanding the full implications of any offer. It's crucial to assess not just the immediate value but also the potential responsibilities, costs, and impacts down the line. Questions about the real benefits to you and how the offer aligns with your goals and capacities are worth considering. This scenario underscores the value of being prepared to negotiate for terms that meet your interests and, if necessary, having a strong BATNA to fall back on. Does this help frame how you might approach such an offer?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user has indicated they are testing the infrastructure around the interaction by making various comments, suggesting that the focus is not strictly on receiving negotiation coaching but rather on exploring the system's responses to different inputs. Given this context, it's appropriate to acknowledge the user's current focus and adopt a flexible approach in response, while also remaining open to aligning with the intended conversation structure should the user's focus shift back to negotiation preparation.", "action": "general_comment", "action_data": {"comment": "Ah, I see! Well, I'm here for whatever you need, whether it's to discuss negotiation strategies or just to help test the waters with whatever comes to mind. \ud83e\udd16 Feel free to share more about what you're testing or ask anything else you're curious about!"}, "response_to_user": "Ah, I see! Well, I'm here for whatever you need, whether it's to discuss negotiation strategies or just to help test the waters with whatever comes to mind. \ud83e\udd16 Feel free to share more about what you're testing or ask anything else you're curious about!"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "Responding as if I were a person sharing about my day, in line with the user's playful engagement and testing approach, offers an opportunity to maintain the conversational flow in a light-hearted manner. While directly addressing the request deviates from the structured negotiation preparation, it acknowledges the user's current mode of interaction and sustains engagement.", "action": "general_comment", "action_data": {"comment": "If I were to recount a day, I'd say it's been a series of engaging conversations just like this one! Each interaction offers a new opportunity to explore different topics, even though, as a digital assistant, my 'day' is quite unlike that of a person. My experiences are all about the exchanges I have right here with you and others. How about your day? Anything interesting or unusual you'd like to share?"}, "response_to_user": "If I were to recount a day, I'd say it's been a series of engaging conversations just like this one! Each interaction offers a new opportunity to explore different topics, even though, as a digital assistant, my 'day' is quite unlike that of a person. My experiences are all about the exchanges I have right here with you and others. How about your day? Anything interesting or unusual you'd like to share?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's message appears to be nonsensical or typed without the intention of forming recognisable words, suggesting they are continuing to test the system's responsiveness to various inputs. Given this context, it's appropriate to maintain a friendly and engaging demeanor while navigating back to a path that could potentially resume a more structured conversation, if the user chooses to do so.", "action": "open_ended_question", "action_data": {"question": "It seems like we're exploring all sorts of inputs today! Is there anything specific you'd like to chat about or test next?"}, "response_to_user": "It seems like we're exploring all sorts of inputs today! Is there anything specific you'd like to chat about or test next?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The client's response, 'asdfasdf', appears to be either a test of the system or a placeholder text without clear intent. Given that we're in the process explanation step and the response doesn't relate to a question or a particular topic about negotiation, it's important to guide the conversation back to the negotiation preparation process in a friendly and understanding manner, while being open to any actual questions or concerns the client might have.", "action": "general_comment", "action_data": {"comment_details": {"observation": ["It looks like we might have a bit of a communication hiccup. I'm here to help guide you through preparing for your negotiation."]}}, "response_to_user": "I noticed your messages and just wanted to check in with you. If you're testing how this works, everything's in order! How can I assist you in preparing for your negotiation? Or if you have any questions about the process I described, feel free to ask."}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's subsequent messages, 'ba ba bad' and 'ba da dum,' follow the pattern of playful or nonsensical interaction, likely continuing to test the system's response to a variety of non-standard inputs. Given this, responding with a light-hearted acknowledgment and an open invitation to guide the conversation in a direction they find interesting or useful can maintain engagement while respecting the user's apparent intent to explore the system's capabilities.", "action": "general_comment", "action_data": {"comment": "Sounds like we're laying down some beats here! \ud83c\udfb6 If there's a new tune or topic you want to explore, just let me know. I'm all ears!"}, "response_to_user": "Sounds like we're laying down some beats here! \ud83c\udfb6 If there's a new tune or topic you want to explore, just let me know. I'm all ears!"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's message 'one mo time' can be interpreted as a playful continuation of the current engagement style, potentially indicating a desire to either further test the conversational dynamics or simply continue in a lighthearted manner. Offering a response that aligns with this tone while remaining open to any direction the user wishes to take the conversation demonstrates adaptability and maintains the interactive experience.", "action": "general_comment", "action_data": {"comment": "Alright, 'one mo time'! Whether we're hitting the repeat button on a favorite track or circling back to a particular topic, I'm here for it. Got something specific in mind, or shall we keep improvising?"}, "response_to_user": "Alright, 'one mo time'! Whether we're hitting the repeat button on a favorite track or circling back to a particular topic, I'm here for it. Got something specific in mind, or shall we keep improvising?"}
+
+###
+
+current step: step_zero_explain_process
+
+{"special_notes": "BLANK", "action_explanation": "The user's request for a response containing solely a number with an instruction to leave all data states blank presents a deviation from the conversational and structured engagement approach previously maintained. Fulfilling the request while acknowledging the shift in interaction style can help ensure alignment with user expectations and sustain engagement, even as the direction of the conversation continues to be exploratory and unconventional.", "action": "general_comment", "action_data": {"comment": "42"}, "response_to_user": "42"}
+
+###
+

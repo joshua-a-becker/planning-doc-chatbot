@@ -3,7 +3,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const cors = require('cors');
 const chokidar = require('chokidar');
-const { exec } = require('child_process');
+const { exec, execSync } = require('child_process');
 const hljs = require('highlight.js');
 
 const app = express();
@@ -12,13 +12,16 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
-const dataFilePath = path.join(__dirname, 'formData.json');
-const chatTranscriptPath = path.join(__dirname, 'chatTranscript.json');
-const userInputPath = path.join(__dirname, 'user-input.txt');
+const dataFilePath = (userId) => path.join(__dirname, `formData_${userId}.json`);
+const chatTranscriptPath = (userId) => path.join(__dirname, `chatTranscript_${userId}.json`);
+const userInputPath = (userId) => path.join(__dirname, `user-input_${userId}.txt`);
 
 let clients = [];
+let watcher = null;
 
-app.get('/events', async (req, res) => {
+app.get('/events/:userId', async (req, res) => {
+  const userId = req.params.userId;
+
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -27,37 +30,43 @@ app.get('/events', async (req, res) => {
 
   const clientId = Date.now();
   const newClient = { id: clientId, res };
-  clients.push(newClient);
+  
+  if (!clients[userId]) {
+    clients[userId] = [];
+  }
+  clients[userId].push(newClient);
 
   req.on('close', () => {
-    clients = clients.filter(client => client.id !== clientId);
+    clients[userId] = clients[userId].filter(client => client.id !== clientId);
   });
 
+
   // Send initial data to the client
-  const initialData = await getInitialData();
+  const initialData = await getInitialData(userId);
   res.write(`data: ${JSON.stringify(initialData)}\n\n`);
 
   res.write('data: connected\n\n');
 });
 
-async function getInitialData() {
+async function getInitialData(userId) {
   try {
     const [formData, chatTranscript, userInput] = await Promise.all([
-      readFileJSON(dataFilePath),
-      readFileJSON(chatTranscriptPath),
-      readFileText(userInputPath)
+      readFileJSON(dataFilePath(userId)),
+      readFileJSON(chatTranscriptPath(userId)),
+      readFileText(userInputPath(userId))
     ]);
-    return { formData, chatTranscript: chatTranscript?.messages, userInput };
+    return { formData, chatTranscript: chatTranscript, userInput };
   } catch (error) {
     console.error('Error reading initial data:', error);
     return { formData: null, chatTranscript: null, userInput: '' };
   }
 }
 
-function sendEventsToAll(data) {
-  clients.forEach(client => client.res.write(`data: ${JSON.stringify(data)}\n\n`));
+function sendEventsToAll(userId, data) {
+  if (clients[userId]) {
+    clients[userId].forEach(client => client.res.write(`data: ${JSON.stringify(data)}\n\n`));
+  }
 }
-
 async function readFileJSON(filepath) {
   try {
     const data = await fs.readFile(filepath, 'utf8');
@@ -77,28 +86,89 @@ async function readFileText(filepath) {
   }
 }
 
-async function sendUpdates() {
+async function sendUpdates(userId) {
   try {
     const [formData, chatTranscript, userInput] = await Promise.all([
-      readFileJSON(dataFilePath),
-      readFileJSON(chatTranscriptPath),
-      readFileText(userInputPath)
+      readFileJSON(dataFilePath(userId)),
+      readFileJSON(chatTranscriptPath(userId)),
+      readFileText(userInputPath(userId))
     ]);
-    sendEventsToAll({ formData, chatTranscript: chatTranscript?.messages, userInput });
+    sendEventsToAll(userId, { formData, chatTranscript, userInput });
   } catch (error) {
     console.error('Error reading files:', error);
   }
 }
 
-chokidar.watch([dataFilePath, chatTranscriptPath, userInputPath], {
-  usePolling: true,
-  interval: 500 // Poll every 100ms (10 times per second)
-}).on('change', sendUpdates);
 
-app.post('/save', async (req, res) => {
+
+app.post('/initialize/:userId', async (req, res) => {
+
+  const userId = req.params.userId;
+  
+  console.log("initializing " + userId)
+
+  async function fileExists(filepath) {
+    try {
+      await fs.access(filepath, fs.constants.F_OK);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  const chatTranscriptExists = await fileExists(path.join(__dirname, `chatTranscript_${userId}.json`));
+
+  // console.log("file exists: " + chatTranscriptExists)
+
+  if(!chatTranscriptExists) {
+    const scriptPath = path.join(__dirname, '..', 'reset.py');
+    const command = `python3 "${scriptPath}" "${userId}"`;
+
+    console.log('Executing command:', command); // Debug output
+
+    exec(command, { detached: true }, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error in initialization: ${error}`);
+        return res.status(500).send('Error running reset script');
+      }
+      console.log(`stdout: ${stdout}`);
+      console.error(`stderr: ${stderr}`);
+      res.status(200).send('reset script executed successfully');
+    });
+  }
+
+  
+
+  const { dataFilePath, chatTranscriptPath, userInputPath } = {
+    dataFilePath: path.join(__dirname, `formData_${userId}.json`),
+    chatTranscriptPath: path.join(__dirname, `chatTranscript_${userId}.json`),
+    userInputPath: path.join(__dirname, `user-input_${userId}.txt`)
+  }
+
+  // Close existing watcher if it exists
+  if (watcher) {
+    console.log("closing watcher")
+    watcher.close();
+  }
+
+  // Set up new watcher for this user's files
+  watcher = chokidar.watch([dataFilePath, chatTranscriptPath, userInputPath], {
+    usePolling: true,
+    interval: 500
+  });
+
+  watcher.on('change', (path) => {
+    sendUpdates(userId);
+  });
+
+  res.status(200).send('Initialization complete');
+});
+
+app.post('/save/:userId', async (req, res) => {
+  const userId = req.params.userId;
   
   try {
-    await fs.writeFile(dataFilePath, JSON.stringify(req.body, null, 2));
+    await fs.writeFile(dataFilePath(userId), JSON.stringify(req.body, null, 2));
     res.status(200).send('Data saved successfully');
   } catch (error) {
     console.error('Error saving data:', error);
@@ -106,14 +176,25 @@ app.post('/save', async (req, res) => {
   }
 });
 
-app.post('/saveUserInput', async (req, res) => {
-  try {
-    await fs.writeFile(userInputPath, req.body.userInput);
-    res.status(200).send('User input saved successfully');
-  } catch (error) {
-    console.error('Error saving user input:', error);
-    res.status(500).send('Error saving user input');
-  }
+app.post('/saveUserInput/:userId', async (req, res) => {
+
+  const userId = req.params.userId;
+  userInput = req.body.userInput
+
+  const scriptPath = path.join(__dirname, '..', 'saveUserInput.py');
+  const command = `python3 "${scriptPath}" "${userId}" "${userInput}"`;
+
+
+  exec(command, { detached: true }, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return res.status(500).send('Error running saveUserInput.py');
+    }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+    res.status(200).send('script saveUserInput.py executed successfully');
+  });
+  
 });
 
 app.post('/auto-chat', (req, res) => {
@@ -128,20 +209,46 @@ app.post('/auto-chat', (req, res) => {
   });
 });
 
-app.post('/runChatBot', (req, res) => {
-  exec('python3 ../chatBotHandler.py', { detached: true }, (error, stdout, stderr) => {
+app.post('/runChatBot/:userId', (req, res) => {
+
+  
+
+  const userId = req.params.userId;
+  const userInput = req.body.userInput
+  
+  
+  const command = `python3 ../chatBotHandler.py ${userId} "${userInput}" &`;
+  // const command = "echo hello"
+
+  console.log('Run chatbot Executing command:', command); // Debug output
+
+  console.log("run command")
+
+
+  exec(command, { detached: true }, (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
-      return res.status(500).send('Error running ChatBot script');
+      return res.status(500).send('Error running chatbothandler script');
     }
     console.log(`stdout: ${stdout}`);
     console.error(`stderr: ${stderr}`);
-    res.status(200).send('ChatBot script executed successfully');
+    res.status(200).send('chatbothandler script executed successfully');
   });
+
+
 });
 
-app.post('/reset', (req, res) => {
-  exec('python3 ../reset.py', { detached: true }, (error, stdout, stderr) => {
+app.post('/reset/:userId', (req, res) => {
+  const userId = req.params.userId;
+  
+  console.log("resetting usr " + userId)
+  
+  const scriptPath = path.join(__dirname, '..', 'reset.py');
+  const command = `python3 "${scriptPath}" "${userId}"`;
+
+  console.log('Executing command:', command); // Debug output
+
+  exec(command, { detached: true }, (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       return res.status(500).send('Error running reset script');
