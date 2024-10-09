@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Send } from 'lucide-react';
 //import { useParams } from 'react-router-dom';
 
-// const SERVER_URL = "http://167.99.10.184:3001"
-const SERVER_URL = "http://localhost:3001"
+const SERVER_URL = "https://planning.negotiation.solutions/data"
+//const SERVER_URL = "http://localhost:3001"
 
 const colors = {
   primary: '#3498db',
@@ -414,6 +414,9 @@ const App = () => {
 
   const urlParams = new URLSearchParams(window.location.search);
   const userId  = urlParams.get('userId')
+  const sessionId  = urlParams.get('sessionId') || "UNSPECIFIED"
+  console.log("Session ID from URL: " + sessionId)
+
   const [chatTranscript, setChatTranscript] = useState([]);
   const [userInput, setUserInput] = useState('');
 
@@ -427,7 +430,7 @@ const App = () => {
   const initialize = async () => {
     if(!initialized){
       try {
-        const response = await fetch(SERVER_URL+'/initialize/'+userId+'/'+"sessionId", { method: 'POST' }); 
+        const response = await fetch(SERVER_URL+'/initialize/'+userId+'/'+ sessionId, { method: 'POST' }); 
         setInitialized(true)
         console.log("initialized:" + initialized)
         console.log(response)

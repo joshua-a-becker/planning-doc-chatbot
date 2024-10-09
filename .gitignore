@@ -10,3 +10,4 @@ storage/last_content.txt
 ux/chatTranscript*.json
 ux/formData*.json
 message.log
+__pycache__/

@@ -37,6 +37,8 @@ class DatabaseHandler:
         }
         
         self.sessions.insert(new_session)
+
+
         return session_id
     
     def create_new_session_for_user(self, user_id):
@@ -63,11 +65,22 @@ class DatabaseHandler:
     def set_current_session_for_user(self, user_id, session_id):
         User = Query()
         user = self.users.get(User.user_id == user_id)
+
+        session = self.users.get(Sessions.session_id == session_id) 
+
+        # if session doesn't exist, return error
+        if(not session):
+            return False
+
         if user:
             self.users.update({'session_id': session_id}, User.user_id == user_id)
+            return True
         else:
             # If user doesn't exist, create new user and session
             self.users.insert({'user_id': user_id, 'session_id': session_id})
+            return True
+
+        return False
 
     def get_session(self, session_id):
         Session = Query()
@@ -143,6 +156,10 @@ class DatabaseHandler:
 
     def load_planning_doc_data(self, session_id):
         # Assuming planning_doc_data is stored in a separate JSON file
+        if not os.path.exists('ux/formData_'+session_id+'.json'):
+            with open('ux/formData_'+session_id+'.json', 'w') as f:
+                f.write(json.dumps(blank_form_data))
+
         with open('ux/formData_'+session_id+'.json', 'r') as file:
             return json.load(file)
         

@@ -1,7 +1,7 @@
 import os
 import sys
-os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
-# os.chdir("/root/planning-doc-chatbot")
+# os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
+os.chdir("/root/planning-doc-chatbot")
 
 from db_handler import db
 

@@ -3,8 +3,8 @@ import os
 from openai import OpenAI
 import json
 
-os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
-# os.chdir("/root/planning-doc-chatbot")
+# os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
+os.chdir("/root/planning-doc-chatbot")
 
 my_key = open('key_to_gpt.txt','r').readline()
 client = OpenAI(api_key=my_key)

@@ -9,6 +9,19 @@ const hljs = require('highlight.js');
 const app = express();
 const PORT = 3001;
 
+// Configuration
+const config = {
+  basePath: '/data'
+};
+
+// Middleware to remove the base path from the URL
+app.use((req, res, next) => {
+  if (req.path.startsWith(config.basePath)) {
+    req.url = req.url.slice(config.basePath.length);
+  }
+  next();
+});
+
 app.use(cors());
 app.use(express.json());
 
@@ -21,7 +34,9 @@ let watcher = null;
 
 app.get('/events/:userId/:sessionId', async (req, res) => {
   const userId = req.params.userId;
-  const sessionId = userId; //reqs.params.sessionId
+
+  const sessionId = userId //reqs.params.sessionId
+  console.log("Session ID: " + sessionId)
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -106,9 +121,23 @@ async function sendUpdates(userId, sessionId) {
 app.post('/initialize/:userId/:sessionId', async (req, res) => {
 
   const userId = req.params.userId;
-  const sessionId = userId; //req.params.sessionId TBD
+  const sessionId = req.params.sessionId; //req.params.sessionId TBD
   
-  console.log("initializing " + userId)
+  console.log("initializing user" + userId) + " session " + sessionId
+
+  // get current session ID if sessionId = "UNSPECIFIED"
+  // or create a new session if specified
+
+
+  await exec("python3 ../getSessionId.py " + userId + " " + sessionId, { detached: true }, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error in initialization: ${error}`);
+      return res.status(500).send('Error running reset script');
+    }
+    console.log(`Session ID: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+
+  });
 
   async function fileExists(filepath) {
     try {
@@ -302,6 +331,10 @@ app.get('/last-content', async (req, res) => {
   }
 });
 
+app.get('/test', (req, res) =>{
+  res.setHeader('Content-Type', 'text/html');
+  res.send("<center><b>root test</b></center>");
+})
 
 
 app.listen(PORT, () => {
