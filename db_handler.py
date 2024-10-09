@@ -66,13 +66,20 @@ class DatabaseHandler:
         User = Query()
         user = self.users.get(User.user_id == user_id)
 
-        session = self.users.get(Sessions.session_id == session_id) 
+        Sessions = Query()
+        all_sessions = self.sessions.search(Sessions.user_id == user_id)
+        session_ids = [session['session_id'] for session in all_sessions]
+        session_exists = session_id in session_ids
+
+        print(session_ids)
 
         # if session doesn't exist, return error
-        if(not session):
+        if(not session_exists):
+            print("requested to set session ID that does not exist")
             return False
 
         if user:
+            print('setting id to ' + session_id)
             self.users.update({'session_id': session_id}, User.user_id == user_id)
             return True
         else:
