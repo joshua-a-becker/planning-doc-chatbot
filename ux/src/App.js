@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Send } from 'lucide-react';
 //import { useParams } from 'react-router-dom';
 
-const SERVER_URL = "https://planning.negotiation.solutions/data"
-//const SERVER_URL = "http://localhost:3001"
+// const SERVER_URL = "https://planning.negotiation.solutions/data"
+const SERVER_URL = "http://localhost:3001"
 
 const colors = {
   primary: '#3498db',
@@ -420,30 +420,44 @@ const App = () => {
   const [chatTranscript, setChatTranscript] = useState([]);
   const [userInput, setUserInput] = useState('');
 
-  const [initialized, setInitialized] = useState(false);
+  //const [initialized, setInitialized] = useState(false);
+  const initializationPromise = useRef(null);
 
   const [formClosed, setFormClosed] = useState(1);
 
   const [isAutoChatting, setIsAutoChatting] = useState(false);
   
+  useEffect(() => {
+    const initialize = async () => {
+      console.log("attempting initialization")
+      if (!initializationPromise.current) {
+        console.log("running initialization")
+        try {
+          console.log("trying initialization")
+          const fetchUrl = SERVER_URL + '/initialize/' + userId + '/' + sessionId;
+          console.log("Fetch URL: " + fetchUrl)
+          initializationPromise.current = fetch(fetchUrl, { method: 'POST' });
+          
+          // Wait for the fetch to complete and get the response
+          const response = await initializationPromise.current;
+          
+          console.log("Response: " + await response.text())
 
-  const initialize = async () => {
-    if(!initialized){
-      try {
-        const response = await fetch(SERVER_URL+'/initialize/'+userId+'/'+ sessionId, { method: 'POST' }); 
-        setInitialized(true)
-        console.log("initialized:" + initialized)
-        console.log(response)
-        return response;
-      } catch (error) {
-        console.error('Error initializing:', error);
-      }  
-    }
-  }
-  initialize()
+        } catch (error) {
+          console.error('Error initializing:', error);
+          initializationPromise.current = null; // Reset on error to allow retrying
+          throw error;
+        }
+        console.log("end initialization run")
+      }
+      console.log("end initialiation attempt")
+    };
+
+    initialize();
+  }, []);
 
   useEffect(() => {
-    const eventSource = new EventSource(SERVER_URL+'/events/'+userId+'/'+'sessionId');
+    const eventSource = new EventSource(SERVER_URL+'/events/'+userId+'/'+sessionId);
     eventSource.onmessage = (event) => {
       if (event.data !== 'connected') {
         const newData = JSON.parse(event.data);

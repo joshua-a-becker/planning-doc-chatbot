@@ -5,6 +5,10 @@ const cors = require('cors');
 const chokidar = require('chokidar');
 const { exec, execSync } = require('child_process');
 const hljs = require('highlight.js');
+const util = require('util');
+const execPromise = util.promisify(exec);
+
+console.log("startup server")
 
 const app = express();
 const PORT = 3001;
@@ -13,6 +17,18 @@ const PORT = 3001;
 const config = {
   basePath: '/data'
 };
+
+// useful tool
+
+async function fileExists(filepath) {
+  try {
+    await fs.access(filepath, fs.constants.F_OK);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
 
 // Middleware to remove the base path from the URL
 app.use((req, res, next) => {
@@ -34,10 +50,8 @@ let watcher = null;
 
 app.get('/events/:userId/:sessionId', async (req, res) => {
   const userId = req.params.userId;
-
-  const sessionId = userId //reqs.params.sessionId
-  console.log("Session ID: " + sessionId)
-
+  const sessionId = req.params.sessionId
+  console.log("Events/:"+userId+"/:"+sessionId)
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -119,11 +133,35 @@ async function sendUpdates(userId, sessionId) {
 
 
 app.post('/initialize/:userId/:sessionId', async (req, res) => {
+  console.log("Initialize")
+  const userId = req.params.userId;
+  const sessionId = req.params.sessionId; //req.params.sessionId TBD
+  var  sessionIdReturned = null;
 
+  console.log("initializing user " + userId + " with session " + sessionId)
+
+  try {
+    const { stdout, stderr } = await execPromise(`python3 ../getSessionId.py ${userId} ${sessionId}`);
+    sessionIdReturned = stdout.trim();
+  } catch (error) {
+    console.error(`exec error in initialization: ${error}`);
+    return res.status(500).send('Error running reset script');
+  }
+
+  const chatTranscriptExists = await fileExists(path.join(__dirname, `chatTranscript_${sessionId}.json`));
+
+  console.log("end initialization")
+  console.log(`Session ID returned to server.js: ${sessionIdReturned}`)
+  res.status(200).send(`${sessionIdReturned}`);
+})
+
+app.post('/initializeX/:userId/:sessionId', async (req, res) => {
+  
+  console.log("Initialize")
   const userId = req.params.userId;
   const sessionId = req.params.sessionId; //req.params.sessionId TBD
   
-  console.log("initializing user" + userId) + " session " + sessionId
+  console.log("initializing user " + userId + " with session " + sessionId)
 
   // get current session ID if sessionId = "UNSPECIFIED"
   // or create a new session if specified
@@ -134,8 +172,6 @@ app.post('/initialize/:userId/:sessionId', async (req, res) => {
       console.error(`exec error in initialization: ${error}`);
       return res.status(500).send('Error running reset script');
     }
-    console.log(`Session ID: ${stdout}`);
-    console.error(`stderr: ${stderr}`);
 
   });
 
@@ -158,15 +194,24 @@ app.post('/initialize/:userId/:sessionId', async (req, res) => {
 
     console.log('Executing command:', command); // Debug output
 
+    var session_id_success = true;
+
     await exec(command, { detached: true }, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error in initialization: ${error}`);
-        return res.status(500).send('Error running reset script');
+        session_id_success = false;
+        //return res.status(500).send('Error running reset script');
       }
-      console.log(`stdout: ${stdout}`);
+      console.log(`SESSION ID OUT: ${stdout}`);
       console.error(`stderr: ${stderr}`);
-      res.status(200).send('reset script executed successfully');
+      //res.status(200).send('reset script executed successfully');
     });
+  }
+
+
+  if(!session_id_success) {
+    res.status(200).send('Initialization failure line 179');
+    return;
   }
 
   
@@ -193,7 +238,10 @@ app.post('/initialize/:userId/:sessionId', async (req, res) => {
     sendUpdates(userId, sessionId);
   });
 
-  res.status(200).send('Initialization complete');
+  console.log("line 204")
+  process.stdout.write("line 204\n");
+
+  res.status(200).send('Initialization complete line 204');
 });
 
 app.post('/save/:userId', async (req, res) => {
