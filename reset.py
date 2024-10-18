@@ -1,7 +1,11 @@
 import os
 import sys
+
 # os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
-os.chdir("/root/planning-doc-chatbot")
+# os.chdir("/root/planning-doc-chatbot")
+
+localdir = open('../localdir.txt', 'r').read()
+os.chdir(localdir)
 
 from db_handler import db
 

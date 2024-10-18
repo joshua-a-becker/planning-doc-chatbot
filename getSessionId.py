@@ -1,7 +1,12 @@
 import os
 import sys
+
 # os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
-os.chdir("/root/planning-doc-chatbot")
+# os.chdir("/root/planning-doc-chatbot")
+
+localdir = open('../localdir.txt', 'r').read()
+os.chdir(localdir)
+
 
 from db_handler import db
 
@@ -10,7 +15,6 @@ session_id = sys.argv[2]
 
 
 def main():
-    
     # create new session
     if(sys.argv[2]) == "NEWSESSION":
         print(db.create_new_session_for_user(user_id))
@@ -22,8 +26,10 @@ def main():
         return
 
     # set requested session to current
-    # or return error if it doesn't exist
-    success = db.set_current_session_for_user(session_id)
+    # note -- this will create a new one if it doesn't exist
+    success = db.set_current_session_for_user(user_id, session_id)
+
+    print("Success: ", success)
 
     if(success):
         print(session_id)

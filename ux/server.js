@@ -45,6 +45,8 @@ const dataFilePath = (userId) => path.join(__dirname, `formData_${userId}.json`)
 const chatTranscriptPath = (userId) => path.join(__dirname, `chatTranscript_${userId}.json`);
 const userInputPath = (userId) => path.join(__dirname, `user-input_${userId}.txt`);
 
+console.log("Chat transcript path: " + chatTranscriptPath("test123"))
+
 let clients = [];
 let watcher = null;
 
@@ -80,12 +82,14 @@ app.get('/events/:userId/:sessionId', async (req, res) => {
 
 async function getInitialData(userId, sessionId) {
 
+  console.log("Get initial data")
   try {
     const [formData, chatTranscript, userInput] = await Promise.all([
       readFileJSON(dataFilePath(userId)),
-      readFileJSON(chatTranscriptPath(sessionId)),
+      readFileJSON(chatTranscriptPath(userId)),
       readFileText(userInputPath(userId))
     ]);
+    console.log("Chat transcript: " + chatTranscript)
     return { formData, chatTranscript: chatTranscript, userInput };
   } catch (error) {
     console.error('Error reading initial data:', error);
@@ -293,22 +297,23 @@ app.post('/auto-chat/:userId/:sessionId', (req, res) => {
   });
 });
 
-app.post('/runChatBot/:userId/:sessionId', async (req, res) => {
+app.post('/runChatBot/:userId', async (req, res) => {
 
   
 
   const userId = req.params.userId;
-  const sessionId = userId; // req.params.sessionId
+  const sessionId = "THIS_IS_NOT_USED"
   const userInput = req.body.userInput
   
-  
+  console.log(userInput)
+
   const command = `python3 ../chatBotHandler.py ${userId} ${sessionId} "${userInput}" &`;
   // const command = "echo hello"
 
   console.log('Run chatbot Executing command:', command); // Debug output
 
   console.log("run command")
-
+  
 
   await exec(command, { detached: true }, (error, stdout, stderr) => {
     if (error) {
@@ -324,7 +329,9 @@ app.post('/runChatBot/:userId/:sessionId', async (req, res) => {
 });
 
 app.post('/reset/:userId', (req, res) => {
+  
   const userId = req.params.userId;
+  console.log("/reset/:"+userId)
   
   console.log("resetting usr " + userId)
   

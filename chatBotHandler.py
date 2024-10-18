@@ -1,9 +1,17 @@
+import os
+
+localdir = open('../localdir.txt', 'r').read()
+os.chdir(localdir)
+
 import sys
 from askGpt import *
 from db_handler import db
-
+import json
 
 print("startup chatbothandler")
+
+
+
 
 user_id = sys.argv[1]
 user_session_id = sys.argv[2]
@@ -31,17 +39,19 @@ def main():
     with open('prompts/output_prompt.txt', 'r') as file:
         output_prompt_component = file.read()
 
-
-    print("User input: " + user_input)
-
     # update chat history with user input
     db.update_chat_history(session_id, {"role": "Client Negotiator", "content": user_input})
 
 
+    print("User input: " + user_input)
+    
     # update chat display with user input
     chat_history = db.get_chat_history(session_id)
     with open('ux/chatTranscript_'+user_id+'.json', 'w') as file:
         json.dump(chat_history, file)
+
+    
+    print("Chat display updated")
 
     ### load planning doc data
     ### NEEDS UPDATING!!! not on the database.
@@ -61,7 +71,7 @@ def main():
     data_state = db.get_data_state(session_id)
     
     # use current thread_id to get a proper thread_id, and set it in the db, and return the value
-    thread_id = db.set_thread_id(session_id, get_or_create_thread(db.get_thread_id(session_id), chat_history))
+    thread_id = db.get_thread_id(session_id)
 
 
     if user_input != "":
@@ -96,14 +106,8 @@ def main():
     execution_time = end_time - start_time
     print(f"run_fn() took {execution_time:.4f} seconds to run.")
 
-    # update chat display with user input
-    chat_history = db.get_chat_history(session_id)
-    with open('ux/chatTranscript_'+user_id+'.json', 'w') as file:
-        json.dump(chat_history, file)
-
     # update last prompt
     db.update_last_prompt(session_id, prompt)
-    print("Propmpt:\n"+prompt)
 
     # update database with final response
     db.update_chat_history(session_id, {"role": "Negotiation Coach", "content": content['response_to_user']})

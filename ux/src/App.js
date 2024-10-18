@@ -415,7 +415,7 @@ const App = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const userId  = urlParams.get('userId')
   const sessionId  = urlParams.get('sessionId') || "UNSPECIFIED"
-  console.log("Session ID from URL: " + sessionId)
+  //console.log("Session ID from URL: " + sessionId)
 
   const [chatTranscript, setChatTranscript] = useState([]);
   const [userInput, setUserInput] = useState('');
@@ -598,7 +598,7 @@ const App = () => {
     // }
     
     try {
-      await fetch(SERVER_URL+'/runChatBot/'+userId+'/'+'sessionId', {
+      await fetch(SERVER_URL+'/runChatBot/'+userId, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userInput: userInput }),

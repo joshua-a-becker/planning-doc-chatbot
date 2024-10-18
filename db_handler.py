@@ -1,3 +1,4 @@
+from openai import OpenAI
 import os
 from tinydb import TinyDB, Query
 import json
@@ -12,6 +13,8 @@ with open('storage/formData_blank.json', 'r') as file:
 with open('storage/data_state_blank.txt', 'r') as file:
     blank_data_state = json.load(file)
 
+my_key = open('key_to_gpt.txt','r').readline()
+client = OpenAI(api_key=my_key)
 
 class DatabaseHandler:
     def __init__(self, db_path='storage/database.json'):
@@ -20,13 +23,24 @@ class DatabaseHandler:
         self.sessions = self.db.table('sessions')
         self.users = self.db.table('users') 
 
-    def create_new_session(self, user_id):
-        session_id = str(uuid.uuid4())
-        print(session_id)
+    def new_session_id(self):
+        all_sessions = self.list_all_sessions()
+        candidate_id = str(uuid.uuid4())
+        if(candidate_id in all_sessions):
+            candidate_id = self.new_session_id()
+        return candidate_id
+    
+    def list_all_sessions(self):
+        return [sessions['session_id'] for sessions in self.sessions.all()]
+
+    def create_new_session(self, user_id, session_id = "CREATESESSIONID"):
+        if(session_id == "CREATESESSIONID"):
+            session_id = self.new_session_id()
+
         new_session = {
             'session_id': session_id,
             'user_id': user_id,
-            'thread_id': "",
+            'thread_id': client.beta.threads.create().id,
             'instructions_prompt_file': 'step_zero_explain_process',
             'user_input' : '',
             'chat_history': blank_chat_history,
@@ -43,6 +57,11 @@ class DatabaseHandler:
     
     def create_new_session_for_user(self, user_id):
         session_id = self.create_new_session(user_id)
+        self.set_current_session_for_user(user_id, session_id)
+        return session_id
+    
+    def create_new_session_for_user_by_session_id(self, user_id, session_id):
+        session_id = self.create_new_session(user_id, session_id)
         self.set_current_session_for_user(user_id, session_id)
         return session_id
 
@@ -71,17 +90,17 @@ class DatabaseHandler:
         session_ids = [session['session_id'] for session in all_sessions]
         session_exists = session_id in session_ids
 
-        print(session_ids)
 
-        # if session doesn't exist, return error
-        if(not session_exists):
-            print("requested to set session ID that does not exist")
-            return False
-
+        # if user exists, load or create session
         if user:
             print('setting id to ' + session_id)
             self.users.update({'session_id': session_id}, User.user_id == user_id)
+            # if session doesn't exist, return error
+            if(not session_exists):
+                self.create_new_session_for_user_by_session_id(user_id, session_id)
+                return True
             return True
+
         else:
             # If user doesn't exist, create new user and session
             self.users.insert({'user_id': user_id, 'session_id': session_id})
@@ -191,6 +210,12 @@ class DatabaseHandler:
     def get_all_users(self):
         return self.users.all()
     
+    def get_user(self, user_id):
+        Users = Query()
+        user = self.users.get(Users.user_id == user_id)
+
+        return user
+
     def get_user_input(self, session_id):
         session = self.get_session(session_id)
         return session['user_input'] if session else ""
