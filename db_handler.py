@@ -213,7 +213,6 @@ class DatabaseHandler:
     def get_user(self, user_id):
         Users = Query()
         user = self.users.get(Users.user_id == user_id)
-
         return user
 
     def get_user_input(self, session_id):
