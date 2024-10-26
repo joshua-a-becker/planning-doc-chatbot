@@ -13,6 +13,12 @@ console.log("startup server")
 const app = express();
 const PORT = 3001;
 
+
+// maps store watchers and connections for different users
+const userWatchers = new Map();
+const userConnections = new Map();
+
+
 // Configuration
 const config = {
   basePath: '/data'
@@ -50,33 +56,129 @@ const userInputPath = (userId) => path.join(__dirname, `user-input_${userId}.txt
 let clients = [];
 let watcher = null;
 
+
+async function setupFileWatcher(userId, sessionId) {
+
+  const filesToWatch = [
+    dataFilePath(userId),
+    chatTranscriptPath(userId),
+    userInputPath(userId)
+  ];
+
+  console.log('Setting up watcher for files:', filesToWatch);
+
+  // Create empty files if they don't exist
+  for (const file of filesToWatch) {
+    try {
+      await fs.access(file, fs.constants.F_OK);
+    } catch (error) {
+      // File doesn't exist, create it
+      console.log(`Creating empty file: ${file}`);
+      try {
+        // Create empty JSON files for data and transcript
+        if (file.includes('chatTranscript')) {
+          const blankData = await fs.readFile(path.join(__dirname, '../storage/chatTranscript_blank.json'), 'utf8');
+          await fs.writeFile(file, blankData);
+        } else if(file.includes('formData')) {
+          const blankData = await fs.readFile(path.join(__dirname, '../storage/formData_blank.json'), 'utf8');
+
+          await fs.writeFile(file, blankData);
+        } else {
+          // Create empty text file for user input
+          // NOT DONE
+        }
+      } catch (error) {
+        console.error(`Error creating file ${file}:`, error);
+      }
+    }
+  }
+
+  const watcher = chokidar.watch([
+    dataFilePath(userId),
+    chatTranscriptPath(userId),
+    userInputPath(userId)
+  ], {
+    persistent: true,
+    usePolling: true,
+    interval: 100,
+    ignoreInitial: false
+  });
+
+  watcher.on('ready', () => {
+    console.log(`Watcher ready for user ${userId}`);
+  });
+
+
+  watcher.on('change', async (path) => {
+    console.log(`File changed: ${path}`);
+    await sendUpdates(userId, sessionId);
+  });
+
+  watcher.on('error', error => {
+    console.error(`Watcher error for user ${userId}:`, error);
+  });
+
+  userWatchers.set(userId, watcher);
+}
+
 app.get('/events/:userId/:sessionId', async (req, res) => {
   const userId = req.params.userId;
   const sessionId = req.params.sessionId
   console.log("RUNNING: Events/:"+userId+"/:"+sessionId)
+  console.log(`New SSE connection for user ${userId}`);
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive'
   });
+  
 
   const clientId = Date.now();
   const newClient = { id: clientId, res };
   
-  if (!clients[userId]) {
-    clients[userId] = [];
-  }
-  clients[userId].push(newClient);
+  // initialize connections and watchers
 
+  // Track the connection
+  if (!userConnections.has(userId)) {
+    console.log(`Creating new connection list for user ${userId}`);
+    userConnections.set(userId, []);
+  }
+  userConnections.get(userId).push(newClient);
+
+  // Clean up on connection close
   req.on('close', () => {
-    clients[userId] = clients[userId].filter(client => client.id !== clientId);
+    console.log(`SSE connection closed for user ${userId}, client ${clientId}`);
+    const userClients = userConnections.get(userId) || [];
+    userConnections.set(userId, userClients.filter(client => client.id !== clientId));
+    
+    // If this was the last connection for this user, clean up their watcher
+    if (userConnections.get(userId).length === 0) {
+      console.log(`No more connections for user ${userId}, cleaning up watcher`);
+      if (userWatchers.has(userId)) {
+        const watcher = userWatchers.get(userId);
+        if (watcher) {
+          try {
+            watcher.close();
+            console.log(`Watcher closed for user ${userId}`);
+          } catch (error) {
+            console.error(`Error closing watcher for user ${userId}:`, error);
+          }
+        }
+        userWatchers.delete(userId);
+      }
+    }
   });
 
+  // Set up watcher if not exists
+  if (!userWatchers.has(userId)) {
+    await setupFileWatcher(userId, sessionId);
+    userWatchers.set(userId, watcher);
+  }
+  
 
   // Send initial data to the client
   const initialData = await getInitialData(userId, sessionId);
   res.write(`data: ${JSON.stringify(initialData)}\n\n`);
-
   res.write('data: connected\n\n');
 });
 
@@ -89,8 +191,8 @@ async function getInitialData(userId, sessionId) {
       readFileJSON(chatTranscriptPath(userId)),
       readFileText(userInputPath(userId))
     ]);
-    // console.log("Chat transcript: " + chatTranscript)
-    return { formData, chatTranscript: chatTranscript, userInput };
+    // console.log("Chat transcript: " + JSON.stringify(chatTranscript))
+    return { formData, chatTranscript: chatTranscript.messages, userInput };
   } catch (error) {
     console.error('Error reading initial data:', error);
     return { formData: null, chatTranscript: null, userInput: '' };
@@ -98,11 +200,20 @@ async function getInitialData(userId, sessionId) {
 }
 
 function sendEventsToAll(userId, data) {
-  if (clients[userId]) {
-    clients[userId].forEach(client => client.res.write(`data: ${JSON.stringify(data)}\n\n`));
-  }
+  const userClients = userConnections.get(userId) || [];
+  console.log(`Sending updates to ${userClients.length} clients for user ${userId}`);
+  console.log("Sending: " + data)
+  userClients.forEach(client => {
+    try {
+      client.res.write(`data: ${JSON.stringify(data)}\n\n`);
+    } catch (error) {
+      console.error(`Error sending to client ${client.id}:`, error);
+    }
+  });
 }
+
 async function readFileJSON(filepath) {
+  console.log("Reading file: " + filepath)
   try {
     const data = await fs.readFile(filepath, 'utf8');
     return JSON.parse(data);
@@ -121,76 +232,6 @@ async function readFileText(filepath) {
   }
 }
 
-async function sendUpdatesX(userId, sessionId) {
-  console.log("Sending Updates")
-  try {
-    const [formData, chatTranscript, userInput] = await Promise.all([
-      readFileJSON(dataFilePath(userId)),
-      readFileJSON(chatTranscriptPath(userId)),
-      readFileText(userInputPath(userId))
-    ]);
-    sendEventsToAll(userId, { formData, chatTranscript, userInput });
-  } catch (error) {
-    console.error('Error reading files:', error);
-  }
-}
-
-
-app.post('/initializeX/:userId/:sessionId', async (req, res) => {
-  console.log("Initialize")
-  const userId = req.params.userId;
-  const sessionId = req.params.sessionId; //req.params.sessionId TBD
-  var  sessionIdReturned = null;
-
-  const { dataFilePath, chatTranscriptPath, userInputPath } = {
-    dataFilePath: path.join(__dirname, `formData_${userId}.json`),
-    chatTranscriptPath: path.join(__dirname, `chatTranscript_${userId}.json`),
-    userInputPath: path.join(__dirname, `user-input_${userId}.txt`)
-  }
-
-  // Close existing watcher if it exists
-  if (watcher) {
-    console.log("closing watcher")
-    watcher.close();
-  }
-
-  console.log("setting up file watcher")
-
-  // Set up new watcher for this user's files
-  console.log("WATCHING: " + chatTranscriptPath)
-  watcher = chokidar.watch([dataFilePath, chatTranscriptPath, userInputPath], {
-    usePolling: true,
-    interval: 500
-  });
-
-  watcher.on('change', (path) => {
-    sendUpdates(userId, sessionId);
-  });
-
-
-  console.log("initializing user " + userId + " with session " + sessionId)
-
-  try {
-    const { stdout, stderr } = await execPromise(`python3 ../getSessionId.py ${userId} ${sessionId}`);
-    console.log("user initialized in DB")
-    sessionIdReturned = stdout.trim();
-  } catch (error) {
-    console.error(`exec error in initialization: ${error}`);
-    return res.status(500).send('Error running reset script');
-  }
-
-  console.log("Sending initial update")
-  sendUpdates(userId, sessionId)
-
-  console.log("end initialization")
-  console.log(`Session ID returned to server.js: ${sessionIdReturned}`)
-  res.status(200).send(`${sessionIdReturned}`);
-})
-
-
-
-// Create a map to store watchers for different users
-const userWatchers = new Map();
 
 app.post('/initialize/:userId/:sessionId', async (req, res) => {
   console.log("Initialize");
@@ -198,66 +239,18 @@ app.post('/initialize/:userId/:sessionId', async (req, res) => {
   const sessionId = req.params.sessionId;
   let sessionIdReturned = null;
 
-  const filePaths = {
-    dataFilePath: path.join(__dirname, `formData_${userId}.json`),
-    chatTranscriptPath: path.join(__dirname, `chatTranscript_${userId}.json`),
-    userInputPath: path.join(__dirname, `user-input_${userId}.txt`)
-  };
-
-  // Close existing watcher for this user if it exists
-  if (userWatchers.has(userId)) {
-    console.log(`Closing watcher for user ${userId}`);
-    userWatchers.get(userId).close();
-    userWatchers.delete(userId);
-  }
-
-  console.log(`Setting up file watcher for user ${userId}`);
-  console.log("WATCHING:", [filePaths.dataFilePath, filePaths.chatTranscriptPath, filePaths.userInputPath]);
-
-  // Set up new watcher for this user's files with more verbose options
-  const watcher = chokidar.watch([
-    filePaths.dataFilePath,
-    filePaths.chatTranscriptPath,
-    filePaths.userInputPath
-  ], {
-    persistent: true,
-    usePolling: true,
-    interval: 100, // Poll more frequently
-    awaitWriteFinish: {
-      stabilityThreshold: 200,
-      pollInterval: 100
-    },
-    ignoreInitial: false
-  });
-
-  // Add debug logging for watcher events
-  watcher
-    .on('add', path => console.log(`File ${path} has been added`))
-    .on('change', async (path) => {
-      console.log(`File ${path} has been changed`);
-      await sendUpdates(userId, sessionId);
-    })
-    .on('unlink', path => console.log(`File ${path} has been removed`))
-    .on('error', error => console.error(`Watcher error: ${error}`));
-
-  // Store the watcher reference for this user
-  userWatchers.set(userId, watcher);
-
   try {
     const { stdout, stderr } = await execPromise(`python3 ../getSessionId.py ${userId} ${sessionId}`);
     console.log("User initialized in DB");
     sessionIdReturned = stdout.trim();
+    res.status(200).send(`${sessionIdReturned}`);
   } catch (error) {
     console.error(`Exec error in initialization: ${error}`);
     return res.status(500).send('Error running reset script');
   }
 
-  // Ensure initial update is sent
-  await sendUpdates(userId, sessionId);
-
   console.log("End initialization");
   console.log(`Session ID returned to server.js: ${sessionIdReturned}`);
-  res.status(200).send(`${sessionIdReturned}`);
 });
 
 // Update the sendUpdates function to include error handling and logging
@@ -271,11 +264,8 @@ async function sendUpdates(userId, sessionId) {
     ]);
     
     console.log('Read updated files successfully');
-    console.log('Broadcasting to clients:', { 
-      hasFormData: !!formData, 
-      hasChatTranscript: !!chatTranscript, 
-      hasUserInput: !!userInput 
-    });
+    console.log("Sending update CT: " + JSON.stringify(chatTranscript))
+    console.log("Broadcasting to: " + userId)
     
     sendEventsToAll(userId, { formData, chatTranscript, userInput });
   } catch (error) {
@@ -430,4 +420,16 @@ app.get('/test', (req, res) =>{
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+// Cleanup on server shutdown
+process.on('SIGINT', () => {
+  console.log('Cleaning up...');
+  for (const [userId, watcher] of userWatchers) {
+    console.log(`Closing watcher for user ${userId}`);
+    watcher.close();
+  }
+  userWatchers.clear();
+  userConnections.clear();
+  process.exit(0);
 });

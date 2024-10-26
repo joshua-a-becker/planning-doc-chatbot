@@ -339,6 +339,7 @@ const PersonForm = ({ personNumber, data, updateData }) => {
 };
 
 const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage, handleResetSystem, autoChatOnce, autoChatRun, isAutoChatting }) => {
+  window.messages=messages
   const messagesContainerRef = useRef(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
 
@@ -371,6 +372,8 @@ const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage,
       onSendMessage();
     }
   };
+
+  window.messages = messages
 
   return (
     <div style={styles.chatTranscript}>
@@ -463,7 +466,10 @@ const App = () => {
       if (event.data !== 'connected') {
         const newData = JSON.parse(event.data);
         if (newData.formData) setFormData(newData.formData);
-        if (newData.chatTranscript) setChatTranscript(newData.chatTranscript);
+        if (newData.chatTranscript) {
+          window.newData = newData
+          setChatTranscript(newData.chatTranscript);
+        }
       }
     };
     return () => eventSource.close();
