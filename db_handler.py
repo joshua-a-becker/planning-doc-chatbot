@@ -77,6 +77,13 @@ class DatabaseHandler:
             if not user['session_id']:
                 user['session_id'] = self.create_new_session(user_id)
                 self.users.update({'session_id': user['session_id']}, User.user_id == user_id)
+
+            # ## initialize the text file for display
+            session = self.get_session(user['session_id'])
+            with open('ux/chatTranscript_'+user_id+'.json', 'w') as file:
+                json.dump(session['chat_history'], file)
+            
+            
             return user['session_id']
         else:
             # If user doesn't exist, create new user and session
@@ -99,10 +106,10 @@ class DatabaseHandler:
         if user:
             print('setting id to ' + session_id)
             self.users.update({'session_id': session_id}, User.user_id == user_id)
-            # if session doesn't exist, return error
+            # if session doesn't exist ...?
             if(not session_exists):
                 self.create_new_session_for_user_by_session_id(user_id, session_id)
-                return True
+                
             return True
 
         else:

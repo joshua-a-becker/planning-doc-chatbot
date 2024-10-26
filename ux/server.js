@@ -263,9 +263,9 @@ async function sendUpdates(userId, sessionId) {
       readFileText(userInputPath(userId))
     ]);
     
-    console.log('Read updated files successfully');
-    console.log("Sending update CT: " + JSON.stringify(chatTranscript))
-    console.log("Broadcasting to: " + userId)
+    // console.log('Read updated files successfully');
+    // console.log("Sending update CT: " + JSON.stringify(chatTranscript))
+    // console.log("Broadcasting to: " + userId)
     
     sendEventsToAll(userId, { formData, chatTranscript, userInput });
   } catch (error) {
