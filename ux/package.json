@@ -20,7 +20,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "server": "nodemon --ignore formData.json --ignore user-input.txt --ignore chatTranscript.json server.js "
+    "server": "nodemon --ignore 'formData*.json' --ignore 'user-input*.txt' --ignore 'chatTranscript*.json' server.js"
   },
   "eslintConfig": {
     "extends": [

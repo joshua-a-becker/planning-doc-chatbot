@@ -68,6 +68,8 @@ def main():
     with open(("prompts/"+instructions_prompt_file+".txt"), 'r') as file:
         instructions_prompt = file.read()
 
+    print("PROMPT: " + instructions_prompt_file)
+
     data_state = db.get_data_state(session_id)
     
     # use current thread_id to get a proper thread_id, and set it in the db, and return the value
@@ -97,6 +99,7 @@ def main():
     log_file = open("message.log","a")
     sys.stdout = log_file
     
+    print("PROMPT CONTENTS: " + prompt)
 
     # run user-response prompt
     import time
@@ -105,6 +108,9 @@ def main():
     end_time = time.time()
     execution_time = end_time - start_time
     print(f"run_fn() took {execution_time:.4f} seconds to run.")
+
+    # print content
+    print("CONTENT" + json.dumps(content))
 
     # update last prompt
     db.update_last_prompt(session_id, prompt)
@@ -122,6 +128,15 @@ def main():
     # update special notes
     db.update_special_notes(session_id, content['special_notes'])
 
+    # Handle action
+    # def update_instructions_prompt_file(self, session_id, prompt_file):
+    action = content['action']
+    print("Action: " + action)
+    if action in ["change_step","step_selection"] :
+        print("CHANGING STEP TO " + content['action_data']['step_selection'])
+        db.update_instructions_prompt_file(session_id, content['action_data']['step_selection'])
+
+    print("Prompt File: " + db.get_instructions_prompt_file(session_id))
 
     print("end")
     log_file.close()

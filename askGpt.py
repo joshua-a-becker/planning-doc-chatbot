@@ -40,7 +40,7 @@ def ask_gpt(instructions_prompt, thread_id, session_id, user_id, current_step):
         assistant_id=assistant.id
     )
 
-    # Stream the response
+    # Stream the thinking indicator
     update_chat_display("Thinking", user_id, is_initial=True)
     dot_count = 0
     while run.status != "completed":

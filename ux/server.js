@@ -45,7 +45,7 @@ const dataFilePath = (userId) => path.join(__dirname, `formData_${userId}.json`)
 const chatTranscriptPath = (userId) => path.join(__dirname, `chatTranscript_${userId}.json`);
 const userInputPath = (userId) => path.join(__dirname, `user-input_${userId}.txt`);
 
-console.log("Chat transcript path: " + chatTranscriptPath("test123"))
+// console.log("Chat transcript path: " + chatTranscriptPath("test123"))
 
 let clients = [];
 let watcher = null;
@@ -53,7 +53,7 @@ let watcher = null;
 app.get('/events/:userId/:sessionId', async (req, res) => {
   const userId = req.params.userId;
   const sessionId = req.params.sessionId
-  console.log("Events/:"+userId+"/:"+sessionId)
+  console.log("RUNNING: Events/:"+userId+"/:"+sessionId)
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -89,7 +89,7 @@ async function getInitialData(userId, sessionId) {
       readFileJSON(chatTranscriptPath(userId)),
       readFileText(userInputPath(userId))
     ]);
-    console.log("Chat transcript: " + chatTranscript)
+    // console.log("Chat transcript: " + chatTranscript)
     return { formData, chatTranscript: chatTranscript, userInput };
   } catch (error) {
     console.error('Error reading initial data:', error);
@@ -121,11 +121,12 @@ async function readFileText(filepath) {
   }
 }
 
-async function sendUpdates(userId, sessionId) {
+async function sendUpdatesX(userId, sessionId) {
+  console.log("Sending Updates")
   try {
     const [formData, chatTranscript, userInput] = await Promise.all([
       readFileJSON(dataFilePath(userId)),
-      readFileJSON(chatTranscriptPath(sessionId)),
+      readFileJSON(chatTranscriptPath(userId)),
       readFileText(userInputPath(userId))
     ]);
     sendEventsToAll(userId, { formData, chatTranscript, userInput });
@@ -135,94 +136,15 @@ async function sendUpdates(userId, sessionId) {
 }
 
 
-
-app.post('/initialize/:userId/:sessionId', async (req, res) => {
+app.post('/initializeX/:userId/:sessionId', async (req, res) => {
   console.log("Initialize")
   const userId = req.params.userId;
   const sessionId = req.params.sessionId; //req.params.sessionId TBD
   var  sessionIdReturned = null;
 
-  console.log("initializing user " + userId + " with session " + sessionId)
-
-  try {
-    const { stdout, stderr } = await execPromise(`python3 ../getSessionId.py ${userId} ${sessionId}`);
-    sessionIdReturned = stdout.trim();
-  } catch (error) {
-    console.error(`exec error in initialization: ${error}`);
-    return res.status(500).send('Error running reset script');
-  }
-
-  const chatTranscriptExists = await fileExists(path.join(__dirname, `chatTranscript_${sessionId}.json`));
-
-  console.log("end initialization")
-  console.log(`Session ID returned to server.js: ${sessionIdReturned}`)
-  res.status(200).send(`${sessionIdReturned}`);
-})
-
-app.post('/initializeX/:userId/:sessionId', async (req, res) => {
-  
-  console.log("Initialize")
-  const userId = req.params.userId;
-  const sessionId = req.params.sessionId; //req.params.sessionId TBD
-  
-  console.log("initializing user " + userId + " with session " + sessionId)
-
-  // get current session ID if sessionId = "UNSPECIFIED"
-  // or create a new session if specified
-
-
-  await exec("python3 ../getSessionId.py " + userId + " " + sessionId, { detached: true }, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`exec error in initialization: ${error}`);
-      return res.status(500).send('Error running reset script');
-    }
-
-  });
-
-  async function fileExists(filepath) {
-    try {
-      await fs.access(filepath, fs.constants.F_OK);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  const chatTranscriptExists = await fileExists(path.join(__dirname, `chatTranscript_${sessionId}.json`));
-
-  // console.log("file exists: " + chatTranscriptExists)
-
-  if(!chatTranscriptExists) {
-    const scriptPath = path.join(__dirname, '..', 'reset.py');
-    const command = `python3 "${scriptPath}" "${userId}"`;
-
-    console.log('Executing command:', command); // Debug output
-
-    var session_id_success = true;
-
-    await exec(command, { detached: true }, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`exec error in initialization: ${error}`);
-        session_id_success = false;
-        //return res.status(500).send('Error running reset script');
-      }
-      console.log(`SESSION ID OUT: ${stdout}`);
-      console.error(`stderr: ${stderr}`);
-      //res.status(200).send('reset script executed successfully');
-    });
-  }
-
-
-  if(!session_id_success) {
-    res.status(200).send('Initialization failure line 179');
-    return;
-  }
-
-  
-
   const { dataFilePath, chatTranscriptPath, userInputPath } = {
     dataFilePath: path.join(__dirname, `formData_${userId}.json`),
-    chatTranscriptPath: path.join(__dirname, `chatTranscript_${sessionId}.json`),
+    chatTranscriptPath: path.join(__dirname, `chatTranscript_${userId}.json`),
     userInputPath: path.join(__dirname, `user-input_${userId}.txt`)
   }
 
@@ -232,7 +154,10 @@ app.post('/initializeX/:userId/:sessionId', async (req, res) => {
     watcher.close();
   }
 
+  console.log("setting up file watcher")
+
   // Set up new watcher for this user's files
+  console.log("WATCHING: " + chatTranscriptPath)
   watcher = chokidar.watch([dataFilePath, chatTranscriptPath, userInputPath], {
     usePolling: true,
     interval: 500
@@ -242,11 +167,122 @@ app.post('/initializeX/:userId/:sessionId', async (req, res) => {
     sendUpdates(userId, sessionId);
   });
 
-  console.log("line 204")
-  process.stdout.write("line 204\n");
 
-  res.status(200).send('Initialization complete line 204');
+  console.log("initializing user " + userId + " with session " + sessionId)
+
+  try {
+    const { stdout, stderr } = await execPromise(`python3 ../getSessionId.py ${userId} ${sessionId}`);
+    console.log("user initialized in DB")
+    sessionIdReturned = stdout.trim();
+  } catch (error) {
+    console.error(`exec error in initialization: ${error}`);
+    return res.status(500).send('Error running reset script');
+  }
+
+  console.log("Sending initial update")
+  sendUpdates(userId, sessionId)
+
+  console.log("end initialization")
+  console.log(`Session ID returned to server.js: ${sessionIdReturned}`)
+  res.status(200).send(`${sessionIdReturned}`);
+})
+
+
+
+// Create a map to store watchers for different users
+const userWatchers = new Map();
+
+app.post('/initialize/:userId/:sessionId', async (req, res) => {
+  console.log("Initialize");
+  const userId = req.params.userId;
+  const sessionId = req.params.sessionId;
+  let sessionIdReturned = null;
+
+  const filePaths = {
+    dataFilePath: path.join(__dirname, `formData_${userId}.json`),
+    chatTranscriptPath: path.join(__dirname, `chatTranscript_${userId}.json`),
+    userInputPath: path.join(__dirname, `user-input_${userId}.txt`)
+  };
+
+  // Close existing watcher for this user if it exists
+  if (userWatchers.has(userId)) {
+    console.log(`Closing watcher for user ${userId}`);
+    userWatchers.get(userId).close();
+    userWatchers.delete(userId);
+  }
+
+  console.log(`Setting up file watcher for user ${userId}`);
+  console.log("WATCHING:", [filePaths.dataFilePath, filePaths.chatTranscriptPath, filePaths.userInputPath]);
+
+  // Set up new watcher for this user's files with more verbose options
+  const watcher = chokidar.watch([
+    filePaths.dataFilePath,
+    filePaths.chatTranscriptPath,
+    filePaths.userInputPath
+  ], {
+    persistent: true,
+    usePolling: true,
+    interval: 100, // Poll more frequently
+    awaitWriteFinish: {
+      stabilityThreshold: 200,
+      pollInterval: 100
+    },
+    ignoreInitial: false
+  });
+
+  // Add debug logging for watcher events
+  watcher
+    .on('add', path => console.log(`File ${path} has been added`))
+    .on('change', async (path) => {
+      console.log(`File ${path} has been changed`);
+      await sendUpdates(userId, sessionId);
+    })
+    .on('unlink', path => console.log(`File ${path} has been removed`))
+    .on('error', error => console.error(`Watcher error: ${error}`));
+
+  // Store the watcher reference for this user
+  userWatchers.set(userId, watcher);
+
+  try {
+    const { stdout, stderr } = await execPromise(`python3 ../getSessionId.py ${userId} ${sessionId}`);
+    console.log("User initialized in DB");
+    sessionIdReturned = stdout.trim();
+  } catch (error) {
+    console.error(`Exec error in initialization: ${error}`);
+    return res.status(500).send('Error running reset script');
+  }
+
+  // Ensure initial update is sent
+  await sendUpdates(userId, sessionId);
+
+  console.log("End initialization");
+  console.log(`Session ID returned to server.js: ${sessionIdReturned}`);
+  res.status(200).send(`${sessionIdReturned}`);
 });
+
+// Update the sendUpdates function to include error handling and logging
+async function sendUpdates(userId, sessionId) {
+  console.log(`Sending updates for user ${userId}`);
+  try {
+    const [formData, chatTranscript, userInput] = await Promise.all([
+      readFileJSON(dataFilePath(userId)),
+      readFileJSON(chatTranscriptPath(userId)),
+      readFileText(userInputPath(userId))
+    ]);
+    
+    console.log('Read updated files successfully');
+    console.log('Broadcasting to clients:', { 
+      hasFormData: !!formData, 
+      hasChatTranscript: !!chatTranscript, 
+      hasUserInput: !!userInput 
+    });
+    
+    sendEventsToAll(userId, { formData, chatTranscript, userInput });
+  } catch (error) {
+    console.error('Error in sendUpdates:', error);
+  }
+}
+
 
 app.post('/save/:userId', async (req, res) => {
   const userId = req.params.userId;
@@ -299,7 +335,7 @@ app.post('/auto-chat/:userId/:sessionId', (req, res) => {
 
 app.post('/runChatBot/:userId', async (req, res) => {
 
-  
+  console.log("RUNNING CHATBOT")
 
   const userId = req.params.userId;
   const sessionId = "THIS_IS_NOT_USED"

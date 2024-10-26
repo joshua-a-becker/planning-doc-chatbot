@@ -52,6 +52,10 @@ class DatabaseHandler:
         
         self.sessions.insert(new_session)
 
+        ## initialize the text file for display
+        with open('ux/chatTranscript_'+user_id+'.json', 'w') as file:
+            json.dump(blank_chat_history, file)
+
 
         return session_id
     
@@ -173,11 +177,11 @@ class DatabaseHandler:
         session = self.get_session(session_id)
         return session['instructions_prompt_file'] if session else ""
 
-    def update_instructions_prompt_file(self, session_id, content):
+    def update_instructions_prompt_file(self, session_id, prompt_file):
         Session = Query()
         session = self.get_session(session_id)
         if session:
-            session['instructions_prompt_file'] = content
+            session['instructions_prompt_file'] = prompt_file
             self.sessions.update(session, Session.session_id == session_id)
 
     def load_planning_doc_data(self, session_id):

@@ -1,1 +1,1 @@
-/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner
+/root/planning-doc-chatbot

@@ -4,7 +4,8 @@ import { ChevronLeft, ChevronRight, Plus, Trash2, Send } from 'lucide-react';
 //import { useParams } from 'react-router-dom';
 
 // const SERVER_URL = "https://planning.negotiation.solutions/data"
-const SERVER_URL = "http://localhost:3001"
+const SERVER_URL = "http://167.172.55.65:3001"
+// const SERVER_URL = "http://localhost:3001"
 
 const colors = {
   primary: '#3498db',
