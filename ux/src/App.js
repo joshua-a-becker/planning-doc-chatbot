@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Send } from 'lucide-react';
 //import { useParams } from 'react-router-dom';
 
-// const SERVER_URL = "https://planning.negotiation.solutions/data"
-const SERVER_URL = "http://167.172.55.65:3001"
+const SERVER_URL = "https://planning.negotiation.solutions/data"
+// const SERVER_URL = "http://167.172.55.65:3001"
 // const SERVER_URL = "http://localhost:3001"
 
 const colors = {
@@ -379,8 +379,9 @@ const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage,
     <div style={styles.chatTranscript}>
       <h2>Chat With Negotiation Coach  
         <button onClick={handleResetSystem}>reset system</button>
-        <button onClick={autoChatRun}>autochat {isAutoChatting ? "stop" : "start"}</button>
-        <button onClick={autoChatOnce}>autochat once</button></h2>
+        {/*<button onClick={autoChatRun}>autochat {isAutoChatting ? "stop" : "start"}</button>
+        <button onClick={autoChatOnce}>autochat once</button>*/}
+      </h2>
       <div 
         ref={messagesContainerRef} 
         style={styles.messagesContainer}
