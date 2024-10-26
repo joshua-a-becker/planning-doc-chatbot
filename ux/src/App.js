@@ -338,8 +338,9 @@ const PersonForm = ({ personNumber, data, updateData }) => {
   );
 };
 
-const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage, handleResetSystem, autoChatOnce, autoChatRun, isAutoChatting }) => {
-  window.messages=messages
+const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage, handleResetSystem, autoChatOnce, autoChatRun, 
+  isAutoChatting, isSubmitting }) => {
+  
   const messagesContainerRef = useRef(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
 
@@ -401,8 +402,9 @@ const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage,
           onKeyPress={handleKeyPress}
           style={styles.chatInputField}
           placeholder="Type your message..."
+          disabled={isSubmitting}
         />
-        <button onClick={onSendMessage} style={styles.button}>
+        <button onClick={onSendMessage}  disabled={isSubmitting}>
           <Send size={18} />
           
         </button>
@@ -424,6 +426,7 @@ const App = () => {
 
   const [chatTranscript, setChatTranscript] = useState([]);
   const [userInput, setUserInput] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   //const [initialized, setInitialized] = useState(false);
   const initializationPromise = useRef(null);
@@ -575,15 +578,16 @@ const App = () => {
 
   const debouncedSaveUserInput = useCallback(
     debounce((input) => {
-      
-      if(input===userInput){
+      console.log("save user input")
+      /*if(input===userInput){
+        console.log("fetching saveUserInput")
         fetch(SERVER_URL+'/saveUserInput/'+userId, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userInput: input }),
         });
-      }
-    }, 1000),
+      }*/
+    }, 500),
     []
   );
 
@@ -605,6 +609,8 @@ const App = () => {
     //   console.error('Error saving user input:', error);
     // }
     
+    setIsSubmitting(true);
+    console.log("set true: " + isSubmitting)
     try {
       await fetch(SERVER_URL+'/runChatBot/'+userId, {
         method: 'POST',
@@ -615,11 +621,9 @@ const App = () => {
       console.error('Error running chatbot:', error);
     }
 
-    
-    
-    
-
     setUserInput("")
+    setIsSubmitting(false);
+    console.log("set false: " + isSubmitting);
   };
 
   const handleResetSystem = () => {
@@ -653,6 +657,7 @@ const App = () => {
           autoChatOnce={autoChatOnce}
           autoChatRun={autoChatRun}
           isAutoChatting={isAutoChatting}
+          isSubmitting={isSubmitting}
         />
       </div>
       <button 

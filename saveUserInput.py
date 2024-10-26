@@ -2,6 +2,8 @@ import os
 import sys
 os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
 
+print("SAVE USER INPUT")
+
 from db_handler import db
 
 user_id = sys.argv[1]
