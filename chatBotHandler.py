@@ -73,21 +73,36 @@ def main():
     data_state = db.get_data_state(session_id)
     
     # use current thread_id to get a proper thread_id, and set it in the db, and return the value
-    thread_id = db.get_thread_id(session_id)
+    # thread_id = db.get_thread_id(session_id)
 
 
-    if user_input != "":
+    if user_input == "":
+        return
+        
+    thread = client.beta.threads.create()
+        
+    # Create thread & populate with chat istory
+    for msg in chat_history:
+        # Skip empty messages
+        if not msg["content"]:
+            continue
+            
+        # Convert "Client Negotiator" role to "user", otherwise use "assistant"
+        role = "user" if msg["role"] == "Client Negotiator" else "assistant"
+        
+        # Add message to thread
         client.beta.threads.messages.create(
-            thread_id=thread_id,
-            role="user",
-            content=user_input
+            thread_id=thread.id,
+            role=role,
+            content=msg["content"]
         )
 
+    thread_id = thread.id
+    print("CREATED THREAD ID: " + thread_id)
     
     # Prepare prompt
     prompt = prompt_template.replace("{instructions_prompt_file}", instructions_prompt_file) \
         .replace("{current_data_state}", json.dumps(data_state)) \
-        .replace("{conversation_thread}", json.dumps(chat_history)) \
         .replace("{output_prompt_component}", output_prompt_component) \
         .replace("{current_instructions_prompt}", instructions_prompt) \
         .replace("{planning_doc_data}", json.dumps(planning_doc_data)) \
@@ -99,7 +114,7 @@ def main():
     log_file = open("message.log","a")
     sys.stdout = log_file
     
-    print("PROMPT CONTENTS: " + prompt)
+    # print("PROMPT CONTENTS: " + prompt)
 
     # run user-response prompt
     import time
@@ -126,7 +141,11 @@ def main():
         file.truncate()
 
     # update special notes
-    db.update_special_notes(session_id, content['special_notes'])
+    try:
+        db.update_special_notes(session_id, content['special_notes'])
+    except (KeyError, TypeError) as e:
+        print(f"Error updating special notes: {e}")
+    
 
     # Handle action
     # def update_instructions_prompt_file(self, session_id, prompt_file):
@@ -137,6 +156,19 @@ def main():
         db.update_instructions_prompt_file(session_id, content['action_data']['step_selection'])
 
     print("Prompt File: " + db.get_instructions_prompt_file(session_id))
+
+    ##### RUN GPT QUERY TO UPDATE DATA STATE
+    with open("prompts/datastate_extractor_prompt_template.txt", 'r') as file:
+        notes_prompt_template = file.read()
+    # Prepare prompt
+    notes_prompt = notes_prompt_template.replace("{instructions_prompt_file}", instructions_prompt_file) \
+        .replace("{current_data_state}", json.dumps(data_state)) \
+        .replace("{conversation_thread}", json.dumps(chat_history)) \
+        .replace("{output_prompt_component}", output_prompt_component) \
+        .replace("{current_instructions_prompt}", instructions_prompt) \
+        .replace("{planning_doc_data}", json.dumps(planning_doc_data)) \
+        .replace("{special_notes}", special_notes)
+
 
     print("end")
     log_file.close()

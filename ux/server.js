@@ -110,7 +110,7 @@ async function setupFileWatcher(userId, sessionId) {
 
 
   watcher.on('change', async (path) => {
-    console.log(`File changed: ${path}`);
+    // console.log(`File changed: ${path}`);
     await sendUpdates(userId, sessionId);
   });
 
@@ -201,8 +201,8 @@ async function getInitialData(userId, sessionId) {
 
 function sendEventsToAll(userId, data) {
   const userClients = userConnections.get(userId) || [];
-  console.log(`Sending updates to ${userClients.length} clients for user ${userId}`);
-  console.log("Sending: " + data)
+  // console.log(`Sending updates to ${userClients.length} clients for user ${userId}`);
+  // console.log("Sending: " + data)
   userClients.forEach(client => {
     try {
       client.res.write(`data: ${JSON.stringify(data)}\n\n`);
@@ -213,7 +213,7 @@ function sendEventsToAll(userId, data) {
 }
 
 async function readFileJSON(filepath) {
-  console.log("Reading file: " + filepath)
+  // console.log("Reading file: " + filepath)
   try {
     const data = await fs.readFile(filepath, 'utf8');
     return JSON.parse(data);
@@ -255,7 +255,7 @@ app.post('/initialize/:userId/:sessionId', async (req, res) => {
 
 // Update the sendUpdates function to include error handling and logging
 async function sendUpdates(userId, sessionId) {
-  console.log(`Sending updates for user ${userId}`);
+  // console.log(`Sending updates for user ${userId}`);
   try {
     const [formData, chatTranscript, userInput] = await Promise.all([
       readFileJSON(dataFilePath(userId)),

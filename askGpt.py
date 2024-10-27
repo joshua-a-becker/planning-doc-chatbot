@@ -7,23 +7,22 @@ my_key = open('key_to_gpt.txt','r').readline()
 client = OpenAI(api_key=my_key)
 
 
-def get_or_create_thread(db_thread_id, message_history):
-    if db_thread_id!='':
-        return db_thread_id
-    else:
-        thread = client.beta.threads.create()
+# def get_or_create_thread(db_thread_id, message_history):
+#     if db_thread_id!='':
+#         return db_thread_id
+#     else:
+#         thread = client.beta.threads.create()
 
-        # Populate the thread with existing messages        
-        for message in message_history:
-            if message["content"] == "":
-                continue 
-            client.beta.threads.messages.create(
-                thread_id=thread.id,
-                role="user" if message["role"] == "Client Negotiator" else "assistant",
-                content=message["content"]
-            )
-        return thread.id
-
+#         # Populate the thread with existing messages        
+#         for message in message_history:
+#             if message["content"] == "":
+#                 continue 
+#             client.beta.threads.messages.create(
+#                 thread_id=thread.id,
+#                 role="user" if message["role"] == "Client Negotiator" else "assistant",
+#                 content=message["content"]
+#             )
+#         return thread.id
 
 
 def ask_gpt(instructions_prompt, thread_id, session_id, user_id, current_step):
@@ -50,6 +49,13 @@ def ask_gpt(instructions_prompt, thread_id, session_id, user_id, current_step):
             update_chat_display(f"Thinking{'. ' * (dot_count // 1)}", user_id, is_initial=False)
 
     
+    ## PRINT ALL MESSAGES
+    # all_messages = client.beta.threads.messages.list(thread_id=thread_id, order="asc")
+    # print("####MESSAGES####")
+    # for message in all_messages:
+    #     print(f"{message.role}: {message.content[0].text.value}")
+    # print("###############")
+
     full_response = client.beta.threads.messages.list(thread_id=thread_id, order="desc", limit=1).data[0].content[0].text.value
     
     # print("FULL RESPONSE") 
