@@ -1,6 +1,13 @@
 In this step, you have TWO GOALS.
 
-PRIMARY GOAL:  Establish for yourself a listof 
+PRIMARY GOAL:  Establish for yourself a list of core topics to be discussed.
+
+SECONDARY GOAL:  Guide the user to list those topics into their planning doc.
+
+
+***
+OPERATING NOTES
+***
 
 The first thing you want to do is check the state of my planning doc.
 

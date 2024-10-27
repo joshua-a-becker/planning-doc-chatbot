@@ -152,6 +152,7 @@ def main():
     action = content['action']
     action_data = json.loads(content['action_data'])
     print("Action: " + action)
+    print("Action_data: " + json.dumps(action_data))
     if action in ["change_step","step_selection"] :
         print("CHANGING STEP TO " + action_data['step_selection'])
         db.update_instructions_prompt_file(session_id, action_data['step_selection'])
