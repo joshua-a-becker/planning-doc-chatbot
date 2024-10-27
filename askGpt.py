@@ -146,6 +146,35 @@ def ask_gpt(instructions_prompt, thread_id, session_id, user_id, current_step):
     return content
 
 
+data_response_format = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "coaching_response",  # Changed to lowercase to follow convention
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "structured_notes": {
+                    "type": "string",
+                    "description": "Formal notes following facilitator process structure go here"
+                },
+                "additional_notes": {
+                    "type": "string",
+                    "description": "any additional notes including brief case narrative go here"
+                },
+                "unaddressed_questions": {
+                    "type": "string",
+                    "description": "any lingering questions go here (remove answered questions)"
+                },
+            },
+            "required": ["structured_notes", "additional_notes", "unaddressed_questions"],
+            "additionalProperties": False
+        }
+    }
+}
+
+
+
 def ask_gpt_data(prompt: str):
     user_prompt = {
         "role": "user",
@@ -155,7 +184,7 @@ def ask_gpt_data(prompt: str):
     completion = client.chat.completions.create(
         model="gpt-4o",
         # model="gpt-4o-mini",
-        response_format={"type": "json_object"},
+        response_format=data_response_format,
         messages=[
             user_prompt
         ]

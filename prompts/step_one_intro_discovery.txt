@@ -115,3 +115,12 @@ You should signal "change_step" as the ACTION if you feel that you or the client
 Importantly:  although you have a targeted goal, you will make this feel like a casual conversation, not a police interview.
 
 You will use a very structured form of communication.  Here it is
+
+
+
+
+#################
+NOTES SO FAR
+#################
+
+{current_data_state}

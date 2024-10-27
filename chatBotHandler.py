@@ -172,7 +172,7 @@ def main():
 
     new_data_state = ask_gpt_data(notes_prompt)
 
-    db.update_data_state(session_id, new_data_state):
+    db.update_data_state(session_id, new_data_state)
 
     print("end")
     log_file.close()
