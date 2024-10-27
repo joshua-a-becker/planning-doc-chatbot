@@ -102,9 +102,9 @@ def main():
     
     # Prepare prompt
     prompt = prompt_template.replace("{instructions_prompt_file}", instructions_prompt_file) \
+        .replace("{current_instructions_prompt}", instructions_prompt) \
         .replace("{current_data_state}", json.dumps(data_state)) \
         .replace("{output_prompt_component}", output_prompt_component) \
-        .replace("{current_instructions_prompt}", instructions_prompt) \
         .replace("{planning_doc_data}", json.dumps(planning_doc_data)) \
         .replace("{special_notes}", special_notes)
 
@@ -114,7 +114,7 @@ def main():
     log_file = open("message.log","a")
     sys.stdout = log_file
     
-    # print("PROMPT CONTENTS: " + prompt)
+    print("PROMPT CONTENTS: " + prompt)
 
     # run user-response prompt
     import time
@@ -150,10 +150,11 @@ def main():
     # Handle action
     # def update_instructions_prompt_file(self, session_id, prompt_file):
     action = content['action']
+    action_data = json.loads(content['action_data'])
     print("Action: " + action)
     if action in ["change_step","step_selection"] :
-        print("CHANGING STEP TO " + content['action_data']['step_selection'])
-        db.update_instructions_prompt_file(session_id, content['action_data']['step_selection'])
+        print("CHANGING STEP TO " + action_data['step_selection'])
+        db.update_instructions_prompt_file(session_id, action_data['step_selection'])
 
     print("Prompt File: " + db.get_instructions_prompt_file(session_id))
 
@@ -169,6 +170,9 @@ def main():
         .replace("{planning_doc_data}", json.dumps(planning_doc_data)) \
         .replace("{special_notes}", special_notes)
 
+    new_data_state = ask_gpt_data(notes_prompt)
+
+    db.update_data_state(session_id, new_data_state):
 
     print("end")
     log_file.close()

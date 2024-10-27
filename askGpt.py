@@ -1,5 +1,6 @@
-import time
-import os
+from pydantic import BaseModel
+# import time
+# import os
 from openai import OpenAI
 import json
 
@@ -25,12 +26,61 @@ client = OpenAI(api_key=my_key)
 #         return thread.id
 
 
+# {
+# 	"special_notes" : "special_notes_instructions_for_here_or_BLANK",
+# 	"action_explanation" : "thought process goes here",
+# 	"action" : "some_action_goes_here",
+# 	"action_data" : { 
+# 		"example_data_header" : {
+# 			"feelings": ["feeling 1", "feeling 2"]
+# 			, "values": ["value 1", "value 2"]
+# 			, "topics": ["topic 1", "topic 2", "topic 3"]
+# 		},
+#  	},
+# 	"response_to_user" : "response goes here"
+response_format = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "coaching_response",  # Changed to lowercase to follow convention
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "special_notes": {
+                    "type": "string",
+                    "description": "Any special notes informing your process."
+                },
+                "action_explanation": {
+                    "type": "string",
+                    "description": "The reasoning behind the action you are about to recommend."
+                },
+                "action": {
+                    "type": "string",
+                    "description": "The action to take: structured_reflection, open_ended_question, process_map, change_step"
+                },
+                "action_data": {
+                    "type": "string",
+                    "description": "Any valid JSON object containing relevant data for the action such as feelings/values/topics"
+                },
+                "response_to_user": {
+                    "type": "string",
+                    "description": "The text of the response that will be displayed to the client."
+                }
+            },
+            "required": ["special_notes", "action_explanation", "action", "action_data", "response_to_user"],
+            "additionalProperties": False
+        }
+    }
+}
+
+
 def ask_gpt(instructions_prompt, thread_id, session_id, user_id, current_step):
     # Create or retrieve the assistant
     assistant = client.beta.assistants.create(
         name="Negotiation Coach",
         instructions=instructions_prompt,
-        model="gpt-4-0125-preview"
+        model="gpt-4o-2024-08-06",
+        response_format = response_format
     )
     
     # Run the assistant
@@ -65,8 +115,26 @@ def ask_gpt(instructions_prompt, thread_id, session_id, user_id, current_step):
     try:
         content = json.loads(full_response)
     except json.JSONDecodeError:
-        print("Error: Failed to parse the full response as JSON")
-        content = {"response_to_user": full_response, "action": "", "data_state": {}}
+        print("Error: Failed to parse the full response as JSON.  Trying again.")
+        print("INCORRECTLY FORMATTED RESPONSE: " + full_response)
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": 'You are a JSON validator.  We have received something that is not correctly formatted.  If possible, please return it in JSON format.'},
+                {"role": "user", "content": full_response}
+            ],
+            temperature=0,
+            max_tokens=1000
+        )
+        
+        try:
+            content = json.loads(response.choices[0].message.content)
+        except json.JSONDecodeError:
+            print("Error: Second attempt failed to parse the full response as JSON.  Returning raw content")
+            content = {"response_to_user": full_response, "action": "", "data_state": {}}
+        
+        
 
         
     with open("storage/content_history.txt", "a") as f:
