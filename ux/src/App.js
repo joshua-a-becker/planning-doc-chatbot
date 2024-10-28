@@ -1,6 +1,7 @@
 import debounce from 'lodash/debounce';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Send } from 'lucide-react';
+import NewUserForm from './components/NewUserForm';
 //import { useParams } from 'react-router-dom';
 
 const SERVER_URL = "https://planning.negotiation.solutions/data"
@@ -642,7 +643,7 @@ const App = () => {
 
 
   if(userId===null) {
-    return("invalid URL")
+    return(<NewUserForm />)
   }
 
   return (

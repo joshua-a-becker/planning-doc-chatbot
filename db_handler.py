@@ -277,6 +277,8 @@ class DatabaseHandler:
             if not from_user or not from_user.get('session_id'):
                 raise ValueError(f"Source user {from_user_id} not found or has no active session")
             from_user_session = self.get_session(self.get_session_id_for_user(from_user_id))
+        else: 
+            from_user_session = self.get_session(from_user_session)
               
         # Create new session for target user using existing method
         new_session_id = self.get_session_id_for_user(to_user_id)
