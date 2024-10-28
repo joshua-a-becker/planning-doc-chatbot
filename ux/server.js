@@ -277,8 +277,24 @@ async function sendUpdates(userId, sessionId) {
 app.post('/save/:userId', async (req, res) => {
   const userId = req.params.userId;
   
+  console.log("save event")
+
   try {
+    console.log("saving to text file...")
     await fs.writeFile(dataFilePath(userId), JSON.stringify(req.body, null, 2));
+    const scriptPath = path.join(__dirname, '..', 'saveFormData.py');
+    console.log("saving to text database...")
+    const command = `python3 "${scriptPath}" "${userId}"`;
+
+    
+    await exec(command, { detached: true }, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+      }
+      console.log(`stdout: ${stdout}`);
+      console.error(`stderr: ${stderr}`);
+    });
+  
     res.status(200).send('Data saved successfully');
   } catch (error) {
     console.error('Error saving data:', error);

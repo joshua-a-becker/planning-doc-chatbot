@@ -83,6 +83,9 @@ class DatabaseHandler:
             with open('ux/userdata/chatTranscript_'+user_id+'.json', 'w') as file:
                 json.dump(session['chat_history'], file)
             
+            ### initialize form data for display
+            with open('ux/userdata/formData_'+ user_id +'.json', 'w') as f:
+                json.dump(session['form_data'], f)
             
             return user['session_id']
         else:
@@ -191,14 +194,30 @@ class DatabaseHandler:
             session['instructions_prompt_file'] = prompt_file
             self.sessions.update(session, Session.session_id == session_id)
 
-    def load_planning_doc_data(self, session_id):
-        # Assuming planning_doc_data is stored in a separate JSON file
-        if not os.path.exists('ux/formData_'+session_id+'.json'):
-            with open('ux/formData_'+session_id+'.json', 'w') as f:
-                f.write(json.dumps(blank_form_data))
+    def set_planning_doc_data(self, user_id, planning_doc_data=None):
+        session_id = self.get_session_id_for_user(user_id)
+        session = self.get_session(session_id)
+        
+        if planning_doc_data is None:
+            # Only perform file operations if planning_doc_data wasn't provided
+            if not os.path.exists('ux/userdata/formData_'+user_id+'.json'):
+                with open('ux/userdata/formData_'+session_id+'.json', 'w') as f:
+                    f.write(json.dumps(blank_form_data))
 
-        with open('ux/formData_'+session_id+'.json', 'r') as file:
-            return json.load(file)
+            with open('ux/userdata/formData_'+user_id+'.json', 'r') as file:
+                planning_doc_data = json.load(file)
+
+        session['form_data'] = planning_doc_data
+
+        Session = Query()
+        self.sessions.update(session, Session.session_id == session_id)
+        
+    def load_planning_doc_data(self, user_id):
+        print("loading planning doc")
+        session_id = self.get_session_id_for_user(user_id)
+        session = self.get_session(session_id)
+        
+        return session['form_data']
         
     def list_all_users(self):
         return [user['user_id'] for user in self.users.all()]
@@ -236,7 +255,44 @@ class DatabaseHandler:
         if session:
             session['user_input'] = content
             self.sessions.update(session, Session.session_id == session_id)
-    
+
+        
+    def copy_user(self, to_user_id, from_user_id, from_user_session=None):
+        """
+        Copy all data from an existing user's session to a new user.
+        If from_user_session is not specified, uses the user's current session.
+        
+        Args:
+            to_user_id (str): User ID to copy data to
+            from_user_id (str): User ID to copy data from
+            from_user_session (str, optional): Specific session ID to copy from
+        
+        Returns:
+            str: The new session ID created for to_user_id
+        """
+        # Get source session ID if not specified
+        if from_user_session is None:
+            Users = Query()
+            from_user = self.users.get(Users.user_id == from_user_id)
+            if not from_user or not from_user.get('session_id'):
+                raise ValueError(f"Source user {from_user_id} not found or has no active session")
+            from_user_session = self.get_session(self.get_session_id_for_user(from_user_id))
+              
+        # Create new session for target user using existing method
+        new_session_id = self.get_session_id_for_user(to_user_id)
+        
+        # Copy chat history message by message
+        for message in from_user_session['chat_history']:
+            self.update_chat_history(new_session_id, message)
+        
+        # Copy data state
+        self.set_planning_doc_data(to_user_id, from_user_session['form_data'])
+
+        # update_instructions_prompt_file
+        self.update_instructions_prompt_file(new_session_id, from_user_session['instructions_prompt_file'])        
+
+        return self.get_session_id_for_user(to_user_id)
+
 
 
 # Initialize the database handler
