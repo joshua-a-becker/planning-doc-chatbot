@@ -53,7 +53,7 @@ class DatabaseHandler:
         self.sessions.insert(new_session)
 
         ## initialize the text file for display
-        with open('ux/chatTranscript_'+user_id+'.json', 'w') as file:
+        with open('ux/userdata/chatTranscript_'+user_id+'.json', 'w') as file:
             json.dump(blank_chat_history, file)
 
 
@@ -80,7 +80,7 @@ class DatabaseHandler:
 
             # ## initialize the text file for display
             session = self.get_session(user['session_id'])
-            with open('ux/chatTranscript_'+user_id+'.json', 'w') as file:
+            with open('ux/userdata/chatTranscript_'+user_id+'.json', 'w') as file:
                 json.dump(session['chat_history'], file)
             
             

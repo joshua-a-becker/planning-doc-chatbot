@@ -47,8 +47,8 @@ app.use((req, res, next) => {
 app.use(cors());
 app.use(express.json());
 
-const dataFilePath = (userId) => path.join(__dirname, `formData_${userId}.json`);
-const chatTranscriptPath = (userId) => path.join(__dirname, `chatTranscript_${userId}.json`);
+const dataFilePath = (userId) => path.join(__dirname, `userdata/formData_${userId}.json`);
+const chatTranscriptPath = (userId) => path.join(__dirname, `userdata/chatTranscript_${userId}.json`);
 const userInputPath = (userId) => path.join(__dirname, `user-input_${userId}.txt`);
 
 // console.log("Chat transcript path: " + chatTranscriptPath("test123"))

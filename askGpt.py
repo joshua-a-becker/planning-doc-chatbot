@@ -198,7 +198,7 @@ def ask_gpt_data(prompt: str):
 
 
 def update_chat_display(message, user_id, is_initial=True):
-    with open('ux/chatTranscript_'+user_id+'.json', 'r+') as file:
+    with open('ux/userdata/chatTranscript_'+user_id+'.json', 'r+') as file:
         chat_history = json.load(file)
         
     if is_initial:
@@ -208,7 +208,7 @@ def update_chat_display(message, user_id, is_initial=True):
         # Replace the last message with the final response
         chat_history[-1] = {"role": "Negotiation Coach", "content": message}
     
-    with open('ux/chatTranscript_'+user_id+'.json', 'r+') as file:
+    with open('ux/userdata/chatTranscript_'+user_id+'.json', 'r+') as file:
         file.seek(0)
         json.dump(chat_history, file)
         file.truncate()

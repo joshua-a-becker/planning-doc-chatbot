@@ -24,5 +24,5 @@ with open('storage/formData_blank.json', 'r') as file:
 new_session_id = db.create_new_session_for_user(user_id)
 
 chat_history = db.get_chat_history(new_session_id)
-with open('ux/chatTranscript_'+user_id+'.json', 'w') as file:
+with open('ux/userdata/chatTranscript_'+user_id+'.json', 'w') as file:
     json.dump(chat_history, file)

@@ -47,7 +47,7 @@ def main():
     
     # update chat display with user input
     chat_history = db.get_chat_history(session_id)
-    with open('ux/chatTranscript_'+user_id+'.json', 'w') as file:
+    with open('ux/userdata/chatTranscript_'+user_id+'.json', 'w') as file:
         json.dump(chat_history, file)
 
     
@@ -135,7 +135,7 @@ def main():
 
     # Update chat display with final response
     chat_history = db.get_chat_history(session_id)
-    with open('ux/chatTranscript_'+user_id+'.json', 'r+') as file:
+    with open('ux/userdata/chatTranscript_'+user_id+'.json', 'r+') as file:
         file.seek(0)
         json.dump(chat_history, file)
         file.truncate()
@@ -174,6 +174,8 @@ def main():
     new_data_state = ask_gpt_data(notes_prompt)
 
     db.update_data_state(session_id, new_data_state)
+
+    print("New data state: " + new_data_state)
 
     print("end")
     log_file.close()
