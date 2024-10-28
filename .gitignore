@@ -7,8 +7,6 @@ message.log
 storage/content_history.txt
 storage/database.json
 storage/last_content.txt
-ux/chatTranscript*.json
-ux/user-input*.json
-ux/formData*.json
+ux/userdata
 message.log
 __pycache__/
