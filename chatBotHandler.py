@@ -135,21 +135,20 @@ def main():
 
     coach_response = ask_gpt_response(coach_response_prompt, thread_id, user_id, chat_history)
 
-    # print("Coach response: " + coach_response)
+    # update database with final response
+    db.update_chat_history(session_id, {"role": "Negotiation Coach", "content": coach_response})
 
     ##################################
     ##### PROCESS COACH RESPONSE #####
     ##################################
 
-    # update database with final response
-    db.update_chat_history(session_id, {"role": "Negotiation Coach", "content": coach_response})
 
     # Update chat display with final response
-    chat_history = db.get_chat_history(session_id)
-    with open('ux/userdata/chatTranscript_'+user_id+'.json', 'r+') as file:
-        file.seek(0)
-        json.dump(chat_history, file)
-        file.truncate()
+    # chat_history = db.get_chat_history(session_id)
+    # with open('ux/userdata/chatTranscript_'+user_id+'.json', 'r+') as file:
+    #     file.seek(0)
+    #     json.dump(chat_history, file)
+    #     file.truncate()
 
     # update special notes
     try:

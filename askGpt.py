@@ -85,14 +85,14 @@ def ask_gpt_strategy(strategy_prompt, session_id, user_id):
 
     # Stream the thinking indicator
     full_response = ""
-    update_chat_display("Thinking.", user_id, is_initial=True)
+    update_chat_display("<THINKING/>Thinking", user_id, is_initial=True)
     dot_count = 0
     for chunk in run:
         dot_count += 1
         if dot_count>100: 
             dot_count=1
 
-        update_chat_display(f"Thinking{'. ' * ((dot_count*10) // 50)}", user_id, is_initial=False)
+        update_chat_display(f"<THINKING/>Thinking{'. ' * ((dot_count*10) // 50)}", user_id, is_initial=False)
         if chunk.choices[0].delta.content is not None:
             full_response += chunk.choices[0].delta.content
 
@@ -153,12 +153,12 @@ def ask_gpt_response(instructions_prompt, thread_id,user_id, chat_history):
                 file.seek(0)
                 json.dump(chat_history, file)
                 file.truncate()
-            update_chat_display("", user_id, is_initial=True)
+            update_chat_display("<THINKING/>", user_id, is_initial=True)
             
         @override
         def on_text_delta(self, delta, snapshot):            
             final_response.text += delta.value
-            update_chat_display(final_response.text, user_id, is_initial=False)
+            update_chat_display("<THINKING/>"+final_response.text, user_id, is_initial=False)
 
     with client.beta.threads.runs.stream(
         thread_id=thread_id,
@@ -167,6 +167,9 @@ def ask_gpt_response(instructions_prompt, thread_id,user_id, chat_history):
         event_handler=EventHandler(),
     ) as stream:
         stream.until_done()    
+
+    final_response_with_signal = "<COMPLETED/>" + final_response.text
+    update_chat_display(final_response_with_signal, user_id, is_initial=False)
 
     return final_response.text
 

@@ -36,6 +36,7 @@ const App = () => {
   const [isAutoChatting, setIsAutoChatting] = useState(false);
   
   const userInputRef = useRef('');
+  const userInputFieldRef = useRef(null);  // Add this line with your other refs/state
 
   const messagesContainerRef = useRef(null);
 
@@ -103,7 +104,7 @@ const App = () => {
           console.log("setting isSubmitting")
           const shouldBeIsSubmitting = 
             (newData.chatTranscript.at(-1).role=="Client Negotiator" & newData.chatTranscript.at(-1).content!="") ||
-            newData.chatTranscript.at(-1).content.toLowerCase().trim().startsWith("thinking.")
+            newData.chatTranscript.at(-1).content.trim().startsWith("<THINKING/>")
 
           setIsSubmitting(
             shouldBeIsSubmitting
@@ -111,7 +112,8 @@ const App = () => {
 
           // and at this point, if isSubmitting==false (SHOULD be)
           console.log("role: " + newData.chatTranscript.at(-1).role)
-          console.log("msg: " + newData.chatTranscript.at(-1).content)
+          //console.log("msg: " + newData.chatTranscript.at(-1).content)
+          console.log("THINKING: " + newData.chatTranscript.at(-1).content.trim().startsWith("<THINKING/>"))
           console.log("UI: " + userInputRef.current)
           console.log("NOT submitting: " + !shouldBeIsSubmitting)
           if(!shouldBeIsSubmitting & userInputRef.current==="processing...") {
@@ -121,6 +123,11 @@ const App = () => {
 
           if(shouldBeIsSubmitting) {
             setUserInput("processing...")
+          }
+
+          // there's a clear signal for completion
+          if( newData.chatTranscript.at(-1).content.trim().startsWith("<COMPLETED/>") ){
+            userInputFieldRef.current?.focus()
           }
 
         }
@@ -332,6 +339,7 @@ const App = () => {
         <div className="bg-white border-t border-gray-200 p-4">
           <div className="flex space-x-2">
             <input
+              ref={userInputFieldRef}
               type="text"
               value={userInput}
               onChange={handleUserInputChange}
