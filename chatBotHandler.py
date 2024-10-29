@@ -107,11 +107,11 @@ def main():
         .replace("{special_notes}", special_notes)
 
 
-    strategy_content = ask_gpt_strategy(strategy_prompt, session_id, user_id)
+    strategy_content = ask_gpt_strategy(strategy_prompt, json.dumps(chat_history), session_id, user_id)
     strategy_content_txt = json.dumps(strategy_content)
 
-    print("Strategy promtp: " + strategy_prompt)
-    print("Strategy content: " + strategy_content_txt)
+    # print("Strategy prompt: " + strategy_prompt)
+    # print("Strategy content: " + strategy_content_txt)
     
     #######################################
     # ask GPT to determine response to user
@@ -133,6 +133,10 @@ def main():
     coach_response_prompt = coach_response_prompt_template \
         .replace("{strategy_output}", strategy_content_txt)
 
+    print("COACHING REPONSE PROMPT:\n")
+    print(coach_response_prompt)
+    print("####################")
+
     coach_response = ask_gpt_response(coach_response_prompt, thread_id, user_id, chat_history)
 
     # update database with final response
@@ -142,15 +146,6 @@ def main():
     ##### PROCESS COACH RESPONSE #####
     ##################################
 
-
-    # Update chat display with final response
-    # chat_history = db.get_chat_history(session_id)
-    # with open('ux/userdata/chatTranscript_'+user_id+'.json', 'r+') as file:
-    #     file.seek(0)
-    #     json.dump(chat_history, file)
-    #     file.truncate()
-
-    # update special notes
     try:
         db.update_special_notes(session_id, strategy_content['special_notes'])
     except (KeyError, TypeError) as e:
@@ -162,10 +157,11 @@ def main():
 
     
     action = strategy_content['action']
-    action_data = strategy_content['action_data']
+    action_data = json.loads(strategy_content['action_data'])
     print("Action: " + action)
     print("Action_data: " + json.dumps(action_data))
-    if action in ["change_step","step_selection"] :
+    if action in ["change_step","step_selection","next_step"] :
+        # print(action_data.keys)
         print("CHANGING STEP TO " + action_data['step_selection'])
         db.update_instructions_prompt_file(session_id, action_data['step_selection'])
 

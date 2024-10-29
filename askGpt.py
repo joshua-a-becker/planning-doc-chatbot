@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from openai import OpenAI
 import json
 from typing_extensions import override
+from typing import Union, List
 from openai import AssistantEventHandler
 
 my_key = open('key_to_gpt.txt','r').readline()
@@ -38,19 +39,33 @@ data_response_format = {
     }
 }
 
+class StructuredReflection(BaseModel):
+    explanation: str
+    feelings: list[str]
+    values: list[str]
+    topics: list[str]
 
+class ChangeStep(BaseModel):
+    explanation: str
+    new_step: str
+    action: str
+
+class StrategyFormat(BaseModel):
+    general_overview: str
+    explanation_of_action: str
+    action: list[Union[ChangeStep,StructuredReflection]]
 
 strategy_format = {
     "type": "json_schema",
     "json_schema": {
-        "name": "coaching_response",  # Changed to lowercase to follow convention
+        "name": "coaching_strategy_output",  # Changed to lowercase to follow convention
         "strict": True,
         "schema": {
             "type": "object",
             "properties": {
-                "special_notes": {
+                "general_overview": {
                     "type": "string",
-                    "description": "Any special notes informing your process."
+                    "description": "A general overview of the situation and what you're going to do."
                 },
                 "action_explanation": {
                     "type": "string",
@@ -62,10 +77,10 @@ strategy_format = {
                 },
                 "action_data": {
                     "type": "string",
-                    "description": "Any valid JSON object containing relevant data for the action such as feelings/values/topics OR the change_step new step update (critical!)"
+                    "description": "A valid JSON object containing relevant data for the action such as feelings/values/topics OR the change_step new step update (critical!)"
                 }
             },
-            "required": ["special_notes", "action_explanation", "action", "action_data"],
+            "required": ["general_overview", "action_explanation", "action", "action_data"],
             "additionalProperties": False
         }
     }
@@ -73,12 +88,16 @@ strategy_format = {
 
 
 
-def ask_gpt_strategy(strategy_prompt, session_id, user_id):
+def ask_gpt_strategy(strategy_prompt, chat_history, session_id, user_id):
     
     # Run the completion API on the strategy prompt
     run = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[{"role": "system", "content": strategy_prompt}],
+        model="gpt-4o-2024-08-06",
+        messages=[
+            {"role": "system", "name": "instructions", "content": "You are an MBA professor acting as a negotiation prep coach."},
+            {"role": "user", "name": "conversation_history", "content" : chat_history},
+            {"role": "system", "name": "instructions", "content": strategy_prompt},
+        ],
         stream=True,
         response_format = strategy_format
     )

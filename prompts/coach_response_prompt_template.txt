@@ -4,5 +4,4 @@ After careful thought, you have generated the following strategy guide:
 
 {strategy_output}
 
-
-What is your response to the user?
+What is your response to the user?  Be very brief.

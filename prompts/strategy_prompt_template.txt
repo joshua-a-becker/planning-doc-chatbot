@@ -1,21 +1,2 @@
 
 {current_instructions_prompt}
-
-
-************************
-   RETURN DATA FORMAT
-************************
-
-{
-	"special_notes" : "special_notes_instructions_for_here_or_BLANK",
-	"action_explanation" : "thought process goes here",
-	"action" : "some_action_goes_here",
-	"action_data" : { 
-		"example_data_header" : {
-			"feelings": ["feeling 1", "feeling 2"]
-			, "values": ["value 1", "value 2"]
-			, "topics": ["topic 1", "topic 2", "topic 3"]
-		},
- 	},
-	"response_to_user" : "response goes here"
-}
