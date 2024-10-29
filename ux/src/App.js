@@ -119,6 +119,10 @@ const App = () => {
             setUserInput("")
           }
 
+          if(shouldBeIsSubmitting) {
+            setUserInput("processing...")
+          }
+
         }
       }
     };
