@@ -79,7 +79,7 @@ const App = () => {
 
     const shouldBeIsSubmitting = 
       (chatTranscript.at(-1).role=="Client Negotiator") ||
-      chatTranscript.at(-1).content.trim().startsWith("<THINKING/>")
+      chatTranscript.at(-1).content.trim().includes("<THINKING/>")
 
     setIsSubmitting(shouldBeIsSubmitting);
 
@@ -359,7 +359,7 @@ const App = () => {
                 {message.role}
               </div>
               <div className="text-gray-800">
-              {message.content.trim().startsWith("<THINKING/>") ? (
+              {message.content.trim().includes("<THINKINGDOTS/>") ? (
                 <>Thinking<ThinkingDots /></>
               ) : (
                 <div dangerouslySetInnerHTML={{__html: message.content}} />

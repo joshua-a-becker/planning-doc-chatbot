@@ -88,7 +88,7 @@ class StrategyFormat(BaseModel):
 def ask_gpt_strategy(messages, session_id, user_id):
     
     # Run the completion API on the strategy prompt
-    update_chat_display("<THINKING/>Thinking...", user_id, is_initial=True)
+    update_chat_display("<THINKING/><THINKINGDOTS/>", user_id, is_initial=True)
     run = client.beta.chat.completions.parse(
         model="gpt-4o-2024-08-06",
         messages=messages,
