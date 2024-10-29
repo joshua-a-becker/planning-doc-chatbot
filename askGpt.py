@@ -85,14 +85,14 @@ def ask_gpt_strategy(strategy_prompt, session_id, user_id):
 
     # Stream the thinking indicator
     full_response = ""
-    update_chat_display("Thinking", user_id, is_initial=True)
+    update_chat_display("Thinking.", user_id, is_initial=True)
     dot_count = 0
     for chunk in run:
         dot_count += 1
-        if dot_count>10: 
+        if dot_count>100: 
             dot_count=1
 
-        update_chat_display(f"Thinking{'. ' * (dot_count // 1)}", user_id, is_initial=False)
+        update_chat_display(f"Thinking{'. ' * ((dot_count*10) // 50)}", user_id, is_initial=False)
         if chunk.choices[0].delta.content is not None:
             full_response += chunk.choices[0].delta.content
 

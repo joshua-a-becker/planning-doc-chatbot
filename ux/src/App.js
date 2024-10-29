@@ -103,7 +103,7 @@ const App = () => {
           console.log("setting isSubmitting")
           const shouldBeIsSubmitting = 
             (newData.chatTranscript.at(-1).role=="Client Negotiator" & newData.chatTranscript.at(-1).content!="") ||
-            newData.chatTranscript.at(-1).content.toLowerCase().includes("thinking")
+            newData.chatTranscript.at(-1).content.toLowerCase().trim().startsWith("thinking.")
 
           setIsSubmitting(
             shouldBeIsSubmitting
