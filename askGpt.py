@@ -40,7 +40,7 @@ data_response_format = {
 
 
 
-response_format = {
+strategy_format = {
     "type": "json_schema",
     "json_schema": {
         "name": "coaching_response",  # Changed to lowercase to follow convention
@@ -63,13 +63,9 @@ response_format = {
                 "action_data": {
                     "type": "string",
                     "description": "Any valid JSON object containing relevant data for the action such as feelings/values/topics OR the change_step new step update (critical!)"
-                },
-                "response_to_user": {
-                    "type": "string",
-                    "description": "The text of the response that will be displayed to the client."
                 }
             },
-            "required": ["special_notes", "action_explanation", "action", "action_data", "response_to_user"],
+            "required": ["special_notes", "action_explanation", "action", "action_data"],
             "additionalProperties": False
         }
     }
@@ -77,43 +73,30 @@ response_format = {
 
 
 
-def ask_gpt_strategy(instructions_prompt, thread_id, session_id, user_id, current_step):
-    # Create or retrieve the assistant
-    assistant = client.beta.assistants.create(
-        name="Negotiation Coach",
-        instructions=instructions_prompt,
-        model="gpt-4o",
-    )
+def ask_gpt_strategy(strategy_prompt, session_id, user_id):
     
-    # Run the assistant
-    run = client.beta.threads.runs.create(
-        thread_id=thread_id,
-        assistant_id=assistant.id
+    # Run the completion API on the strategy prompt
+    run = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "system", "content": strategy_prompt}],
+        stream=True,
+        response_format = strategy_format
     )
 
     # Stream the thinking indicator
+    full_response = ""
     update_chat_display("Thinking", user_id, is_initial=True)
     dot_count = 0
-    while run.status != "completed":
-        run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
-        if run.status == "in_progress":
-            dot_count += 1
-            update_chat_display(f"Thinking{'. ' * (dot_count // 1)}", user_id, is_initial=False)
+    for chunk in run:
+        dot_count += 1
+        if dot_count>10: 
+            dot_count=1
 
-    
-    ## PRINT ALL MESSAGES
-    # all_messages = client.beta.threads.messages.list(thread_id=thread_id, order="asc")
-    # print("####MESSAGES####")
-    # for message in all_messages:
-    #     print(f"{message.role}: {message.content[0].text.value}")
-    # print("###############")
+        update_chat_display(f"Thinking{'. ' * (dot_count // 1)}", user_id, is_initial=False)
+        if chunk.choices[0].delta.content is not None:
+            full_response += chunk.choices[0].delta.content
 
-    full_response = client.beta.threads.messages.list(thread_id=thread_id, order="desc", limit=1).data[0].content[0].text.value
-    
-    # print("FULL RESPONSE") 
-    # print(full_response)
 
-    # Try to parse the full response as JSON
     try:
         content = json.loads(full_response)
     except json.JSONDecodeError:
@@ -136,51 +119,26 @@ def ask_gpt_strategy(instructions_prompt, thread_id, session_id, user_id, curren
             print("Error: Second attempt failed to parse the full response as JSON.  Returning raw content")
             content = {"response_to_user": full_response, "action": "", "data_state": {}}
         
-        
-
-        
-    with open("storage/content_history.txt", "a") as f:
-        f.write("current step: " + current_step + "\n\n" +json.dumps(content) + "\n\n###\n\n")
-    
-    with open("storage/last_content.txt", "w") as f:
-        f.write(json.dumps(content))
 
     return content
 
 
 
 
-def ask_gpt_response(instructions_prompt, thread_id, session_id, user_id, current_step, chat_history):
+def ask_gpt_response(instructions_prompt, thread_id,user_id, chat_history):
     # Create or retrieve the assistant
     assistant = client.beta.assistants.create(
         name="Negotiation Coach",
         instructions=instructions_prompt,
         model="gpt-4o",
     )
-    
-    # Run the assistant
-    # run = client.beta.threads.runs.create(
-    #     thread_id=thread_id,
-    #     assistant_id=assistant.id
-    # )
 
-    # # Stream the thinking indicator
-    # update_chat_display("Thinking", user_id, is_initial=True)
-    # dot_count = 0
-    # while run.status != "completed":
-    #     run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
-    #     if run.status == "in_progress":
-    #         dot_count += 1
-    #         update_chat_display(f"Thinking{'. ' * (dot_count // 1)}", user_id, is_initial=False)
-
-
-        # update_chat_display("Thinking", user_id, is_initial=True)
-    # dot_count = 0
-    # while run.status != "completed":
-    #     run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
-    #     if run.status == "in_progress":
-    #         dot_count += 1
-    #         update_chat_display(f"Thinking{'. ' * (dot_count // 1)}", user_id, is_initial=False)
+    # print("COACH RESPONSE THREAD MESSAGES")
+    # messages = client.beta.threads.messages.list(thread_id=thread_id)
+    # for msg in messages:
+    #     print(f"Role: {msg.role}")
+    #     print(f"Content: {msg.content[0].text.value}")
+    # print("END COACH RESPONSE THREAD MESSAGES")
 
     class ResponseAccumulator:
         def __init__(self):
@@ -195,12 +153,10 @@ def ask_gpt_response(instructions_prompt, thread_id, session_id, user_id, curren
                 file.seek(0)
                 json.dump(chat_history, file)
                 file.truncate()
-            print(f"\nassistant > ", end="", flush=True)
             update_chat_display("", user_id, is_initial=True)
             
         @override
         def on_text_delta(self, delta, snapshot):            
-            print(delta.value, end="", flush=True)
             final_response.text += delta.value
             update_chat_display(final_response.text, user_id, is_initial=False)
 
