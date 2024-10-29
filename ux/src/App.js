@@ -8,6 +8,22 @@ const SERVER_URL = "https://planning.negotiation.solutions/data"
 
 
 
+const ThinkingDots = () => {
+  const [dots, setDots] = useState('.');
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots(prev => {
+        if (prev.length >= 6) return '.';
+        return prev + '.';
+      });
+    }, 400);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  return <span className="inline-block min-w-[24px]">{dots}</span>;
+};
 
 const App = () => {
   const [formData, setFormData] = useState({
@@ -126,7 +142,7 @@ const App = () => {
           }
 
           // there's a clear signal for completion
-          if( newData.chatTranscript.at(-1).content.trim().startsWith("<COMPLETED/>") ){
+          if( !newData.chatTranscript.at(-1).content.trim().includes("<THINKING/>") ){
             userInputFieldRef.current?.focus()
           }
 
@@ -327,10 +343,13 @@ const App = () => {
               <div className="font-medium text-sm mb-1">
                 {message.role}
               </div>
-              <div 
-                className="text-gray-800"
-                dangerouslySetInnerHTML={{__html: message.content}}
-              />
+              <div className="text-gray-800">
+              {message.content.trim().startsWith("<THINKING/>") ? (
+                <>Thinking<ThinkingDots /></>
+              ) : (
+                <div dangerouslySetInnerHTML={{__html: message.content}} />
+              )}
+            </div>
             </div>
           ))}
         </div>

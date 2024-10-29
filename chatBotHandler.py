@@ -49,6 +49,8 @@ class TeeStream:
 
 def main():
 
+    
+
     # only run with user input
     if user_input == "":
         return
@@ -57,6 +59,7 @@ def main():
     tee = TeeStream("message.log")
     sys.stdout = tee
 
+    test_structured_output()
     print("running chatbot query")
     
     
@@ -93,21 +96,23 @@ def main():
 
     with open(("prompts/"+strategy_prompt_file+".txt"), 'r') as file:
         strategy_prompt = file.read()
-    with open('prompts/strategy_prompt_template.txt', 'r') as file:
-        strategy_prompt_template = file.read()
-    with open('prompts/strategy_output_prompt.txt', 'r') as file:
-        strategy_output_prompt_component = file.read()
-
     
-    strategy_prompt = strategy_prompt_template.replace("{instructions_prompt_file}", strategy_prompt_file) \
-        .replace("{current_instructions_prompt}", strategy_prompt) \
-        .replace("{current_data_state}", json.dumps(data_state)) \
-        .replace("{output_prompt_component}", strategy_output_prompt_component) \
-        .replace("{planning_doc_data}", json.dumps(planning_doc_data)) \
-        .replace("{special_notes}", special_notes)
+    # strategy_prompt = strategy_prompt_template.replace("{instructions_prompt_file}", strategy_prompt_file) \
+    #     .replace("{current_instructions_prompt}", strategy_prompt) \
+    #     .replace("{output_prompt_component}", strategy_output_prompt_component) \
+    #     .replace("{planning_doc_data}", json.dumps(planning_doc_data)) \
+    #     .replace("{special_notes}", special_notes)
 
+    strategy_messages = [
+        {"role": "system", "name": "instructions", "content": "You are an MBA professor acting as a negotiation prep coach."},
+        {"role": "system", "name": "current_step", "content": "CURRENT STEP " + strategy_prompt_file},
+        {"role": "user", "name": "conversation_history", "content" : str(chat_history)},
+        {"role": "user", "name": "planning_doc_form", "content" : str(planning_doc_data)},
+        #{"role": "system", "name": "notes_so_far", "content": data_state},
+        {"role": "system", "name": "instructions", "content": str(strategy_prompt)},
+    ]
 
-    strategy_content = ask_gpt_strategy(strategy_prompt, json.dumps(chat_history), session_id, user_id)
+    strategy_content = ask_gpt_strategy(strategy_messages, session_id, user_id)
     strategy_content_txt = json.dumps(strategy_content)
 
     # print("Strategy prompt: " + strategy_prompt)
@@ -146,24 +151,26 @@ def main():
     ##### PROCESS COACH RESPONSE #####
     ##################################
 
-    try:
-        db.update_special_notes(session_id, strategy_content['special_notes'])
-    except (KeyError, TypeError) as e:
-        print(f"Error updating special notes: {e}")
+    # try:
+    #     db.update_special_notes(session_id, strategy_content['special_notes'])
+    # except (KeyError, TypeError) as e:
+    #     print(f"Error updating special notes: {e}")
     
     ############################################
     # Handle action from strategy if appropriate
     ############################################
 
     
-    action = strategy_content['action']
-    action_data = json.loads(strategy_content['action_data'])
-    print("Action: " + action)
-    print("Action_data: " + json.dumps(action_data))
-    if action in ["change_step","step_selection","next_step"] :
-        # print(action_data.keys)
-        print("CHANGING STEP TO " + action_data['step_selection'])
-        db.update_instructions_prompt_file(session_id, action_data['step_selection'])
+    # action = strategy_content['action']
+    # action_data = json.loads(strategy_content['action_data'])
+    # print("Action: " + action)
+    # print("Action_data: " + json.dumps(action_data))
+    # if action in ["change_step","step_selection","next_step"] :
+    #     # print(action_data.keys)
+    #     print("CHANGING STEP TO " + action_data['step_selection'])
+    #     db.update_instructions_prompt_file(session_id, action_data['step_selection'])
+
+    db.update_instructions_prompt_file(session_id, strategy_content['next_step'])
 
 
     ############################################

@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from openai import OpenAI
 import json
 from typing_extensions import override
-from typing import Union, List
+from typing import Union, List, Literal
 from openai import AssistantEventHandler
 
 my_key = open('key_to_gpt.txt','r').readline()
@@ -39,106 +39,64 @@ data_response_format = {
     }
 }
 
-class StructuredReflection(BaseModel):
-    explanation: str
-    feelings: list[str]
-    values: list[str]
-    topics: list[str]
+##action: list[Union[ChangeStep,StructuredReflection]]
 
-class ChangeStep(BaseModel):
-    explanation: str
-    new_step: str
-    action: str
+ProcessStep = Literal[
+    "step_zero_explain_process",
+    "step_one_intro_discovery",
+    "step_two_topics_validating",
+    "step_three_topics_values",
+    "step_four_batna"
+]  
+
+class Reflection(BaseModel):
+    type: Literal["reflection"]
+    feelings: List[str]
+    values: List[str]
+    topics: List[str]
+    closing_phrase: str
+    follow_up_question: str
+
+class OpenQuestion(BaseModel):
+    type: Literal["open_ended_question"]
+    feelings: List[str]
+    values: List[str]
+    topics: List[str]
+    goal_of_question: str
+    the_question: str
+
+class ProcessMap(BaseModel):
+    type: Literal["process_map"]
+    user_is_trying_to: str
+    current_step_is: str
+    explanation_and_or_redirecting_comment: str
 
 class StrategyFormat(BaseModel):
     general_overview: str
-    explanation_of_action: str
-    action: list[Union[ChangeStep,StructuredReflection]]
+    action: Reflection | OpenQuestion | ProcessMap
+    current_step: ProcessStep
+    next_step: ProcessStep
 
-strategy_format = {
-    "type": "json_schema",
-    "json_schema": {
-        "name": "coaching_strategy_output",  # Changed to lowercase to follow convention
-        "strict": True,
-        "schema": {
-            "type": "object",
-            "properties": {
-                "general_overview": {
-                    "type": "string",
-                    "description": "A general overview of the situation and what you're going to do."
-                },
-                "action_explanation": {
-                    "type": "string",
-                    "description": "The reasoning behind the action you are about to recommend."
-                },
-                "action": {
-                    "type": "string",
-                    "description": "The action to take: structured_reflection, open_ended_question, process_map, change_step"
-                },
-                "action_data": {
-                    "type": "string",
-                    "description": "A valid JSON object containing relevant data for the action such as feelings/values/topics OR the change_step new step update (critical!)"
-                }
-            },
-            "required": ["general_overview", "action_explanation", "action", "action_data"],
-            "additionalProperties": False
-        }
-    }
-}
+    
+    #general_overview:  a human-readable analysis of the situation and what action you recommend.
+    #action: one of SIX ACTIONS:[structured_reflection, open_ended_question, process_map, advisory_comment, general_comment]
+    #current_step:  the current step
+    #next_step:  the next step, which will usually be the current step unless you are process mapping.
 
 
 
-def ask_gpt_strategy(strategy_prompt, chat_history, session_id, user_id):
+def ask_gpt_strategy(messages, session_id, user_id):
     
     # Run the completion API on the strategy prompt
-    run = client.chat.completions.create(
+    update_chat_display("<THINKING/>Thinking...", user_id, is_initial=True)
+    run = client.beta.chat.completions.parse(
         model="gpt-4o-2024-08-06",
-        messages=[
-            {"role": "system", "name": "instructions", "content": "You are an MBA professor acting as a negotiation prep coach."},
-            {"role": "user", "name": "conversation_history", "content" : chat_history},
-            {"role": "system", "name": "instructions", "content": strategy_prompt},
-        ],
-        stream=True,
-        response_format = strategy_format
+        messages=messages,
+        response_format = StrategyFormat
     )
 
-    # Stream the thinking indicator
-    full_response = ""
-    update_chat_display("<THINKING/>Thinking", user_id, is_initial=True)
-    dot_count = 0
-    for chunk in run:
-        dot_count += 1
-        if dot_count>100: 
-            dot_count=1
-
-        update_chat_display(f"<THINKING/>Thinking{'. ' * ((dot_count*10) // 50)}", user_id, is_initial=False)
-        if chunk.choices[0].delta.content is not None:
-            full_response += chunk.choices[0].delta.content
-
-
-    try:
-        content = json.loads(full_response)
-    except json.JSONDecodeError:
-        print("Error: Failed to parse the full response as JSON.  Trying again.")
-        print("INCORRECTLY FORMATTED RESPONSE: " + full_response)
-
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": 'You are a JSON validator.  We have received something that is not correctly formatted.  If possible, please return it in JSON format.'},
-                {"role": "user", "content": full_response}
-            ],
-            temperature=0,
-            max_tokens=1000
-        )
-        
-        try:
-            content = json.loads(response.choices[0].message.content)
-        except json.JSONDecodeError:
-            print("Error: Second attempt failed to parse the full response as JSON.  Returning raw content")
-            content = {"response_to_user": full_response, "action": "", "data_state": {}}
-        
-
+    content = run.choices[0].message.parsed.model_dump()
+    
     return content
 
 
@@ -233,3 +191,23 @@ def update_chat_display(message, user_id, is_initial=True):
         file.truncate()
 
 
+def test_structured_output():
+    print("testing structured output")
+
+    class CalendarEvent(BaseModel):
+        name: str
+        date: str
+        participants: list[str]
+
+    completion = client.beta.chat.completions.parse(
+        model="gpt-4o-2024-08-06",
+        messages=[
+            {"role": "system", "content": "Extract the event information."},
+            {"role": "user", "content": "Alice and Bob are going to a science fair on Friday."},
+        ],
+        response_format=CalendarEvent,
+    )
+
+    event = completion.choices[0].message.parsed
+
+    print("finished structured output")
