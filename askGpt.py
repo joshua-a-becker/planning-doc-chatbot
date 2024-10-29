@@ -102,48 +102,30 @@ def ask_gpt_strategy(messages, session_id, user_id):
 
 
 
-def ask_gpt_response(instructions_prompt, thread_id,user_id, chat_history):
-    # Create or retrieve the assistant
-    assistant = client.beta.assistants.create(
-        name="Negotiation Coach",
-        instructions=instructions_prompt,
-        model="gpt-4o",
-    )
+def ask_gpt_response(messages, thread_id,user_id, chat_history):
 
-    # print("COACH RESPONSE THREAD MESSAGES")
-    # messages = client.beta.threads.messages.list(thread_id=thread_id)
-    # for msg in messages:
-    #     print(f"Role: {msg.role}")
-    #     print(f"Content: {msg.content[0].text.value}")
-    # print("END COACH RESPONSE THREAD MESSAGES")
+
+    with open('ux/userdata/chatTranscript_'+user_id+'.json', 'r+') as file:
+                    file.seek(0)
+                    json.dump(chat_history, file)
+                    file.truncate()
+    update_chat_display("<THINKING/>", user_id, is_initial=True)
+
+    stream = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=messages,
+        stream=True,
+    )
 
     class ResponseAccumulator:
         def __init__(self):
             self.text = ""
 
     final_response = ResponseAccumulator()
-
-    class EventHandler(AssistantEventHandler):    
-        @override
-        def on_text_created(self, text) -> None:
-            with open('ux/userdata/chatTranscript_'+user_id+'.json', 'r+') as file:
-                file.seek(0)
-                json.dump(chat_history, file)
-                file.truncate()
-            update_chat_display("<THINKING/>", user_id, is_initial=True)
-            
-        @override
-        def on_text_delta(self, delta, snapshot):            
-            final_response.text += delta.value
+    for chunk in stream:
+        if chunk.choices[0].delta.content is not None:
+            final_response.text += chunk.choices[0].delta.content
             update_chat_display("<THINKING/>"+final_response.text, user_id, is_initial=False)
-
-    with client.beta.threads.runs.stream(
-        thread_id=thread_id,
-        assistant_id=assistant.id,
-        instructions=instructions_prompt,
-        event_handler=EventHandler(),
-    ) as stream:
-        stream.until_done()    
 
     final_response_with_signal = "<COMPLETED/>" + final_response.text
     update_chat_display(final_response_with_signal, user_id, is_initial=False)

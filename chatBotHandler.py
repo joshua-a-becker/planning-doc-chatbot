@@ -89,14 +89,20 @@ def main():
     #####################
     # run strategy prompt 
     #####################
-    
-    strategy_prompt_file = db.get_instructions_prompt_file(session_id)
+    instructions_step = db.get_instructions_prompt_file(session_id)
+    strategy_prompt_file = "strategy_" + instructions_step
 
     print("PROMPT: " + strategy_prompt_file)
 
     with open(("prompts/"+strategy_prompt_file+".txt"), 'r') as file:
         strategy_prompt = file.read()
     
+    with open(("prompts/strategy_intro.txt"), 'r') as file:
+            strategy_intro = file.read()
+        
+
+    print("DATA STATE: " + str(data_state))
+
     # strategy_prompt = strategy_prompt_template.replace("{instructions_prompt_file}", strategy_prompt_file) \
     #     .replace("{current_instructions_prompt}", strategy_prompt) \
     #     .replace("{output_prompt_component}", strategy_output_prompt_component) \
@@ -104,11 +110,11 @@ def main():
     #     .replace("{special_notes}", special_notes)
 
     strategy_messages = [
-        {"role": "system", "name": "instructions", "content": "You are an MBA professor acting as a negotiation prep coach."},
+        {"role": "system", "name": "general_instructions", "content": strategy_intro},
         {"role": "system", "name": "current_step", "content": "CURRENT STEP " + strategy_prompt_file},
         {"role": "user", "name": "conversation_history", "content" : str(chat_history)},
         {"role": "user", "name": "planning_doc_form", "content" : str(planning_doc_data)},
-        #{"role": "system", "name": "notes_so_far", "content": data_state},
+        {"role": "system", "name": "notes_so_far", "content": str(data_state)},
         {"role": "system", "name": "instructions", "content": str(strategy_prompt)},
     ]
 
@@ -116,12 +122,14 @@ def main():
     strategy_content_txt = json.dumps(strategy_content)
 
     # print("Strategy prompt: " + strategy_prompt)
-    # print("Strategy content: " + strategy_content_txt)
+    print("#####\nStrategy content: \n\n" + strategy_content_txt + "\n\n ######")
     
+
+
+
     #######################################
     # ask GPT to determine response to user
     #######################################
-
 
     # add user input to thread
     thread_id = db.get_thread_id(session_id)
@@ -135,6 +143,9 @@ def main():
     with open('prompts/coach_response_prompt_template.txt', 'r') as file:
         coach_response_prompt_template = file.read()
 
+    with open('prompts/coach_response_intro.txt', 'r') as file:
+        coach_response_intro = file.read()
+
     coach_response_prompt = coach_response_prompt_template \
         .replace("{strategy_output}", strategy_content_txt)
 
@@ -142,33 +153,24 @@ def main():
     print(coach_response_prompt)
     print("####################")
 
-    coach_response = ask_gpt_response(coach_response_prompt, thread_id, user_id, chat_history)
+
+    all_messages = []
+    for message in chat_history:
+        role = "assistant" if message['role']=="Negotiation Coach" else "user"
+        content=message['content']
+        all_messages.append({'role':role, 'content':content})
+    
+
+    coach_response_prompt_messages = []
+    coach_response_prompt_messages.extend([{"role":"system", "content" : coach_response_intro}])
+    coach_response_prompt_messages.extend(all_messages)
+    coach_response_prompt_messages.extend([{"role": "system", "content" : coach_response_prompt}])
+
+    coach_response = ask_gpt_response(coach_response_prompt_messages, thread_id, user_id, chat_history)
 
     # update database with final response
     db.update_chat_history(session_id, {"role": "Negotiation Coach", "content": coach_response})
 
-    ##################################
-    ##### PROCESS COACH RESPONSE #####
-    ##################################
-
-    # try:
-    #     db.update_special_notes(session_id, strategy_content['special_notes'])
-    # except (KeyError, TypeError) as e:
-    #     print(f"Error updating special notes: {e}")
-    
-    ############################################
-    # Handle action from strategy if appropriate
-    ############################################
-
-    
-    # action = strategy_content['action']
-    # action_data = json.loads(strategy_content['action_data'])
-    # print("Action: " + action)
-    # print("Action_data: " + json.dumps(action_data))
-    # if action in ["change_step","step_selection","next_step"] :
-    #     # print(action_data.keys)
-    #     print("CHANGING STEP TO " + action_data['step_selection'])
-    #     db.update_instructions_prompt_file(session_id, action_data['step_selection'])
 
     db.update_instructions_prompt_file(session_id, strategy_content['next_step'])
 
@@ -180,12 +182,8 @@ def main():
     with open("prompts/datastate_extractor_prompt_template.txt", 'r') as file:
         notes_prompt_template = file.read()
     # Prepare prompt
-    notes_prompt = notes_prompt_template.replace("{instructions_prompt_file}", strategy_prompt_file) \
-        .replace("{current_data_state}", json.dumps(data_state)) \
-        .replace("{conversation_thread}", json.dumps(chat_history)) \
-        .replace("{current_instructions_prompt}", strategy_prompt) \
-        .replace("{planning_doc_data}", json.dumps(planning_doc_data)) \
-        .replace("{special_notes}", special_notes)
+    notes_prompt = notes_prompt_template.replace("{instructions_prompt_file}", instructions_step) \
+        .replace("{conversation_thread}", str(chat_history))
 
     new_data_state = ask_gpt_data(notes_prompt)
 
