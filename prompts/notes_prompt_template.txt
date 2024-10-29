@@ -76,6 +76,11 @@ Critically:  it's not up to you to decide what's important!  Use your expertise 
 </### END DATA STATE INSTRUCTIONS ###>
 
 
+******************
+CURRENT DATA STATE
+*******************
+{current_data_state}
+
 
 ***************************
 CURRENT CONVERSATION THREAD

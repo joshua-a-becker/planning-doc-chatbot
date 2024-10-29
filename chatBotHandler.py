@@ -179,13 +179,27 @@ def main():
     ##### RUN GPT QUERY TO UPDATE DATA STATE ###
     ############################################
 
-    with open("prompts/datastate_extractor_prompt_template.txt", 'r') as file:
+    with open("prompts/notes_prompt_template.txt", 'r') as file:
         notes_prompt_template = file.read()
+
+    with open("prompts/notes_prompt_header.txt", 'r') as file:
+        notes_prompt_header = file.read()
     # Prepare prompt
     notes_prompt = notes_prompt_template.replace("{instructions_prompt_file}", instructions_step) \
+        .replace("{current_data_state}", str(data_state)) \
         .replace("{conversation_thread}", str(chat_history))
 
-    new_data_state = ask_gpt_data(notes_prompt)
+    notes_messages=[
+        {"role":"system", "name":"header","content":notes_prompt_header},
+        {"role":"user", "name":"conversation_history","content":str(chat_history)},
+        {"role":"system", "name":"current_data_state","content":str(data_state)},
+        {"role":"system", "name":"instructions","content":notes_prompt},
+        
+    ]
+
+    new_data_state = ask_gpt_data(notes_messages)
+
+    print("New Data State: " + str(new_data_state))
 
     db.update_data_state(session_id, new_data_state)
 

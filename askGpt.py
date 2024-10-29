@@ -39,7 +39,9 @@ data_response_format = {
     }
 }
 
-##action: list[Union[ChangeStep,StructuredReflection]]
+
+
+## STRATEGY RESPONSE STRUCTURE
 
 ProcessStep = Literal[
     "step_zero_explain_process",
@@ -77,12 +79,23 @@ class StrategyFormat(BaseModel):
     current_step: ProcessStep
     next_step: ProcessStep
 
-    
-    #general_overview:  a human-readable analysis of the situation and what action you recommend.
-    #action: one of SIX ACTIONS:[structured_reflection, open_ended_question, process_map, advisory_comment, general_comment]
-    #current_step:  the current step
-    #next_step:  the next step, which will usually be the current step unless you are process mapping.
 
+
+## NOTES RESPONSE STRUCTURE
+class TreeTopic(BaseModel):
+    type: Literal["tree_topic"]
+    name: str
+    position: str
+    values: List[str]
+    feelings: List[str]
+
+
+class NotesFormat(BaseModel):
+     general_narrative: str
+     analysis: str
+     feelings: List[str]
+     values: List[str]
+     topics: List[TreeTopic]
 
 
 def ask_gpt_strategy(messages, session_id, user_id):
@@ -134,23 +147,17 @@ def ask_gpt_response(messages, thread_id,user_id, chat_history):
 
 
 
-def ask_gpt_data(prompt: str):
-    user_prompt = {
-        "role": "user",
-        "content": prompt
-    }
-    
-    completion = client.chat.completions.create(
-        model="gpt-4o",
-        # model="gpt-4o-mini",
-        response_format=data_response_format,
-        messages=[
-            user_prompt
-        ]
+def ask_gpt_data(messages):
+
+    run = client.beta.chat.completions.parse(
+        model="gpt-4o-2024-08-06",
+        messages=messages,
+        response_format = NotesFormat
     )
+    content = run.choices[0].message.parsed.model_dump()
 
     # content = json.loads(completion.choices[0].message.content)
-    content = completion.choices[0].message.content
+    # content = completion.choices[0].message.content
 
     return content
 
