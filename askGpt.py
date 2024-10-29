@@ -3,41 +3,43 @@ from pydantic import BaseModel
 # import os
 from openai import OpenAI
 import json
+from typing_extensions import override
+from openai import AssistantEventHandler
 
 my_key = open('key_to_gpt.txt','r').readline()
 client = OpenAI(api_key=my_key)
 
 
-# def get_or_create_thread(db_thread_id, message_history):
-#     if db_thread_id!='':
-#         return db_thread_id
-#     else:
-#         thread = client.beta.threads.create()
+ 
+data_response_format = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "coaching_response",  # Changed to lowercase to follow convention
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "structured_notes": {
+                    "type": "string",
+                    "description": "Formal notes following facilitator process structure go here"
+                },
+                "additional_notes": {
+                    "type": "string",
+                    "description": "any additional notes including brief case narrative go here"
+                },
+                "unaddressed_questions": {
+                    "type": "string",
+                    "description": "any lingering questions go here (remove answered questions)"
+                },
+            },
+            "required": ["structured_notes", "additional_notes", "unaddressed_questions"],
+            "additionalProperties": False
+        }
+    }
+}
 
-#         # Populate the thread with existing messages        
-#         for message in message_history:
-#             if message["content"] == "":
-#                 continue 
-#             client.beta.threads.messages.create(
-#                 thread_id=thread.id,
-#                 role="user" if message["role"] == "Client Negotiator" else "assistant",
-#                 content=message["content"]
-#             )
-#         return thread.id
 
 
-# {
-# 	"special_notes" : "special_notes_instructions_for_here_or_BLANK",
-# 	"action_explanation" : "thought process goes here",
-# 	"action" : "some_action_goes_here",
-# 	"action_data" : { 
-# 		"example_data_header" : {
-# 			"feelings": ["feeling 1", "feeling 2"]
-# 			, "values": ["value 1", "value 2"]
-# 			, "topics": ["topic 1", "topic 2", "topic 3"]
-# 		},
-#  	},
-# 	"response_to_user" : "response goes here"
 response_format = {
     "type": "json_schema",
     "json_schema": {
@@ -60,7 +62,7 @@ response_format = {
                 },
                 "action_data": {
                     "type": "string",
-                    "description": "Any valid JSON object containing relevant data for the action such as feelings/values/topics"
+                    "description": "Any valid JSON object containing relevant data for the action such as feelings/values/topics OR the change_step new step update (critical!)"
                 },
                 "response_to_user": {
                     "type": "string",
@@ -74,13 +76,13 @@ response_format = {
 }
 
 
-def ask_gpt(instructions_prompt, thread_id, session_id, user_id, current_step):
+
+def ask_gpt_strategy(instructions_prompt, thread_id, session_id, user_id, current_step):
     # Create or retrieve the assistant
     assistant = client.beta.assistants.create(
         name="Negotiation Coach",
         instructions=instructions_prompt,
-        model="gpt-4o-2024-08-06",
-        response_format = response_format
+        model="gpt-4o",
     )
     
     # Run the assistant
@@ -146,32 +148,71 @@ def ask_gpt(instructions_prompt, thread_id, session_id, user_id, current_step):
     return content
 
 
-data_response_format = {
-    "type": "json_schema",
-    "json_schema": {
-        "name": "coaching_response",  # Changed to lowercase to follow convention
-        "strict": True,
-        "schema": {
-            "type": "object",
-            "properties": {
-                "structured_notes": {
-                    "type": "string",
-                    "description": "Formal notes following facilitator process structure go here"
-                },
-                "additional_notes": {
-                    "type": "string",
-                    "description": "any additional notes including brief case narrative go here"
-                },
-                "unaddressed_questions": {
-                    "type": "string",
-                    "description": "any lingering questions go here (remove answered questions)"
-                },
-            },
-            "required": ["structured_notes", "additional_notes", "unaddressed_questions"],
-            "additionalProperties": False
-        }
-    }
-}
+
+
+def ask_gpt_response(instructions_prompt, thread_id, session_id, user_id, current_step, chat_history):
+    # Create or retrieve the assistant
+    assistant = client.beta.assistants.create(
+        name="Negotiation Coach",
+        instructions=instructions_prompt,
+        model="gpt-4o",
+    )
+    
+    # Run the assistant
+    # run = client.beta.threads.runs.create(
+    #     thread_id=thread_id,
+    #     assistant_id=assistant.id
+    # )
+
+    # # Stream the thinking indicator
+    # update_chat_display("Thinking", user_id, is_initial=True)
+    # dot_count = 0
+    # while run.status != "completed":
+    #     run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
+    #     if run.status == "in_progress":
+    #         dot_count += 1
+    #         update_chat_display(f"Thinking{'. ' * (dot_count // 1)}", user_id, is_initial=False)
+
+
+        # update_chat_display("Thinking", user_id, is_initial=True)
+    # dot_count = 0
+    # while run.status != "completed":
+    #     run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
+    #     if run.status == "in_progress":
+    #         dot_count += 1
+    #         update_chat_display(f"Thinking{'. ' * (dot_count // 1)}", user_id, is_initial=False)
+
+    class ResponseAccumulator:
+        def __init__(self):
+            self.text = ""
+
+    final_response = ResponseAccumulator()
+
+    class EventHandler(AssistantEventHandler):    
+        @override
+        def on_text_created(self, text) -> None:
+            with open('ux/userdata/chatTranscript_'+user_id+'.json', 'r+') as file:
+                file.seek(0)
+                json.dump(chat_history, file)
+                file.truncate()
+            print(f"\nassistant > ", end="", flush=True)
+            update_chat_display("", user_id, is_initial=True)
+            
+        @override
+        def on_text_delta(self, delta, snapshot):            
+            print(delta.value, end="", flush=True)
+            final_response.text += delta.value
+            update_chat_display(final_response.text, user_id, is_initial=False)
+
+    with client.beta.threads.runs.stream(
+        thread_id=thread_id,
+        assistant_id=assistant.id,
+        instructions=instructions_prompt,
+        event_handler=EventHandler(),
+    ) as stream:
+        stream.until_done()    
+
+    return final_response.text
 
 
 
