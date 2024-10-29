@@ -114,7 +114,7 @@ def main():
     log_file = open("message.log","a")
     sys.stdout = log_file
     
-    print("PROMPT CONTENTS: " + prompt)
+    # print("PROMPT CONTENTS: " + prompt)
 
     # run user-response prompt
     import time

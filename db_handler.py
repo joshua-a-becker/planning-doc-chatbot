@@ -83,10 +83,6 @@ class DatabaseHandler:
             with open('ux/userdata/chatTranscript_'+user_id+'.json', 'w') as file:
                 json.dump(session['chat_history'], file)
             
-            ### initialize form data for display
-            with open('ux/userdata/formData_'+ user_id +'.json', 'w') as f:
-                json.dump(session['form_data'], f)
-            
             return user['session_id']
         else:
             # If user doesn't exist, create new user and session
@@ -113,14 +109,12 @@ class DatabaseHandler:
             if(not session_exists):
                 self.create_new_session_for_user_by_session_id(user_id, session_id)
                 
-            return True
-
         else:
             # If user doesn't exist, create new user and session
             self.users.insert({'user_id': user_id, 'session_id': session_id})
-            return True
 
-        return False
+
+        return True
 
     def get_session(self, session_id):
         Session = Query()
@@ -195,17 +189,26 @@ class DatabaseHandler:
             self.sessions.update(session, Session.session_id == session_id)
 
     def set_planning_doc_data(self, user_id, planning_doc_data=None):
+        print("line 198")
+        
         session_id = self.get_session_id_for_user(user_id)
+
+
         session = self.get_session(session_id)
         
+        print("line 201")
+
         if planning_doc_data is None:
+            print("no planning doc data")
             # Only perform file operations if planning_doc_data wasn't provided
             if not os.path.exists('ux/userdata/formData_'+user_id+'.json'):
+                print("writing blank")
                 with open('ux/userdata/formData_'+session_id+'.json', 'w') as f:
                     f.write(json.dumps(blank_form_data))
 
-            with open('ux/userdata/formData_'+user_id+'.json', 'r') as file:
-                planning_doc_data = json.load(file)
+            print("line 211")
+
+
 
         session['form_data'] = planning_doc_data
 
