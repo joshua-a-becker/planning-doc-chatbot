@@ -67,12 +67,51 @@ const App = () => {
 
 
   useEffect(()=>{
+
+    
+    
+    // set isSubmitting based on state of message chain
+    // note---the brief gap is filled but setIsSubmitting(true) on message send
+    // console.log(chatTranscript)
+    // console.log("CT: " + chatTranscript.length)
+    window.chatTranscript=chatTranscript
+    if(chatTranscript.length===0) return;
+
+    const shouldBeIsSubmitting = 
+      (chatTranscript.at(-1).role=="Client Negotiator") ||
+      chatTranscript.at(-1).content.trim().startsWith("<THINKING/>")
+
+    setIsSubmitting(shouldBeIsSubmitting);
+
+    // // and at this point, if isSubmitting==false (SHOULD be)
+    // //console.log("msg: " + newData.chatTranscript.at(-1).content)
+    // console.log("!SBI: " + !shouldBeIsSubmitting)
+    // console.log("UIR.current: " + userInputRef.current)
+    if(!shouldBeIsSubmitting & userInputRef.current==="processing...") {
+      console.log("clearing user input")
+      setUserInput("")
+    }
+
+    if(shouldBeIsSubmitting) {
+      setUserInput("processing...")
+    }
+
+
     scrollToBottom();      
+    // console.log("Before focus, active element:", document.activeElement);
+    requestAnimationFrame(() => {
+      userInputFieldRef.current?.focus();
+    });
+    // console.log("After focus, active element:", document.activeElement);
+    // console.log("Is input focused?", document.activeElement === userInputFieldRef.current);
+
+    
   }, [chatTranscript]);
   
 
   useEffect(() => {
-    
+
+  
     const initialize = async () => {
       console.log("attempting initialization")
       if (!initializationPromise.current) {
@@ -103,8 +142,13 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    
+    console.log("App mounted");
+    return () => console.log("App unmounted");
+  }, []);
 
+  useEffect(() => {
+    
+    console.log("EventSource effect running");
     const eventSource = new EventSource(SERVER_URL+'/events/'+userId+'/'+sessionId);
     eventSource.onmessage = (event) => {
       if (event.data !== 'connected') {
@@ -113,43 +157,14 @@ const App = () => {
         if (newData.chatTranscript) {
           
           setChatTranscript(newData.chatTranscript);
-
-          
-          // set isSubmitting based on state of message chain
-          // note---the brief gap is filled but setIsSubmitting(true) on message send
-          console.log("setting isSubmitting")
-          const shouldBeIsSubmitting = 
-            (newData.chatTranscript.at(-1).role=="Client Negotiator" & newData.chatTranscript.at(-1).content!="") ||
-            newData.chatTranscript.at(-1).content.trim().startsWith("<THINKING/>")
-
-          setIsSubmitting(
-            shouldBeIsSubmitting
-          );
-
-          // and at this point, if isSubmitting==false (SHOULD be)
-          console.log("role: " + newData.chatTranscript.at(-1).role)
-          //console.log("msg: " + newData.chatTranscript.at(-1).content)
-          console.log("THINKING: " + newData.chatTranscript.at(-1).content.trim().startsWith("<THINKING/>"))
-          console.log("UI: " + userInputRef.current)
-          console.log("NOT submitting: " + !shouldBeIsSubmitting)
-          if(!shouldBeIsSubmitting & userInputRef.current==="processing...") {
-            console.log("clearing user input")
-            setUserInput("")
-          }
-
-          if(shouldBeIsSubmitting) {
-            setUserInput("processing...")
-          }
-
-          // there's a clear signal for completion
-          if( !newData.chatTranscript.at(-1).content.trim().includes("<THINKING/>") ){
-            userInputFieldRef.current?.focus()
-          }
-
+ 
         }
       }
     };
-    return () => eventSource.close();
+    return () => {
+      console.log("EventSource effect cleanup");
+      eventSource.close();
+    }
   }, []);
 
 
@@ -271,8 +286,8 @@ const App = () => {
   };
 
   const handleSendMessage = async () => {
-    
     setIsSubmitting(true);
+    scrollToBottom();
     setUserInput("processing...")
     console.log("set true: " + isSubmitting)
     try {
@@ -286,7 +301,7 @@ const App = () => {
       console.error('Error running chatbot:', error);
     }
 
-    scrollToBottom();
+    // scrollToBottom();
     // setIsSubmitting(false);
     console.log("set false: " + isSubmitting);
   };
