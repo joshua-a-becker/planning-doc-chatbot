@@ -29,33 +29,19 @@ const App = () => {
   //const [initialized, setInitialized] = useState(false);
   const initializationPromise = useRef(null);
 
-  const [firstLoad, setFirstLoad] = useState(true);
-
   const [formClosed, setFormClosed] = useState(1);
 
   const [isAutoChatting, setIsAutoChatting] = useState(false);
   
   const userInputRef = useRef('');
 
-  const messagesContainerRef = useRef(null);
-
-  const scrollToBottom = () => {
-    messagesContainerRef.current?.scrollTo(0, messagesContainerRef.current.scrollHeight);
-  };
-
   // Update the ref whenever userInput changes
   useEffect(() => {
     userInputRef.current = userInput;
   }, [userInput]);
-
-
-  useEffect(()=>{
-    scrollToBottom();      
-  }, [chatTranscript]);
   
 
   useEffect(() => {
-    
     const initialize = async () => {
       console.log("attempting initialization")
       if (!initializationPromise.current) {
@@ -82,7 +68,6 @@ const App = () => {
     };
 
     initialize();
-
   }, []);
 
   useEffect(() => {
@@ -96,7 +81,6 @@ const App = () => {
         if (newData.chatTranscript) {
           
           setChatTranscript(newData.chatTranscript);
-
           
           // set isSubmitting based on state of message chain
           // note---the brief gap is filled but setIsSubmitting(true) on message send
@@ -104,16 +88,15 @@ const App = () => {
           const shouldBeIsSubmitting = 
             (newData.chatTranscript.at(-1).role=="Client Negotiator" & newData.chatTranscript.at(-1).content!="") ||
             newData.chatTranscript.at(-1).content.toLowerCase().includes("thinking")
-
           setIsSubmitting(
             shouldBeIsSubmitting
           );
 
           // and at this point, if isSubmitting==false (SHOULD be)
-          console.log("role: " + newData.chatTranscript.at(-1).role)
-          console.log("msg: " + newData.chatTranscript.at(-1).content)
+          console.log("UI....")
           console.log("UI: " + userInputRef.current)
-          console.log("NOT submitting: " + !shouldBeIsSubmitting)
+          console.log("UI: " + (userInputRef.current==="processing..."))
+          console.log("SBIS: " + !shouldBeIsSubmitting)
           if(!shouldBeIsSubmitting & userInputRef.current==="processing...") {
             console.log("clearing user input")
             setUserInput("")
@@ -254,12 +237,11 @@ const App = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userInput: userInput }),
       });
-      
     } catch (error) {
       console.error('Error running chatbot:', error);
     }
 
-    scrollToBottom();
+    
     // setIsSubmitting(false);
     console.log("set false: " + isSubmitting);
   };
@@ -303,21 +285,21 @@ const App = () => {
         </div>
 
         {/* Messages Container */}
-        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {chatTranscript.map((message, index) => (
             <div
               key={index}
-              className={`rounded-lg p-4 mb-4 max-w-[80%] ${
-                message.role === 'Client Negotiator' 
-                  ? 'bg-slate-200 ml-auto' // Right-aligned
-                  : 'bg-indigo-100 mr-auto'  // Left-aligned
+              className={`relative p-4 rounded-lg ${
+                message.role === 'assistant'
+                  ? 'bg-blue-50 ml-12'
+                  : 'bg-gray-100 mr-12'
               }`}
             >
-              <div className="font-medium text-sm mb-1">
+              <div className="font-medium text-sm text-gray-600 mb-2">
                 {message.role}
               </div>
               <div 
-                className="text-gray-800"
+                className="text-gray-800 prose prose-sm max-w-none"
                 dangerouslySetInnerHTML={{__html: message.content}}
               />
             </div>
@@ -331,14 +313,9 @@ const App = () => {
               type="text"
               value={userInput}
               onChange={handleUserInputChange}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !isSubmitting) {
-                  handleSendMessage();
-                }
-              }}
               disabled={isSubmitting}
               placeholder="Type your message..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:text-gray-500 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <button
               onClick={handleSendMessage}

@@ -80,9 +80,9 @@ async function setupFileWatcher(userId, sessionId) {
           const blankData = await fs.readFile(path.join(__dirname, '../storage/chatTranscript_blank.json'), 'utf8');
           await fs.writeFile(file, blankData);
         } else if(file.includes('formData')) {
-          const blankData = await fs.readFile(path.join(__dirname, '../storage/formData_blank.json'), 'utf8');
+          // const blankData = await fs.readFile(path.join(__dirname, '../storage/formData_blank.json'), 'utf8');
 
-          await fs.writeFile(file, blankData);
+          // await fs.writeFile(file, blankData);
         } else {
           // Create empty text file for user input
           // NOT DONE
@@ -281,12 +281,13 @@ app.post('/save/:userId', async (req, res) => {
 
   try {
     console.log("saving to text file...")
+
     await fs.writeFile(dataFilePath(userId), JSON.stringify(req.body, null, 2));
     const scriptPath = path.join(__dirname, '..', 'saveFormData.py');
     console.log("saving to text database...")
     const command = `python3 "${scriptPath}" "${userId}"`;
 
-    
+    console.log("running command...")
     await exec(command, { detached: true }, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
