@@ -40,10 +40,14 @@ const App = () => {
   const [userInput, setUserInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [myVal, setMyVal] = useState(0);
+
   const [lastMessage, setLastMessage] = useState("");
 
   //const [initialized, setInitialized] = useState(false);
   const initializationPromise = useRef(null);
+
+  const prevMessageRef = useRef(null);
 
   const [firstLoad, setFirstLoad] = useState(true);
 
@@ -69,13 +73,9 @@ const App = () => {
   useEffect(()=>{
 
     
-    
-    // set isSubmitting based on state of message chain
-    // note---the brief gap is filled but setIsSubmitting(true) on message send
-    // console.log(chatTranscript)
-    // console.log("CT: " + chatTranscript.length)
-    window.chatTranscript=chatTranscript
     if(chatTranscript.length===0) return;
+
+    const currentLastMessage = chatTranscript.at(-1)?.content;
 
     const shouldBeIsSubmitting = 
       (chatTranscript.at(-1).role=="Client Negotiator") ||
@@ -97,17 +97,51 @@ const App = () => {
     }
 
 
-    scrollToBottom();      
-    // console.log("Before focus, active element:", document.activeElement);
-    requestAnimationFrame(() => {
-      userInputFieldRef.current?.focus();
-    });
-    // console.log("After focus, active element:", document.activeElement);
-    // console.log("Is input focused?", document.activeElement === userInputFieldRef.current);
-
     
+    console.log("ChatTranscript updated: ",  prevMessageRef.current!=currentLastMessage);
+    console.log("Current : ", currentLastMessage)
+    console.log("Previous: ", prevMessageRef.current)
+    
+
+    if(prevMessageRef.current !== currentLastMessage) {
+      scrollToBottom();      
+      requestAnimationFrame(() => {
+        console.log("focus");
+        userInputFieldRef.current?.focus();
+      });    
+    }
+
+    prevMessageRef.current = currentLastMessage;
+    // return () => {      
+    //   const currentLastMessage = chatTranscript.at(-1)?.content
+    //   console.log("ChatTranscript updated: ", previousLastMessage!=currentLastMessage);
+    //   console.log("Current : ", currentLastMessage)
+    //   console.log("Previous: ", previousLastMessage)
+
+    //   // only run if chat Transcript is actually updated
+    //   if(previousLastMessage!=currentLastMessage) {
+    //     scrollToBottom();      
+    //     // console.log("Before focus, active element:", document.activeElement);
+    //     requestAnimationFrame(() => {
+    //       console.log("focus")
+    //       userInputFieldRef.current?.focus();
+    //     });    
+    //   }
+    // };
   }, [chatTranscript]);
   
+
+  useEffect(()=>{
+    
+      console.log("My val: ", myVal)
+      return () => {
+        // This runs BEFORE the next effect, but has access to 
+        // the values from when this effect ran
+        console.log("Cleaning up from when myVal was:", myVal);
+      };
+    
+  }, [myVal]);
+
 
   useEffect(() => {
 
@@ -135,6 +169,12 @@ const App = () => {
         console.log("end initialization run")
       }
       console.log("end initialiation attempt")
+
+      requestAnimationFrame(() => {
+        console.log("loading scroll")
+        scrollToBottom();   
+      });   
+  
     };
 
     initialize();
@@ -241,7 +281,6 @@ const App = () => {
 
 
   const updateData = (newData) => {
-    console.log("here")
     setFormData(newData);
     debouncedSaveFormData(newData);
   }
