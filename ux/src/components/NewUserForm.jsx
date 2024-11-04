@@ -1,93 +1,89 @@
 import React, { useState } from 'react';
 import { Send } from 'lucide-react';
 
-const styles = {
-  container: {
-    display: 'flex',
-    height: '100vh',
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f8f9fa',
-    padding: '20px',
-  },
-  formCard: {
-    width: '100%',
-    maxWidth: '400px',
-    backgroundColor: 'white',
-    borderRadius: '8px',
-    padding: '32px',
-    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-  },
-  title: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    marginBottom: '24px',
-    textAlign: 'center',
-  },
-  inputGroup: {
-    display: 'flex',
-    marginBottom: '16px',
-  },
-  input: {
-    flex: '1',
-    padding: '10px',
-    border: '1px solid #e0e0e0',
-    borderRadius: '4px 0 0 4px',
-    fontSize: '14px',
-    '&:focus': {
-      outline: 'none',
-      borderColor: '#3498db',
-    },
-  },
-  button: {
-    padding: '10px 16px',
-    backgroundColor: '#3498db',
-    color: 'white',
-    border: 'none',
-    borderRadius: '0 4px 4px 0',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    '&:hover': {
-      backgroundColor: '#2980b9',
-    },
-  },
-};
-
 const NewUserForm = () => {
   const [username, setUsername] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (username.trim()) {
-      // Replace whitespace with underscores and remove any other special characters
       const formattedUsername = username.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
       window.location.href = `${window.location.pathname}?userId=${encodeURIComponent(formattedUsername)}`;
     }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.formCard}>
-        <h1 style={styles.title}>Welcome to your online negotiation coach!</h1>
-        <form onSubmit={handleSubmit}>
-          <div style={styles.inputGroup}>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              style={styles.input}
-              placeholder="Enter username"
-              required
-            />
-            <button type="submit" style={styles.button}>
-              <Send size={18} />
-            </button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="absolute inset-0" style={{ 
+        backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(203 213 225 / 0.2) 1px, transparent 0)',
+        backgroundSize: '40px 40px'
+      }}></div>
+      
+      <div className="container mx-auto px-4 py-16 relative">
+        <div className="max-w-2xl mx-auto space-y-8">
+          {/* Hero Section */}
+          <div className="text-center space-y-4">
+            <div className="inline-block mb-2 text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+              AI-Powered Negotiation Platform
+            </div>
+            <h1 className="text-4xl font-bold text-slate-900">
+              Your Personal Negotiation Coach
+            </h1>
+            <p className="text-xl text-slate-600">
+              Master the art of negotiation with AI-powered guidance
+            </p>
           </div>
-        </form>
+
+          {/* Main Content Block */}
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-slate-200">
+            <div className="p-8">
+              <div className="prose text-slate-700">
+                <p className="mb-4">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor 
+                  incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis 
+                  nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                </p>
+                <p className="mb-4">
+                  Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore 
+                  eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt 
+                  in culpa qui officia deserunt mollit anim id est laborum.
+                </p>
+                <p>
+                  Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit 
+                  laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure 
+                  reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Username Input Card */}
+          <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden border border-slate-200">
+            <div className="p-6">
+              <h2 className="text-2xl font-semibold text-center mb-4 text-slate-900">
+                Get Started
+              </h2>
+              <form onSubmit={handleSubmit}>
+                <div className="flex rounded-lg overflow-hidden border border-slate-200 bg-white">
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="flex-1 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter username"
+                    required
+                  />
+                  <button 
+                    type="submit" 
+                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                  >
+                    <Send size={18} />
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

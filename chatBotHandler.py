@@ -68,7 +68,7 @@ def main():
 
 
     # update chat history with user input
-    db.update_chat_history(session_id, {"role": "Client Negotiator", "content": user_input})
+    db.update_chat_history(session_id, {"role": user_id, "content": user_input})
 
     # update chat display with user input
     chat_history = db.get_chat_history(session_id)

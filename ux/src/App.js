@@ -78,7 +78,7 @@ const App = () => {
     const currentLastMessage = chatTranscript.at(-1)?.content;
 
     const shouldBeIsSubmitting = 
-      (chatTranscript.at(-1).role=="Client Negotiator") ||
+      (chatTranscript.at(-1).role==userId) ||
       chatTranscript.at(-1).content.trim().includes("<THINKING/>")
 
     setIsSubmitting(shouldBeIsSubmitting);
@@ -389,7 +389,7 @@ const App = () => {
             <div
               key={index}
               className={`rounded-lg p-4 mb-4 max-w-[80%] ${
-                message.role === 'Client Negotiator' 
+                message.role === userId
                   ? 'bg-slate-200 ml-auto' // Right-aligned
                   : 'bg-indigo-100 mr-auto'  // Left-aligned
               }`}
@@ -570,7 +570,7 @@ const PersonForm = ({ personNumber, data, updateData }) => {
         <div className="space-y-4 mt-6">
           <div>
             <label className="block font-medium text-gray-700 mb-1" htmlFor={`alternative-${personNumber}`}>
-              BATNA
+              BATNA (Best Alternative to Negotiated Agreement)
             </label>
             <input
               id={`alternative-${personNumber}`}
@@ -583,7 +583,7 @@ const PersonForm = ({ personNumber, data, updateData }) => {
 
           <div>
             <label className="block font-medium text-gray-700 mb-1" htmlFor={`bottomLine-${personNumber}`}>
-              RP
+              Reservation Point
             </label>
             <input
               id={`bottomLine-${personNumber}`}
