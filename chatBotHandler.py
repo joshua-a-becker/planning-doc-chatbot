@@ -75,6 +75,8 @@ def main():
     with open('ux/userdata/chatTranscript_'+user_id+'.json', 'w') as file:
         json.dump(chat_history, file)
 
+    print("display updated")
+
     ### load planning doc data
     planning_doc_data = db.load_planning_doc_data(user_id) #TBD <- session_id
     
@@ -99,7 +101,13 @@ def main():
     
     with open(("prompts/strategy_intro.txt"), 'r') as file:
             strategy_intro = file.read()
-        
+
+    with open(("prompts/skills_trainer.txt"), 'r') as file:
+            skills_trainer = file.read()
+
+    with open(("prompts/technical_administrator.txt"), 'r') as file:
+            technical_administrator = file.read()
+
 
     print("DATA STATE: " + str(data_state))
 
@@ -110,12 +118,14 @@ def main():
     #     .replace("{special_notes}", special_notes)
 
     strategy_messages = [
-        {"role": "system", "name": "general_instructions", "content": strategy_intro},
-        {"role": "system", "name": "current_step", "content": "CURRENT STEP " + strategy_prompt_file},
-        {"role": "user", "name": "conversation_history", "content" : str(chat_history)},
-        {"role": "user", "name": "planning_doc_form", "content" : str(planning_doc_data)},
-        {"role": "system", "name": "notes_so_far", "content": str(data_state)},
-        {"role": "system", "name": "instructions", "content": str(strategy_prompt)},
+        {"role": "system", "name": "instructor_general_instructions", "content": strategy_intro},
+        {"role": "system", "name": "self_current_step", "content": "CURRENT STEP " + strategy_prompt_file},
+        {"role": "user", "name": "self_conversation_history", "content" : str(chat_history)},
+        {"role": "user", "name": "user_planning_doc", "content" : str(planning_doc_data)},
+        {"role": "system", "name": "self_notes_so_far", "content": str(data_state)},
+        {"role": "system", "name": "instructor_instructions", "content": str(strategy_prompt)},
+        {"role": "system", "name": "instructor_skills_trainer", "content": str(skills_trainer)},
+        {"role": "system", "name": "instructor_technical_administrator", "content": str(technical_administrator)}
     ]
 
     strategy_content = ask_gpt_strategy(strategy_messages, session_id, user_id)
@@ -140,19 +150,17 @@ def main():
     )
 
     # load prompt content
-    with open('prompts/coach_response_prompt_template.txt', 'r') as file:
-        coach_response_prompt_template = file.read()
-
     with open('prompts/coach_response_intro.txt', 'r') as file:
         coach_response_intro = file.read()
 
-    coach_response_prompt = coach_response_prompt_template \
-        .replace("{strategy_output}", strategy_content_txt)
+    with open('prompts/coach_response_instructions.txt', 'r') as file:
+        coach_response_instructions = file.read(). \
+            replace("{strategy_output}", strategy_content_txt). \
+            replace("{instructions_prompt_file}", instructions_step)
 
-    print("COACHING REPONSE PROMPT:\n")
-    print(coach_response_prompt)
-    print("####################")
 
+    with open('prompts/coach_response_skills_training.txt', 'r') as file:
+        coach_response_skills_training = file.read()
 
     all_messages = []
     for message in chat_history:
@@ -163,8 +171,9 @@ def main():
 
     coach_response_prompt_messages = []
     coach_response_prompt_messages.extend([{"role":"system", "content" : coach_response_intro}])
+    coach_response_prompt_messages.extend([{"role":"system", "content" : coach_response_skills_training}])
     coach_response_prompt_messages.extend(all_messages)
-    coach_response_prompt_messages.extend([{"role": "system", "content" : coach_response_prompt}])
+    coach_response_prompt_messages.extend([{"role": "system", "content" : coach_response_instructions}])
 
     coach_response = ask_gpt_response(coach_response_prompt_messages, thread_id, user_id, chat_history)
 

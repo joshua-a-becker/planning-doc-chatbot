@@ -1,0 +1,12 @@
+planning.negotiation.solutions {
+        route /* {
+                reverse_proxy localhost:3001
+        }
+}
+
+
+167.172.55.65 {
+        route /* {
+                reverse_proxy localhost:3001
+        }
+}

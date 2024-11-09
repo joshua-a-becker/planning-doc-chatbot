@@ -51,13 +51,20 @@ ProcessStep = Literal[
     "step_four_batna"
 ]  
 
-class Reflection(BaseModel):
-    type: Literal["reflection"]
+class QuestionAfterReflection(BaseModel):
+    type: Literal["question_with_reflection"]
     feelings: List[str]
     values: List[str]
     topics: List[str]
     closing_phrase: str
     follow_up_question: str
+
+class Reflection(BaseModel):
+    type: Literal["reflection_only"]
+    feelings: List[str]
+    values: List[str]
+    topics: List[str]
+    closing_phrase: str
 
 class OpenQuestion(BaseModel):
     type: Literal["open_ended_question"]
@@ -73,9 +80,16 @@ class ProcessMap(BaseModel):
     current_step_is: str
     explanation_and_or_redirecting_comment: str
 
+class Overview(BaseModel):
+     type: Literal["general_narrative_overview"]
+     narrative_summary: str
+     action: str
+     explanation: str
+     additional_comments: str
+
 class StrategyFormat(BaseModel):
-    general_overview: str
-    action: Reflection | OpenQuestion | ProcessMap
+    general_overview: Overview
+    action: Reflection | OpenQuestion | QuestionAfterReflection | ProcessMap
     current_step: ProcessStep
     next_step: ProcessStep
 

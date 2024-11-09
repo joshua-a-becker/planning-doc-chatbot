@@ -1,13 +1,15 @@
+from openai import OpenAI
 import os
+import time
+localdir = open('localdir.txt', 'r').read()
+os.chdir(localdir)
 
-os.chdir("/Users/joshua/Dropbox/academia/Research/ChatBot/PrepPartner")
-# os.chdir("/root/planning-doc-chatbot")
 
 import json
-from openai import OpenAI
+
 
 # File paths
-chat_history_file = 'ux/chatTranscript.json'
+chat_history_file = 'ux/userdata/chatTranscript_autobot.json'
 prompt_template_file = 'prompts/client_prompt_template.txt'
 api_key_file = 'key_to_gpt.txt'
 
@@ -24,7 +26,7 @@ with open(prompt_template_file, 'r') as f:
     prompt_template = f.read()
 
 # Replace placeholder with chat history
-prompt = prompt_template.replace('{conversation_history}', json.dumps(chat_history['messages']))
+prompt = prompt_template.replace('{conversation_history}', json.dumps(chat_history))
 
 # Send request to OpenAI API
 response = client.chat.completions.create(
@@ -38,12 +40,6 @@ api_response = response.choices[0].message.content
 # Append response to chat history
 # chat_history['messages'].append({"role": "Client Negotiator", "content": api_response})
 
-with open("ux/user-input.txt", 'w') as f:
-    json.dump(api_response, f, indent=2)
-
-# Save updated chat history
-# with open(chat_history_file, 'w') as f:
-#     json.dump(chat_history, f, indent=2)
-
-# print("Response added to chat history.")
-print("Response saved to user input")
+os.chdir("ux")
+os.system(f'python3 ../chatBotHandler.py autobot NA "{api_response}"')
+os.getcwd()
