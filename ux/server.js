@@ -325,7 +325,11 @@ app.post('/saveUserInput/:userId', async (req, res) => {
   
 });
 
-app.post('/auto-chat/:userId/:sessionId', (req, res) => {
+app.get('/test', (req, res) => {
+  res.send('Test route working');
+});
+
+app.get('/auto-chat/:userId/:sessionId', (req, res) => {
 
   const userId = req.params.userId;
   const sessionId = userId; // req.params.sessionId

@@ -14,4 +14,4 @@ pm2 save
 
 pm2 restart server # restart
 
-pm2 restart server # monitor
+pm2 monit            # Shows real-time monitoring

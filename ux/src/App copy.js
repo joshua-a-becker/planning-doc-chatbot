@@ -5,419 +5,36 @@ import NewUserForm from './components/NewUserForm';
 //import { useParams } from 'react-router-dom';
 
 const SERVER_URL = "https://planning.negotiation.solutions/data"
-// const SERVER_URL = "http://167.172.55.65:3001"
-// const SERVER_URL = "http://localhost:3001"
-
-const colors = {
-  primary: '#3498db',
-  secondary: '#2ecc71',
-  background: '#f8f9fa',
-  text: '#2c3e50',
-  border: '#e0e0e0',
-};
-
-const styles = {
-
-  toggleButton_open: {
-    position: 'absolute',
-    top: '50%',
-    left: 'calc(40% - 30px)', // Adjust based on your layout
-    width: '30px',
-    height: '30px',
-    borderRadius: '50%',
-    backgroundColor: colors.primary,
-    color: 'white',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    cursor: 'pointer',
-    border: 'none',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-    zIndex: 10,
-  },
 
 
-  toggleButton_closed: {
-    position: 'absolute',
-    top: '50%',
-    left: 'calc(80% - 15px)', // Adjust based on your layout
-    width: '30px',
-    height: '30px',
-    borderRadius: '50%',
-    backgroundColor: colors.primary,
-    color: 'white',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    cursor: 'pointer',
-    border: 'none',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-    zIndex: 10,
-  },
 
-
-  app: {
-    display: 'flex',
-    height: '100vh',
-    width: '100%',
-    overflowX: 'hidden',
-    fontFamily: "'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
-    color: colors.text,
-    backgroundColor: colors.background,
-  },
-
-  chatSection_closed: {
-    flex: '0 0 80%',
-    borderRight: `1px solid ${colors.border}`,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-
-  formSection_closed: {
-    flex: '0 0 30%',
-    overflowY: 'auto',
-    minWidth: '50%',
-    padding: '20px',
-    overflowX: 'visible',
-    filter: 'blur(2px) brightness(0.7)',
-  },
-
-  chatSection_open: {
-    flex: '1 1 40%',
-    borderRight: `1px solid ${colors.border}`,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-
-  formSection_open: {
-    flex: '1 1 60%',
-    overflowY: 'auto',
-    minWidth: '50%',
-    padding: '20px',
-  },
-
-  heading: {
-    color: colors.primary,
-    borderBottom: `2px solid ${colors.primary}`,
-    paddingBottom: '10px',
-    marginBottom: '20px',
-  },
-  personSection: {
-    marginBottom: '30px',
-    backgroundColor: 'white',
-    borderRadius: '8px',
-    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-    padding: '20px',
-  },
-  row: {
-    marginBottom: '15px',
-  },
-  label: {
-    minWidth: '80px',
-    marginRight: '10px',
-    fontWeight: 'bold',
-    color: '#555',
-  },
+const ThinkingDots = () => {
+  const [dots, setDots] = useState('.');
   
-
-  input: {
-    flex: 1,
-    padding: '8px',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-    fontSize: '14px',
-  },
-  inputOLD: {
-    width: '100%',
-    padding: '10px',
-    border: `1px solid ${colors.border}`,
-    borderRadius: '4px',
-    fontSize: '14px',
-    transition: 'border-color 0.3s',
-    '&:focus': {
-      borderColor: colors.primary,
-      outline: 'none',
-    },
-  },
-  button: {
-    padding: '8px 12px',
-    backgroundColor: '#f0f0f0',
-    color: '#333',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '5px',
-    fontSize: '14px',
-    transition: 'background-color 0.3s',
-    '&:hover': {
-      backgroundColor: '#e0e0e0',
-    },
-  },
-  topicRow: {
-    backgroundColor: '#f8f9fa',
-    border: '1px solid #e0e0e0',
-    borderRadius: '8px',
-    padding: '15px',
-    marginBottom: '20px',
-  },
-  inputGroup: {
-    display: 'flex',
-    alignItems: 'center',
-    marginBottom: '10px',
-  },
-  
-  deleteButton: {
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    color: '#e74c3c',
-    display: 'flex',
-    alignItems: 'center',
-    padding: '5px',
-    marginLeft: '10px',
-  },
-  topicInput: {
-    marginBottom: '10px',
-  },
-  topicLabel: {
-    display: 'block',
-    marginBottom: '5px',
-    fontWeight: 'bold',
-    color: '#555',
-  },
-
-  chatTranscript: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-  },
-  messagesContainer: {
-    flexGrow: 1,
-    overflowY: 'auto',
-    padding: '20px',
-    scrollBehavior: 'smooth',
-  },
-
-  message: {
-    marginBottom: '15px',
-    padding: '10px',
-    borderRadius: '8px',
-    backgroundColor: '#f1f1f1',
-  },
-  chatInput: {
-    display: 'flex',
-    padding: '15px',
-    borderTop: `1px solid ${colors.border}`,
-  },
-  chatInputField: {
-    flex: 1,
-    padding: '10px',
-    border: `1px solid ${colors.border}`,
-    borderRadius: '4px',
-    marginRight: '10px',
-  },
-};
-
-
-
-const PersonForm = ({ personNumber, data, updateData }) => {
-  const person = `person${personNumber}`;
-
-  const updateField = (field, value) => {
-    const newData = {
-      ...data,
-      [person]: { ...data[person], [field]: value }
-    };
-    updateData(newData);
-  };
-
-  const updateTopic = (index, field, value) => {
-    const newData = {
-      ...data,
-      [person]: {
-        ...data[person],
-        topics: data[person].topics.map((item, i) => 
-          i === index ? { ...item, [field]: value } : item
-        )
-      }
-    };
-    updateData(newData);
-  };
-
-  const addTopic = () => {
-
-    const newData = {
-      ...data,
-      [person]: {
-        ...data[person],
-        topics: [...(data[person].topics || []), { topic: '', position: '', needsInterests: '' }]
-      }
-    };
-    updateData(newData);
-  };
-
-  const deleteTopic = (index) => {
-    const newData = {
-      ...data,
-      [person]: {
-        ...data[person],
-        topics: data[person].topics.filter((_, i) => i !== index)
-      }
-    }
-    updateData(newData);
-  };
-
-  return (
-    <div style={styles.personSection}>
-      <h2>{personNumber === 1 ? "Self" : "Counterpart"}</h2>
-      {data[person].topics.map((topic, index) => (
-        <div key={index} style={styles.topicRow}>
-          <div style={styles.inputGroup}>
-            <span style={styles.label}>Topic:</span>
-            <input
-              type="text"
-              value={topic.topic}
-              onChange={(e) => updateTopic(index, 'topic', e.target.value)}
-              style={styles.input}
-            />
-          </div>
-          <div style={styles.inputGroup}>
-            <span style={styles.label}>Position:</span>
-            <input
-              type="text"
-              value={topic.position}
-              onChange={(e) => updateTopic(index, 'position', e.target.value)}
-              style={styles.input}
-            />
-          </div>
-          <div style={styles.inputGroup}>
-            <span style={styles.label}>Interest:</span>
-            <input
-              type="text"
-              value={topic.needsInterests}
-              onChange={(e) => updateTopic(index, 'needsInterests', e.target.value)}
-              style={styles.input}
-            />
-            <button onClick={() => deleteTopic(index)} style={styles.deleteButton}>
-              <Trash2 size={18} />
-            </button>
-          </div>
-        </div>
-      ))}
-      <button style={styles.button} onClick={addTopic}>
-        <Plus size={14} />
-        Add Topic
-      </button>
-      <br/><br/>
-      <div style={styles.row}>
-        <div style={{ flex: 1 }}>
-          <label style={styles.label} htmlFor={`alternative-${personNumber}`}>BATNA</label>
-          <input
-            id={`alternative-${personNumber}`}
-            style={styles.input}
-            type="text"
-            value={data[person].alternative}
-            onChange={(e) => updateField('alternative', e.target.value)}
-          />
-        </div>
-      </div>
-      <div style={styles.row}>
-        <div style={{ flex: 1 }}>
-          <label style={styles.label} htmlFor={`bottomLine-${personNumber}`}>RP</label>
-          <input
-            id={`bottomLine-${personNumber}`}
-            style={styles.input}
-            type="text"
-            value={data[person].bottomLine}
-            onChange={(e) => updateField('bottomLine', e.target.value)}
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ChatTranscript = ({ messages, userInput, onUserInputChange, onSendMessage, handleResetSystem, autoChatOnce, autoChatRun, 
-  isAutoChatting, isSubmitting }) => {
-  
-  const messagesContainerRef = useRef(null);
-  const [isNearBottom, setIsNearBottom] = useState(true);
-
   useEffect(() => {
-    const container = messagesContainerRef.current;
-    if (container && isNearBottom) {
-      container.scrollTop = container.scrollHeight;
-    }
-  }, [messages, isNearBottom]);
-
-  const handleScroll = () => {
-    const container = messagesContainerRef.current;
-    if (container) {
-      const { scrollTop, scrollHeight, clientHeight } = container;
-      const bottomThreshold = 100; // pixels from bottom
-      setIsNearBottom(scrollHeight - (scrollTop + clientHeight) <= bottomThreshold);
-    }
-  };
-
-  const handleKeyPress = (event) => {
-    // console.log("pressed")
-    // fetch(SERVER_URL+'/saveUserInput', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ userInput: userInput }),
-    // });
+    const interval = setInterval(() => {
+      setDots(prev => {
+        if (prev.length >= 6) return '.';
+        return prev + '.';
+      });
+    }, 400);
     
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      onSendMessage();
-    }
-  };
+    return () => clearInterval(interval);
+  }, []);
 
-  window.messages = messages
-
-  return (
-    <div style={styles.chatTranscript}>
-      <h2>Chat With Negotiation Coach  
-        <button onClick={handleResetSystem}>reset system</button>
-        {/*<button onClick={autoChatRun}>autochat {isAutoChatting ? "stop" : "start"}</button>
-        <button onClick={autoChatOnce}>autochat once</button>*/}
-      </h2>
-      <div 
-        ref={messagesContainerRef} 
-        style={styles.messagesContainer}
-        onScroll={handleScroll}
-      >
-        {messages.map((message, index) => (
-          <div key={index} style={styles.message}>
-            <strong>{message.role}:</strong> <div dangerouslySetInnerHTML={{__html: message.content}}/>
-          </div>
-        ))}
-      </div>
-      <div style={styles.chatInput}>
-        <input
-          type="text"
-          value={userInput}
-          onChange={onUserInputChange}
-          onKeyPress={handleKeyPress}
-          style={styles.chatInputField}
-          placeholder="Type your message..."
-          disabled={isSubmitting}
-        />
-        <button onClick={onSendMessage}  disabled={isSubmitting}>
-          <Send size={18} />
-          
-        </button>
-      </div>
-    </div>
-  );
+  return <span className="inline-block min-w-[24px]">{dots}</span>;
 };
 
 const App = () => {
+  // const [formData, setFormData] = useState({
+  //   person1: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
+  //   person2: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' }
+  // });
+
   const [formData, setFormData] = useState({
     person1: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
-    person2: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' }
+    person2: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
+    strategy: { sourcesOfPower: '', plan: '', additionalNotes: '' }  // Add this new section
   });
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -429,24 +46,112 @@ const App = () => {
   const [userInput, setUserInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [myVal, setMyVal] = useState(0);
+
   const [lastMessage, setLastMessage] = useState("");
 
   //const [initialized, setInitialized] = useState(false);
   const initializationPromise = useRef(null);
+
+  const prevMessageRef = useRef(null);
+
+  const [firstLoad, setFirstLoad] = useState(true);
 
   const [formClosed, setFormClosed] = useState(1);
 
   const [isAutoChatting, setIsAutoChatting] = useState(false);
   
   const userInputRef = useRef('');
+  const userInputFieldRef = useRef(null);  // Add this line with your other refs/state
+
+  const messagesContainerRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesContainerRef.current?.scrollTo(0, messagesContainerRef.current.scrollHeight);
+  };
 
   // Update the ref whenever userInput changes
   useEffect(() => {
     userInputRef.current = userInput;
   }, [userInput]);
+
+
+  useEffect(()=>{
+
+    
+    if(chatTranscript.length===0) return;
+
+    const currentLastMessage = chatTranscript.at(-1)?.content;
+
+    const shouldBeIsSubmitting = 
+      (chatTranscript.at(-1).role==userId) ||
+      chatTranscript.at(-1).content.trim().includes("<THINKING/>")
+
+    setIsSubmitting(shouldBeIsSubmitting);
+
+    // // and at this point, if isSubmitting==false (SHOULD be)
+    // //console.log("msg: " + newData.chatTranscript.at(-1).content)
+    // console.log("!SBI: " + !shouldBeIsSubmitting)
+    // console.log("UIR.current: " + userInputRef.current)
+    if(!shouldBeIsSubmitting & userInputRef.current==="processing...") {
+      console.log("clearing user input")
+      setUserInput("")
+    }
+
+    if(shouldBeIsSubmitting) {
+      setUserInput("processing...")
+    }
+
+
+    
+    console.log("ChatTranscript updated: ",  prevMessageRef.current!=currentLastMessage);
+    console.log("Current : ", currentLastMessage)
+    console.log("Previous: ", prevMessageRef.current)
+    
+
+    if(prevMessageRef.current !== currentLastMessage) {
+      scrollToBottom();      
+      requestAnimationFrame(() => {
+        console.log("focus");
+        userInputFieldRef.current?.focus();
+      });    
+    }
+
+    prevMessageRef.current = currentLastMessage;
+    // return () => {      
+    //   const currentLastMessage = chatTranscript.at(-1)?.content
+    //   console.log("ChatTranscript updated: ", previousLastMessage!=currentLastMessage);
+    //   console.log("Current : ", currentLastMessage)
+    //   console.log("Previous: ", previousLastMessage)
+
+    //   // only run if chat Transcript is actually updated
+    //   if(previousLastMessage!=currentLastMessage) {
+    //     scrollToBottom();      
+    //     // console.log("Before focus, active element:", document.activeElement);
+    //     requestAnimationFrame(() => {
+    //       console.log("focus")
+    //       userInputFieldRef.current?.focus();
+    //     });    
+    //   }
+    // };
+  }, [chatTranscript]);
   
 
+  useEffect(()=>{
+    
+      console.log("My val: ", myVal)
+      return () => {
+        // This runs BEFORE the next effect, but has access to 
+        // the values from when this effect ran
+        console.log("Cleaning up from when myVal was:", myVal);
+      };
+    
+  }, [myVal]);
+
+
   useEffect(() => {
+
+  
     const initialize = async () => {
       console.log("attempting initialization")
       if (!initializationPromise.current) {
@@ -470,14 +175,26 @@ const App = () => {
         console.log("end initialization run")
       }
       console.log("end initialiation attempt")
+
+      requestAnimationFrame(() => {
+        console.log("loading scroll")
+        scrollToBottom();   
+      });   
+  
     };
 
     initialize();
+
+  }, []);
+
+  useEffect(() => {
+    console.log("App mounted");
+    return () => console.log("App unmounted");
   }, []);
 
   useEffect(() => {
     
-
+    console.log("EventSource effect running");
     const eventSource = new EventSource(SERVER_URL+'/events/'+userId+'/'+sessionId);
     eventSource.onmessage = (event) => {
       if (event.data !== 'connected') {
@@ -486,31 +203,14 @@ const App = () => {
         if (newData.chatTranscript) {
           
           setChatTranscript(newData.chatTranscript);
-          
-          // set isSubmitting based on state of message chain
-          // note---the brief gap is filled but setIsSubmitting(true) on message send
-          console.log("setting isSubmitting")
-          const shouldBeIsSubmitting = 
-            (newData.chatTranscript.at(-1).role=="Client Negotiator" & newData.chatTranscript.at(-1).content!="") ||
-            newData.chatTranscript.at(-1).content.toLowerCase().includes("thinking")
-          setIsSubmitting(
-            shouldBeIsSubmitting
-          );
-
-          // and at this point, if isSubmitting==false (SHOULD be)
-          console.log("UI....")
-          console.log("UI: " + userInputRef.current)
-          console.log("UI: " + (userInputRef.current==="processing..."))
-          console.log("SBIS: " + !shouldBeIsSubmitting)
-          if(!shouldBeIsSubmitting & userInputRef.current==="processing...") {
-            console.log("clearing user input")
-            setUserInput("")
-          }
-
+ 
         }
       }
     };
-    return () => eventSource.close();
+    return () => {
+      console.log("EventSource effect cleanup");
+      eventSource.close();
+    }
   }, []);
 
 
@@ -581,13 +281,12 @@ const App = () => {
 
 
   const debouncedSaveFormData = useCallback(
-    debounce(saveFormData, 5000),
+    debounce(saveFormData, 1000),
     []
   );
 
 
   const updateData = (newData) => {
-    console.log("here")
     setFormData(newData);
     debouncedSaveFormData(newData);
   }
@@ -632,8 +331,8 @@ const App = () => {
   };
 
   const handleSendMessage = async () => {
-    
     setIsSubmitting(true);
+    scrollToBottom();
     setUserInput("processing...")
     console.log("set true: " + isSubmitting)
     try {
@@ -642,11 +341,12 @@ const App = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userInput: userInput }),
       });
+      
     } catch (error) {
       console.error('Error running chatbot:', error);
     }
 
-    
+    // scrollToBottom();
     // setIsSubmitting(false);
     console.log("set false: " + isSubmitting);
   };
@@ -671,31 +371,287 @@ const App = () => {
   }
 
   return (
-    <div style={styles.app}>
-      <div style={formClosed===0 ? styles.chatSection_open : styles.chatSection_closed}>
-        <ChatTranscript 
-          messages={chatTranscript} 
-          userInput={userInput}
-          onUserInputChange={handleUserInputChange}
-          onSendMessage={handleSendMessage}
-          handleResetSystem={handleResetSystem}
-          autoChatOnce={autoChatOnce}
-          autoChatRun={autoChatRun}
-          isAutoChatting={isAutoChatting}
-          isSubmitting={isSubmitting}
-        />
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    {/* Chat Section */}
+    <div className={`relative transition-all duration-300 ease-in-out border-r border-gray-200
+      ${formClosed ? 'w-4/5' : 'w-2/5'}`}>
+      <div className="flex flex-col h-full">
+        {/* Chat Header */}
+        <div className="bg-white px-6 py-4 border-b border-gray-200">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-gray-800">Chat With Negotiation Coach</h2>
+            <button 
+              onClick={handleResetSystem}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+            >
+              Start New Conversation
+            </button>
+          </div>
+        </div>
+
+        {/* Messages Container */}
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
+          {chatTranscript.map((message, index) => (
+            <div
+              key={index}
+              className={`rounded-lg p-4 mb-4 max-w-[80%] ${
+                message.role === userId
+                  ? 'bg-slate-200 ml-auto' // Right-aligned
+                  : 'bg-indigo-100 mr-auto'  // Left-aligned
+              }`}
+            >
+              <div className="font-medium text-sm mb-1">
+                {message.role}
+              </div>
+              <div className="text-gray-800">
+              {message.content.trim().includes("<THINKINGDOTS/>") ? (
+                <>Thinking<ThinkingDots /></>
+              ) : (
+                <div dangerouslySetInnerHTML={{__html: message.content}} />
+              )}
+            </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Chat Input */}
+        <div className="bg-white border-t border-gray-200 p-4">
+          <div className="flex space-x-2">
+            <input
+              ref={userInputFieldRef}
+              type="text"
+              value={userInput}
+              onChange={handleUserInputChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !isSubmitting) {
+                  handleSendMessage();
+                }
+              }}
+              disabled={isSubmitting}
+              placeholder="Type your message..."
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:text-gray-500 disabled:cursor-not-allowed"
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={isSubmitting}
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <Send size={18} />
+            </button>
+          </div>
+        </div>
       </div>
-      <button 
-        style={formClosed===0 ? styles.toggleButton_open : styles.toggleButton_closed} 
-        onClick={handleSetForm}
-        aria-label={formClosed === 0 ? "Close form" : "Open form"}
-      >
-        {formClosed === 0 ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-      </button>
-      <div style={formClosed===0 ? styles.formSection_open : styles.formSection_closed}>
-        <h1 style={styles.heading}>Planning Doc</h1> 
+    </div>
+
+    {/* Toggle Button */}
+    <button 
+      onClick={() => setFormClosed(prev => !prev)}
+      className={`absolute top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-all ${
+        formClosed ? 'left-[calc(80%-1rem)]' : 'left-[calc(40%-1rem)]'
+      }`}
+    >
+      {formClosed ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+    </button>
+
+    {/* Form Section */}
+    <div className={`transition-all duration-300 ${
+      formClosed 
+        ? 'w-1/5 opacity-50 filter blur-sm'
+        : 'w-3/5 opacity-100 filter-none'
+    }`}>
+      <div className="h-full p-6 overflow-y-auto">
+        <h1 className="text-2xl font-bold text-gray-800 border-b border-gray-200 pb-4 mb-6">
+          Planning Doc
+        </h1>
         <PersonForm personNumber={1} data={formData} updateData={updateData} />
         <PersonForm personNumber={2} data={formData} updateData={updateData} />
+        {/* Strategy Section */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Strategy
+          </h2>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">
+                What are your sources of power?
+              </label>
+              <input
+                type="text"
+                value={formData.strategy.sourcesOfPower}
+                onChange={(e) => updateData({
+                  ...formData,
+                  strategy: { ...formData.strategy, sourcesOfPower: e.target.value }
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">
+                What is your strategy?
+              </label>
+              <input
+                type="text"
+                value={formData.strategy.plan}
+                onChange={(e) => updateData({
+                  ...formData,
+                  strategy: { ...formData.strategy, plan: e.target.value }
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">
+                Additional Notes
+              </label>
+              <textarea
+                value={formData.strategy.additionalNotes}
+                onChange={(e) => updateData({
+                  ...formData,
+                  strategy: { ...formData.strategy, additionalNotes: e.target.value }
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[150px] resize-y"
+                placeholder="Enter any additional notes about your strategy..."
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  );
+};
+
+
+const PersonForm = ({ personNumber, data, updateData }) => {
+  const person = `person${personNumber}`;
+
+  const updateField = (field, value) => {
+    const newData = {
+      ...data,
+      [person]: { ...data[person], [field]: value }
+    };
+    updateData(newData);
+  };
+
+  const updateTopic = (index, field, value) => {
+    const newData = {
+      ...data,
+      [person]: {
+        ...data[person],
+        topics: data[person].topics.map((item, i) => 
+          i === index ? { ...item, [field]: value } : item
+        )
+      }
+    };
+    updateData(newData);
+  };
+
+  const addTopic = () => {
+    const newData = {
+      ...data,
+      [person]: {
+        ...data[person],
+        topics: [...(data[person].topics || []), { topic: '', position: '', needsInterests: '' }]
+      }
+    };
+    updateData(newData);
+  };
+
+  const deleteTopic = (index) => {
+    const newData = {
+      ...data,
+      [person]: {
+        ...data[person],
+        topics: data[person].topics.filter((_, i) => i !== index)
+      }
+    };
+    updateData(newData);
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">
+        {personNumber === 1 ? "Self" : "Counterpart"}
+      </h2>
+      
+      <div className="space-y-4">
+        {data[person].topics.map((topic, index) => (
+          <div key={index} className="bg-gray-50 rounded-lg p-4 space-y-3">
+            <div className="flex items-center space-x-2">
+              <span className="min-w-[80px] font-medium text-gray-700">Topic:</span>
+              <input
+                type="text"
+                value={topic.topic}
+                onChange={(e) => updateTopic(index, 'topic', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <span className="min-w-[80px] font-medium text-gray-700">Position:</span>
+              <input
+                type="text"
+                value={topic.position}
+                onChange={(e) => updateTopic(index, 'position', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <span className="min-w-[80px] font-medium text-gray-700">Interest:</span>
+              <input
+                type="text"
+                value={topic.needsInterests}
+                onChange={(e) => updateTopic(index, 'needsInterests', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <button
+                onClick={() => deleteTopic(index)}
+                className="p-2 text-red-500 hover:text-red-600 transition-colors"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+          </div>
+        ))}
+
+        <button
+          onClick={addTopic}
+          className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+        >
+          <Plus size={14} className="mr-2" />
+          Add Topic
+        </button>
+
+        <div className="space-y-4 mt-6">
+          <div>
+            <label className="block font-medium text-gray-700 mb-1" htmlFor={`alternative-${personNumber}`}>
+              BATNA (Best Alternative to Negotiated Agreement)
+            </label>
+            <input
+              id={`alternative-${personNumber}`}
+              type="text"
+              value={data[person].alternative}
+              onChange={(e) => updateField('alternative', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label className="block font-medium text-gray-700 mb-1" htmlFor={`bottomLine-${personNumber}`}>
+              Reservation Point
+            </label>
+            <input
+              id={`bottomLine-${personNumber}`}
+              type="text"
+              value={data[person].bottomLine}
+              onChange={(e) => updateField('bottomLine', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

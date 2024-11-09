@@ -26,9 +26,15 @@ const ThinkingDots = () => {
 };
 
 const App = () => {
+  // const [formData, setFormData] = useState({
+  //   person1: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
+  //   person2: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' }
+  // });
+
   const [formData, setFormData] = useState({
     person1: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
-    person2: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' }
+    person2: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
+    strategy: { sourcesOfPower: '', plan: '', additionalNotes: '' }  // Add this new section
   });
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -275,7 +281,7 @@ const App = () => {
 
 
   const debouncedSaveFormData = useCallback(
-    debounce(saveFormData, 1000),
+    debounce(saveFormData, 2000),
     []
   );
 
@@ -359,109 +365,290 @@ const App = () => {
     setFormClosed(prevState => prevState === 0 ? 1 : 0);
   }
 
+  // First, add this function near your other handlers in App.js
+  const handleExport = () => {
+    const printContent = `
+      <html>
+        <head>
+          <title>Negotiation Planning Document</title>
+          <style>
+            body { 
+              font-family: Arial, sans-serif; 
+              padding: 30px; 
+              line-height: 1.6;
+              max-width: 1000px;
+              margin: 0 auto;
+            }
+            h1 { 
+              color: #4E2A84; 
+              margin-bottom: 30px;
+              font-size: 24px;
+            }
+            h2 { 
+              color: #4E2A84; 
+              margin-top: 30px;
+              font-size: 20px;
+            }
+            .card {
+              border: 1px solid #e2e2e2;
+              border-radius: 6px;
+              padding: 24px;
+              margin-bottom: 24px;
+            }
+            .topic {
+              border: 1px solid #e2e2e2;
+              border-radius: 4px;
+              padding: 16px;
+              margin-bottom: 16px;
+            }
+            .topic-item {
+              margin-bottom: 12px;
+            }
+            .topic-item:last-child {
+              margin-bottom: 0;
+            }
+            .label {
+              font-weight: bold;
+              color: #4E2A84;
+              display: inline-block;
+              width: 100px;
+            }
+            .section {
+              margin-bottom: 16px;
+            }
+            @media print {
+              body { padding: 20px; }
+              .card { break-inside: avoid; }
+              .topic { break-inside: avoid; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Negotiation Planning Document</h1>
+          
+          <div class="card">
+            <h2>Self</h2>
+            ${formData.person1.topics.map(topic => `
+              <div class="topic">
+                <div class="topic-item"><span class="label">Topic:</span> ${topic.topic}</div>
+                <div class="topic-item"><span class="label">Position:</span> ${topic.position}</div>
+                <div class="topic-item"><span class="label">Interest:</span> ${topic.needsInterests}</div>
+              </div>
+            `).join('')}
+            <div class="section">
+              <div class="topic-item"><span class="label">BATNA:</span> ${formData.person1.alternative}</div>
+              <div class="topic-item"><span class="label">Reservation:</span> ${formData.person1.bottomLine}</div>
+            </div>
+          </div>
+  
+          <div class="card">
+            <h2>Counterpart</h2>
+            ${formData.person2.topics.map(topic => `
+              <div class="topic">
+                <div class="topic-item"><span class="label">Topic:</span> ${topic.topic}</div>
+                <div class="topic-item"><span class="label">Position:</span> ${topic.position}</div>
+                <div class="topic-item"><span class="label">Interest:</span> ${topic.needsInterests}</div>
+              </div>
+            `).join('')}
+            <div class="section">
+              <div class="topic-item"><span class="label">BATNA:</span> ${formData.person2.alternative}</div>
+              <div class="topic-item"><span class="label">Reservation:</span> ${formData.person2.bottomLine}</div>
+            </div>
+          </div>
+  
+          <div class="card">
+            <h2>Strategy</h2>
+            <div class="section">
+              <div class="topic-item"><span class="label">Power:</span> ${formData.strategy.sourcesOfPower}</div>
+              <div class="topic-item"><span class="label">Plan:</span> ${formData.strategy.plan}</div>
+              <div class="topic-item"><span class="label">Notes:</span> ${formData.strategy.additionalNotes}</div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+  
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
+  };
 
   if(userId===null) {
     return(<NewUserForm />)
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
-    {/* Chat Section */}
-    <div className={`relative transition-all duration-300 ease-in-out border-r border-gray-200
-      ${formClosed ? 'w-4/5' : 'w-2/5'}`}>
-      <div className="flex flex-col h-full">
-        {/* Chat Header */}
-        <div className="bg-white px-6 py-4 border-b border-gray-200">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-800">Chat With Negotiation Coach</h2>
-            <button 
-              onClick={handleResetSystem}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
-            >
-              Start New Conversation
-            </button>
+    <div className="flex h-screen bg-slate-50 overflow-hidden">
+      {/* Chat Section */}
+      <div className={`relative transition-all duration-300 ease-in-out border-r border-slate-200
+        ${formClosed ? 'w-4/5' : 'w-2/5'}`}>
+        <div className="flex flex-col h-full">
+          {/* Chat Header - Kellogg Purple */}
+          <div className="bg-[#4E2A84] px-6 py-4 shadow-sm">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-semibold text-white">Negotiation Coach</h2>
+              <button 
+                onClick={handleResetSystem}
+                className="px-4 py-2 text-sm font-medium text-[#4E2A84] bg-white rounded-lg hover:bg-slate-100 border border-[#4E2A84] transition-all duration-200"
+              >
+                Start New Conversation
+              </button>
+            </div>
           </div>
-        </div>
-
-        {/* Messages Container */}
-        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
-          {chatTranscript.map((message, index) => (
-            <div
-              key={index}
-              className={`rounded-lg p-4 mb-4 max-w-[80%] ${
-                message.role === userId
-                  ? 'bg-slate-200 ml-auto' // Right-aligned
-                  : 'bg-indigo-100 mr-auto'  // Left-aligned
-              }`}
-            >
-              <div className="font-medium text-sm mb-1">
-                {message.role}
+  
+          {/* Messages Container */}
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
+            {chatTranscript.map((message, index) => (
+              <div
+                key={index}
+                className={`rounded-lg p-4 mb-4 max-w-[80%] shadow-sm ${
+                  message.role === userId
+      ? 'bg-[#F0F7FF] border border-slate-200 ml-auto'  // Light blue tint
+      : 'bg-[#F6F4F9] border border-slate-200 mr-auto'  // Light purple tint
+                }`}
+              >
+                <div className={`font-medium text-sm mb-1 ${
+                  message.role === userId ? 'text-[#4E2A84]' : 'text-[#4E2A84]'
+                }`}>
+                  <b>{message.role}</b>
+                </div>
+                <div className="text-slate-800">
+                  {message.content.trim().includes("<THINKINGDOTS/>") ? (
+                    <div className="flex items-center space-x-2">
+                      <span>Thinking</span>
+                      <ThinkingDots />
+                    </div>
+                  ) : (
+                    <div dangerouslySetInnerHTML={{__html: message.content}} />
+                  )}
+                </div>
               </div>
-              <div className="text-gray-800">
-              {message.content.trim().includes("<THINKINGDOTS/>") ? (
-                <>Thinking<ThinkingDots /></>
-              ) : (
-                <div dangerouslySetInnerHTML={{__html: message.content}} />
-              )}
+            ))}
+          </div>
+  
+          {/* Chat Input */}
+          <div className="bg-[#d3d3e3] border-t border-slate-200 p-4">
+            <div className="flex space-x-2">
+              <input
+                ref={userInputFieldRef}
+                type="text"
+                value={userInput}
+                onChange={handleUserInputChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !isSubmitting) {
+                    handleSendMessage();
+                  }
+                }}
+                disabled={isSubmitting}
+                placeholder="Type your message..."
+                className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed transition-all duration-200"
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={isSubmitting}
+                className="px-4 py-3 bg-[#4E2A84] text-white rounded-lg hover:bg-[#836EAA] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              >
+                <Send size={20} />
+              </button>
             </div>
-            </div>
-          ))}
+          </div>
         </div>
+      </div>
+  
+      {/* Toggle Button */}
+      <button 
+        onClick={() => setFormClosed(prev => !prev)}
+        className={`absolute top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-[#4E2A84] text-white rounded-full flex items-center justify-center hover:bg-[#836EAA] transition-all duration-200 shadow-lg ${
+          formClosed ? 'left-[calc(80%-1.25rem)]' : 'left-[calc(40%-1.25rem)]'
+        }`}
+      >
+        {formClosed ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
+      </button>
+  
+      {/* Form Section */}
+      <div className={`transition-all duration-300 ${
+        formClosed 
+          ? 'w-1/5 opacity-50 filter blur-sm'
+          : 'w-3/5 opacity-100 filter-none'
+      }`}>
+        <div className="h-full p-6 overflow-y-auto">
+          <h1 className="text-3xl font-bold text-[#4E2A84] border-b border-slate-200 pb-4 mb-6">
+            Planning Document
+          </h1>
+          <PersonForm personNumber={1} data={formData} updateData={updateData} />
+          <PersonForm personNumber={2} data={formData} updateData={updateData} />
+          
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-slate-200">
+            <h2 className="text-2xl font-bold text-[#4E2A84] mb-6">
+              Strategy
+            </h2>
+            
+            <div className="space-y-6">
+              {/* Strategy inputs remain the same, just update input classes to match others */}        
+              <div className="space-y-4">
+                <div>
+                  <label className="block font-medium text-[#4E2A84] mb-2">
+                    What are your sources of power?
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.strategy.sourcesOfPower}
+                    onChange={(e) => updateData({
+                      ...formData,
+                      strategy: { ...formData.strategy, sourcesOfPower: e.target.value }
+                    })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
 
-        {/* Chat Input */}
-        <div className="bg-white border-t border-gray-200 p-4">
-          <div className="flex space-x-2">
-            <input
-              ref={userInputFieldRef}
-              type="text"
-              value={userInput}
-              onChange={handleUserInputChange}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !isSubmitting) {
-                  handleSendMessage();
-                }
-              }}
-              disabled={isSubmitting}
-              placeholder="Type your message..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:text-gray-500 disabled:cursor-not-allowed"
-            />
+                <div>
+                  <label className="block font-medium text-[#4E2A84] mb-2">
+                    What is your strategy?
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.strategy.plan}
+                    onChange={(e) => updateData({
+                      ...formData,
+                      strategy: { ...formData.strategy, plan: e.target.value }
+                    })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium text-[#4E2A84] mb-2">
+                    Additional Notes
+                  </label>
+                  <textarea
+                    value={formData.strategy.additionalNotes}
+                    onChange={(e) => updateData({
+                      ...formData,
+                      strategy: { ...formData.strategy, additionalNotes: e.target.value }
+                    })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[200px] resize-y"
+                    placeholder="Enter any additional notes about your strategy..."
+                  />
+                </div>
+              </div>
+            
+            </div>
+          </div>
+          <div className="flex justify-end mb-6">
             <button
-              onClick={handleSendMessage}
-              disabled={isSubmitting}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              onClick={handleExport}
+              className="px-6 py-3 bg-[#4E2A84] text-white rounded-lg hover:bg-[#836EAA] transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm"
             >
-              <Send size={18} />
+              <span>Export to PDF</span>
             </button>
           </div>
         </div>
       </div>
     </div>
-
-    {/* Toggle Button */}
-    <button 
-      onClick={() => setFormClosed(prev => !prev)}
-      className={`absolute top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-all ${
-        formClosed ? 'left-[calc(80%-1rem)]' : 'left-[calc(40%-1rem)]'
-      }`}
-    >
-      {formClosed ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-    </button>
-
-    {/* Form Section */}
-    <div className={`transition-all duration-300 ${
-      formClosed 
-        ? 'w-1/5 opacity-50 filter blur-sm'
-        : 'w-3/5 opacity-100 filter-none'
-    }`}>
-      <div className="h-full p-6 overflow-y-auto">
-        <h1 className="text-2xl font-bold text-gray-800 border-b border-gray-200 pb-4 mb-6">
-          Planning Doc
-        </h1>
-        <PersonForm personNumber={1} data={formData} updateData={updateData} />
-        <PersonForm personNumber={2} data={formData} updateData={updateData} />
-      </div>
-    </div>
-  </div>
   );
 };
 
@@ -513,47 +700,48 @@ const PersonForm = ({ personNumber, data, updateData }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">
+    // Update the main form container
+    <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-slate-200">
+      <h2 className="text-2xl font-bold text-[#4E2A84] mb-6">
         {personNumber === 1 ? "Self" : "Counterpart"}
       </h2>
       
-      <div className="space-y-4">
+      <div className="space-y-6">
         {data[person].topics.map((topic, index) => (
-          <div key={index} className="bg-gray-50 rounded-lg p-4 space-y-3">
-            <div className="flex items-center space-x-2">
-              <span className="min-w-[80px] font-medium text-gray-700">Topic:</span>
+          <div key={index} className="bg-[#F8F7FA] rounded-lg p-5 space-y-4 border border-slate-200">
+            <div className="flex items-center space-x-3">
+              <span className="min-w-[80px] font-medium text-[#4E2A84]">Topic:</span>
               <input
                 type="text"
                 value={topic.topic}
                 onChange={(e) => updateTopic(index, 'topic', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
               />
             </div>
             
-            <div className="flex items-center space-x-2">
-              <span className="min-w-[80px] font-medium text-gray-700">Position:</span>
+            <div className="flex items-center space-x-3">
+              <span className="min-w-[80px] font-medium text-[#4E2A84]">Position:</span>
               <input
                 type="text"
                 value={topic.position}
                 onChange={(e) => updateTopic(index, 'position', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
               />
             </div>
             
-            <div className="flex items-center space-x-2">
-              <span className="min-w-[80px] font-medium text-gray-700">Interest:</span>
+            <div className="flex items-center space-x-3">
+              <span className="min-w-[80px] font-medium text-[#4E2A84]">Interest:</span>
               <input
                 type="text"
                 value={topic.needsInterests}
                 onChange={(e) => updateTopic(index, 'needsInterests', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
               />
               <button
                 onClick={() => deleteTopic(index)}
-                className="p-2 text-red-500 hover:text-red-600 transition-colors"
+                className="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
               >
-                <Trash2 size={18} />
+                <Trash2 size={20} />
               </button>
             </div>
           </div>
@@ -561,15 +749,15 @@ const PersonForm = ({ personNumber, data, updateData }) => {
 
         <button
           onClick={addTopic}
-          className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+          className="flex items-center px-4 py-2 text-sm font-medium text-[#4E2A84] bg-[#F6F4F9] rounded-lg hover:bg-[#836EAA] hover:text-white transition-all duration-200"
         >
-          <Plus size={14} className="mr-2" />
+          <Plus size={16} className="mr-2" />
           Add Topic
         </button>
 
-        <div className="space-y-4 mt-6">
+        <div className="space-y-6 mt-6">
           <div>
-            <label className="block font-medium text-gray-700 mb-1" htmlFor={`alternative-${personNumber}`}>
+            <label className="block font-medium text-[#4E2A84] mb-2" htmlFor={`alternative-${personNumber}`}>
               BATNA (Best Alternative to Negotiated Agreement)
             </label>
             <input
@@ -577,12 +765,12 @@ const PersonForm = ({ personNumber, data, updateData }) => {
               type="text"
               value={data[person].alternative}
               onChange={(e) => updateField('alternative', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
             />
           </div>
 
           <div>
-            <label className="block font-medium text-gray-700 mb-1" htmlFor={`bottomLine-${personNumber}`}>
+            <label className="block font-medium text-[#4E2A84] mb-2" htmlFor={`bottomLine-${personNumber}`}>
               Reservation Point
             </label>
             <input
@@ -590,7 +778,7 @@ const PersonForm = ({ personNumber, data, updateData }) => {
               type="text"
               value={data[person].bottomLine}
               onChange={(e) => updateField('bottomLine', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
             />
           </div>
         </div>

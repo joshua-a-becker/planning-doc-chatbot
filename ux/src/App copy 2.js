@@ -8,11 +8,33 @@ const SERVER_URL = "https://planning.negotiation.solutions/data"
 
 
 
+const ThinkingDots = () => {
+  const [dots, setDots] = useState('.');
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots(prev => {
+        if (prev.length >= 6) return '.';
+        return prev + '.';
+      });
+    }, 400);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  return <span className="inline-block min-w-[24px]">{dots}</span>;
+};
 
 const App = () => {
+  // const [formData, setFormData] = useState({
+  //   person1: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
+  //   person2: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' }
+  // });
+
   const [formData, setFormData] = useState({
     person1: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
-    person2: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' }
+    person2: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
+    strategy: { sourcesOfPower: '', plan: '', additionalNotes: '' }  // Add this new section
   });
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -24,24 +46,112 @@ const App = () => {
   const [userInput, setUserInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [myVal, setMyVal] = useState(0);
+
   const [lastMessage, setLastMessage] = useState("");
 
   //const [initialized, setInitialized] = useState(false);
   const initializationPromise = useRef(null);
+
+  const prevMessageRef = useRef(null);
+
+  const [firstLoad, setFirstLoad] = useState(true);
 
   const [formClosed, setFormClosed] = useState(1);
 
   const [isAutoChatting, setIsAutoChatting] = useState(false);
   
   const userInputRef = useRef('');
+  const userInputFieldRef = useRef(null);  // Add this line with your other refs/state
+
+  const messagesContainerRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesContainerRef.current?.scrollTo(0, messagesContainerRef.current.scrollHeight);
+  };
 
   // Update the ref whenever userInput changes
   useEffect(() => {
     userInputRef.current = userInput;
   }, [userInput]);
+
+
+  useEffect(()=>{
+
+    
+    if(chatTranscript.length===0) return;
+
+    const currentLastMessage = chatTranscript.at(-1)?.content;
+
+    const shouldBeIsSubmitting = 
+      (chatTranscript.at(-1).role==userId) ||
+      chatTranscript.at(-1).content.trim().includes("<THINKING/>")
+
+    setIsSubmitting(shouldBeIsSubmitting);
+
+    // // and at this point, if isSubmitting==false (SHOULD be)
+    // //console.log("msg: " + newData.chatTranscript.at(-1).content)
+    // console.log("!SBI: " + !shouldBeIsSubmitting)
+    // console.log("UIR.current: " + userInputRef.current)
+    if(!shouldBeIsSubmitting & userInputRef.current==="processing...") {
+      console.log("clearing user input")
+      setUserInput("")
+    }
+
+    if(shouldBeIsSubmitting) {
+      setUserInput("processing...")
+    }
+
+
+    
+    console.log("ChatTranscript updated: ",  prevMessageRef.current!=currentLastMessage);
+    console.log("Current : ", currentLastMessage)
+    console.log("Previous: ", prevMessageRef.current)
+    
+
+    if(prevMessageRef.current !== currentLastMessage) {
+      scrollToBottom();      
+      requestAnimationFrame(() => {
+        console.log("focus");
+        userInputFieldRef.current?.focus();
+      });    
+    }
+
+    prevMessageRef.current = currentLastMessage;
+    // return () => {      
+    //   const currentLastMessage = chatTranscript.at(-1)?.content
+    //   console.log("ChatTranscript updated: ", previousLastMessage!=currentLastMessage);
+    //   console.log("Current : ", currentLastMessage)
+    //   console.log("Previous: ", previousLastMessage)
+
+    //   // only run if chat Transcript is actually updated
+    //   if(previousLastMessage!=currentLastMessage) {
+    //     scrollToBottom();      
+    //     // console.log("Before focus, active element:", document.activeElement);
+    //     requestAnimationFrame(() => {
+    //       console.log("focus")
+    //       userInputFieldRef.current?.focus();
+    //     });    
+    //   }
+    // };
+  }, [chatTranscript]);
   
 
+  useEffect(()=>{
+    
+      console.log("My val: ", myVal)
+      return () => {
+        // This runs BEFORE the next effect, but has access to 
+        // the values from when this effect ran
+        console.log("Cleaning up from when myVal was:", myVal);
+      };
+    
+  }, [myVal]);
+
+
   useEffect(() => {
+
+  
     const initialize = async () => {
       console.log("attempting initialization")
       if (!initializationPromise.current) {
@@ -65,14 +175,26 @@ const App = () => {
         console.log("end initialization run")
       }
       console.log("end initialiation attempt")
+
+      requestAnimationFrame(() => {
+        console.log("loading scroll")
+        scrollToBottom();   
+      });   
+  
     };
 
     initialize();
+
+  }, []);
+
+  useEffect(() => {
+    console.log("App mounted");
+    return () => console.log("App unmounted");
   }, []);
 
   useEffect(() => {
     
-
+    console.log("EventSource effect running");
     const eventSource = new EventSource(SERVER_URL+'/events/'+userId+'/'+sessionId);
     eventSource.onmessage = (event) => {
       if (event.data !== 'connected') {
@@ -81,31 +203,14 @@ const App = () => {
         if (newData.chatTranscript) {
           
           setChatTranscript(newData.chatTranscript);
-          
-          // set isSubmitting based on state of message chain
-          // note---the brief gap is filled but setIsSubmitting(true) on message send
-          console.log("setting isSubmitting")
-          const shouldBeIsSubmitting = 
-            (newData.chatTranscript.at(-1).role=="Client Negotiator" & newData.chatTranscript.at(-1).content!="") ||
-            newData.chatTranscript.at(-1).content.toLowerCase().includes("thinking")
-          setIsSubmitting(
-            shouldBeIsSubmitting
-          );
-
-          // and at this point, if isSubmitting==false (SHOULD be)
-          console.log("UI....")
-          console.log("UI: " + userInputRef.current)
-          console.log("UI: " + (userInputRef.current==="processing..."))
-          console.log("SBIS: " + !shouldBeIsSubmitting)
-          if(!shouldBeIsSubmitting & userInputRef.current==="processing...") {
-            console.log("clearing user input")
-            setUserInput("")
-          }
-
+ 
         }
       }
     };
-    return () => eventSource.close();
+    return () => {
+      console.log("EventSource effect cleanup");
+      eventSource.close();
+    }
   }, []);
 
 
@@ -176,13 +281,12 @@ const App = () => {
 
 
   const debouncedSaveFormData = useCallback(
-    debounce(saveFormData, 5000),
+    debounce(saveFormData, 1000),
     []
   );
 
 
   const updateData = (newData) => {
-    console.log("here")
     setFormData(newData);
     debouncedSaveFormData(newData);
   }
@@ -227,8 +331,8 @@ const App = () => {
   };
 
   const handleSendMessage = async () => {
-    
     setIsSubmitting(true);
+    scrollToBottom();
     setUserInput("processing...")
     console.log("set true: " + isSubmitting)
     try {
@@ -237,11 +341,12 @@ const App = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userInput: userInput }),
       });
+      
     } catch (error) {
       console.error('Error running chatbot:', error);
     }
 
-    
+    // scrollToBottom();
     // setIsSubmitting(false);
     console.log("set false: " + isSubmitting);
   };
@@ -266,94 +371,118 @@ const App = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
-    {/* Chat Section */}
-    <div className={`relative transition-all duration-300 ease-in-out border-r border-gray-200
-      ${formClosed ? 'w-4/5' : 'w-2/5'}`}>
-      <div className="flex flex-col h-full">
-        {/* Chat Header */}
-        <div className="bg-white px-6 py-4 border-b border-gray-200">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-800">Chat With Negotiation Coach</h2>
-            <button 
-              onClick={handleResetSystem}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
-            >
-              Reset System
-            </button>
-          </div>
-        </div>
-
-        {/* Messages Container */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {chatTranscript.map((message, index) => (
-            <div
-              key={index}
-              className={`relative p-4 rounded-lg ${
-                message.role === 'assistant'
-                  ? 'bg-blue-50 ml-12'
-                  : 'bg-gray-100 mr-12'
-              }`}
-            >
-              <div className="font-medium text-sm text-gray-600 mb-2">
-                {message.role}
-              </div>
-              <div 
-                className="text-gray-800 prose prose-sm max-w-none"
-                dangerouslySetInnerHTML={{__html: message.content}}
-              />
+    <div className="flex h-screen bg-slate-50 overflow-hidden">
+      {/* Chat Section */}
+      <div className={`relative transition-all duration-300 ease-in-out border-r border-slate-200
+        ${formClosed ? 'w-4/5' : 'w-2/5'}`}>
+        <div className="flex flex-col h-full">
+          {/* Chat Header - Kellogg Purple */}
+          <div className="bg-[#4E2A84] px-6 py-4 shadow-sm">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-semibold text-white">Negotiation Coach</h2>
+              <button 
+                onClick={handleResetSystem}
+                className="px-4 py-2 text-sm font-medium text-[#4E2A84] bg-white rounded-lg hover:bg-slate-100 border border-[#4E2A84] transition-all duration-200"
+              >
+                Start New Conversation
+              </button>
             </div>
-          ))}
+          </div>
+  
+          {/* Messages Container */}
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
+            {chatTranscript.map((message, index) => (
+              <div
+                key={index}
+                className={`rounded-lg p-4 mb-4 max-w-[80%] shadow-sm ${
+                  message.role === userId
+      ? 'bg-[#F0F7FF] border border-slate-200 ml-auto'  // Light blue tint
+      : 'bg-[#F6F4F9] border border-slate-200 mr-auto'  // Light purple tint
+                }`}
+              >
+                <div className={`font-medium text-sm mb-1 ${
+                  message.role === userId ? 'text-[#4E2A84]' : 'text-[#4E2A84]'
+                }`}>
+                  <b>{message.role}</b>
+                </div>
+                <div className="text-slate-800">
+                  {message.content.trim().includes("<THINKINGDOTS/>") ? (
+                    <div className="flex items-center space-x-2">
+                      <span>Thinking</span>
+                      <ThinkingDots />
+                    </div>
+                  ) : (
+                    <div dangerouslySetInnerHTML={{__html: message.content}} />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+  
+          {/* Chat Input */}
+          <div className="bg-[#d3d3e3] border-t border-slate-200 p-4">
+            <div className="flex space-x-2">
+              <input
+                ref={userInputFieldRef}
+                type="text"
+                value={userInput}
+                onChange={handleUserInputChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !isSubmitting) {
+                    handleSendMessage();
+                  }
+                }}
+                disabled={isSubmitting}
+                placeholder="Type your message..."
+                className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed transition-all duration-200"
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={isSubmitting}
+                className="px-4 py-3 bg-[#4E2A84] text-white rounded-lg hover:bg-[#836EAA] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              >
+                <Send size={20} />
+              </button>
+            </div>
+          </div>
         </div>
-
-        {/* Chat Input */}
-        <div className="bg-white border-t border-gray-200 p-4">
-          <div className="flex space-x-2">
-            <input
-              type="text"
-              value={userInput}
-              onChange={handleUserInputChange}
-              disabled={isSubmitting}
-              placeholder="Type your message..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={isSubmitting}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <Send size={18} />
-            </button>
+      </div>
+  
+      {/* Toggle Button */}
+      <button 
+        onClick={() => setFormClosed(prev => !prev)}
+        className={`absolute top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-[#4E2A84] text-white rounded-full flex items-center justify-center hover:bg-[#836EAA] transition-all duration-200 shadow-lg ${
+          formClosed ? 'left-[calc(80%-1.25rem)]' : 'left-[calc(40%-1.25rem)]'
+        }`}
+      >
+        {formClosed ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
+      </button>
+  
+      {/* Form Section */}
+      <div className={`transition-all duration-300 ${
+        formClosed 
+          ? 'w-1/5 opacity-50 filter blur-sm'
+          : 'w-3/5 opacity-100 filter-none'
+      }`}>
+        <div className="h-full p-6 overflow-y-auto">
+          <h1 className="text-3xl font-bold text-[#4E2A84] border-b border-slate-200 pb-4 mb-6">
+            Planning Document
+          </h1>
+          <PersonForm personNumber={1} data={formData} updateData={updateData} />
+          <PersonForm personNumber={2} data={formData} updateData={updateData} />
+          
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-slate-200">
+            <h2 className="text-2xl font-bold text-[#4E2A84] mb-6">
+              Strategy
+            </h2>
+            
+            <div className="space-y-6">
+              {/* Strategy inputs remain the same, just update input classes to match others */}
+            </div>
           </div>
         </div>
       </div>
     </div>
-
-    {/* Toggle Button */}
-    <button 
-      onClick={() => setFormClosed(prev => !prev)}
-      className={`absolute top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-all ${
-        formClosed ? 'left-[calc(80%-1rem)]' : 'left-[calc(40%-1rem)]'
-      }`}
-    >
-      {formClosed ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-    </button>
-
-    {/* Form Section */}
-    <div className={`transition-all duration-300 ${
-      formClosed 
-        ? 'w-1/5 opacity-50 filter blur-sm'
-        : 'w-3/5 opacity-100 filter-none'
-    }`}>
-      <div className="h-full p-6 overflow-y-auto">
-        <h1 className="text-2xl font-bold text-gray-800 border-b border-gray-200 pb-4 mb-6">
-          Planning Doc
-        </h1>
-        <PersonForm personNumber={1} data={formData} updateData={updateData} />
-        <PersonForm personNumber={2} data={formData} updateData={updateData} />
-      </div>
-    </div>
-  </div>
   );
 };
 
@@ -405,47 +534,48 @@ const PersonForm = ({ personNumber, data, updateData }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">
+    // Update the main form container
+    <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-slate-200">
+      <h2 className="text-2xl font-bold text-[#4E2A84] mb-6">
         {personNumber === 1 ? "Self" : "Counterpart"}
       </h2>
       
-      <div className="space-y-4">
+      <div className="space-y-6">
         {data[person].topics.map((topic, index) => (
-          <div key={index} className="bg-gray-50 rounded-lg p-4 space-y-3">
-            <div className="flex items-center space-x-2">
-              <span className="min-w-[80px] font-medium text-gray-700">Topic:</span>
+          <div key={index} className="bg-[#F8F7FA] rounded-lg p-5 space-y-4 border border-slate-200">
+            <div className="flex items-center space-x-3">
+              <span className="min-w-[80px] font-medium text-[#4E2A84]">Topic:</span>
               <input
                 type="text"
                 value={topic.topic}
                 onChange={(e) => updateTopic(index, 'topic', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
               />
             </div>
             
-            <div className="flex items-center space-x-2">
-              <span className="min-w-[80px] font-medium text-gray-700">Position:</span>
+            <div className="flex items-center space-x-3">
+              <span className="min-w-[80px] font-medium text-[#4E2A84]">Position:</span>
               <input
                 type="text"
                 value={topic.position}
                 onChange={(e) => updateTopic(index, 'position', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
               />
             </div>
             
-            <div className="flex items-center space-x-2">
-              <span className="min-w-[80px] font-medium text-gray-700">Interest:</span>
+            <div className="flex items-center space-x-3">
+              <span className="min-w-[80px] font-medium text-[#4E2A84]">Interest:</span>
               <input
                 type="text"
                 value={topic.needsInterests}
                 onChange={(e) => updateTopic(index, 'needsInterests', e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
               />
               <button
                 onClick={() => deleteTopic(index)}
-                className="p-2 text-red-500 hover:text-red-600 transition-colors"
+                className="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
               >
-                <Trash2 size={18} />
+                <Trash2 size={20} />
               </button>
             </div>
           </div>
@@ -453,36 +583,36 @@ const PersonForm = ({ personNumber, data, updateData }) => {
 
         <button
           onClick={addTopic}
-          className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+          className="flex items-center px-4 py-2 text-sm font-medium text-[#4E2A84] bg-[#F6F4F9] rounded-lg hover:bg-[#836EAA] hover:text-white transition-all duration-200"
         >
-          <Plus size={14} className="mr-2" />
+          <Plus size={16} className="mr-2" />
           Add Topic
         </button>
 
-        <div className="space-y-4 mt-6">
+        <div className="space-y-6 mt-6">
           <div>
-            <label className="block font-medium text-gray-700 mb-1" htmlFor={`alternative-${personNumber}`}>
-              BATNA
+            <label className="block font-medium text-[#4E2A84] mb-2" htmlFor={`alternative-${personNumber}`}>
+              BATNA (Best Alternative to Negotiated Agreement)
             </label>
             <input
               id={`alternative-${personNumber}`}
               type="text"
               value={data[person].alternative}
               onChange={(e) => updateField('alternative', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
             />
           </div>
 
           <div>
-            <label className="block font-medium text-gray-700 mb-1" htmlFor={`bottomLine-${personNumber}`}>
-              RP
+            <label className="block font-medium text-[#4E2A84] mb-2" htmlFor={`bottomLine-${personNumber}`}>
+              Reservation Point
             </label>
             <input
               id={`bottomLine-${personNumber}`}
               type="text"
               value={data[person].bottomLine}
               onChange={(e) => updateField('bottomLine', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
             />
           </div>
         </div>

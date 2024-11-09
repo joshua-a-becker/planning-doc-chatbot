@@ -39,19 +39,16 @@ const NewUserForm = () => {
             <div className="p-8">
               <div className="prose text-slate-700">
                 <p className="mb-4">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor 
-                  incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis 
-                  nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                  Think of me as your personal negotiation strategist, available 24/7 through a familiar chat interface. Rather than offering pre-made solutions, I guide you through proven frameworks to develop your own winning strategy.
                 </p>
                 <p className="mb-4">
-                  Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore 
-                  eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt 
-                  in culpa qui officia deserunt mollit anim id est laborum.
+                  Through our interactive dialogue, we'll analyze your position, articulate your priorities, and work together on your planning document. Instead of filling out the document for you, I'll ask targeted questions to help you determine your own strategy. I'll help you refine your issues list, identify core needs, and master the art of perspective-taking to anticipate other parties' positions.
                 </p>
-                <p>
-                  Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit 
-                  laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure 
-                  reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.
+                <p className="mb-4">
+                  Currently in beta testing and available only to students at Kellogg, this interactive tool transforms theoretical knowledge into practical preparation skills.
+                </p>
+                <p className="mb-4">
+                  <br/><center><i>Your strategy. My guidance. Real results.</i></center>
                 </p>
               </div>
             </div>
@@ -61,7 +58,7 @@ const NewUserForm = () => {
           <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden border border-slate-200">
             <div className="p-6">
               <h2 className="text-2xl font-semibold text-center mb-4 text-slate-900">
-                Get Started
+                Tell me your name to start.
               </h2>
               <form onSubmit={handleSubmit}>
                 <div className="flex rounded-lg overflow-hidden border border-slate-200 bg-white">
@@ -70,7 +67,7 @@ const NewUserForm = () => {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     className="flex-1 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter username"
+                    placeholder="Enter user name"
                     required
                   />
                   <button 
