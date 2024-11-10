@@ -3,302 +3,300 @@ import os
 from tinydb import TinyDB, Query
 import json
 import uuid
+import threading
+import filelock
+import time
+from contextlib import contextmanager
 
-with open('storage/chatTranscript_blank.json', 'r') as file:
-    blank_chat_history = json.load(file)['messages']
-
-with open('storage/formData_blank.json', 'r') as file:
-    blank_form_data = json.load(file)
-
-with open('storage/data_state_blank.txt', 'r') as file:
-    blank_data_state = json.load(file)
-
-my_key = open('key_to_gpt.txt','r').readline()
-client = OpenAI(api_key=my_key)
-
-class DatabaseHandler:
+class ThreadSafeDatabaseHandler:
     def __init__(self, db_path='storage/database.json'):
+        self.db_path = db_path
+        self.lock_path = f"{db_path}.lock"
+        self.file_lock = filelock.FileLock(self.lock_path)
+        self.memory_lock = threading.Lock()
+        
+        # Ensure directory exists
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
-        self.db = TinyDB(db_path)
-        self.sessions = self.db.table('sessions')
-        self.users = self.db.table('users') 
+        
+        # Load blank templates
+        with open('storage/chatTranscript_blank.json', 'r') as file:
+            self.blank_chat_history = json.load(file)['messages']
+        with open('storage/formData_blank.json', 'r') as file:
+            self.blank_form_data = json.load(file)
+        with open('storage/data_state_blank.txt', 'r') as file:
+            self.blank_data_state = json.load(file)
+
+        # Initialize OpenAI client
+        self.my_key = open('key_to_gpt.txt','r').readline()
+        self.client = OpenAI(api_key=self.my_key)
+
+    @contextmanager
+    def get_db_connection(self, timeout=10):
+        """Thread-safe database connection context manager"""
+        start_time = time.time()
+        while True:
+            try:
+                with self.file_lock.acquire(timeout=timeout):
+                    db = TinyDB(self.db_path)
+                    try:
+                        yield db
+                    finally:
+                        db.close()
+                break
+            except filelock.Timeout:
+                if time.time() - start_time > timeout:
+                    raise TimeoutError("Could not acquire database lock")
+                time.sleep(0.1)
 
     def new_session_id(self):
-        all_sessions = self.list_all_sessions()
-        candidate_id = str(uuid.uuid4())
-        if(candidate_id in all_sessions):
-            candidate_id = self.new_session_id()
-        return candidate_id
-    
-    def list_all_sessions(self):
-        return [sessions['session_id'] for sessions in self.sessions.all()]
+        """Generate a unique session ID"""
+        with self.memory_lock:
+            with self.get_db_connection() as db:
+                sessions = db.table('sessions')
+                all_session_ids = [session['session_id'] for session in sessions.all()]
+                while True:
+                    candidate_id = str(uuid.uuid4())
+                    if candidate_id not in all_session_ids:
+                        return candidate_id
 
-    def create_new_session(self, user_id, session_id = "CREATESESSIONID"):
-        if(session_id == "CREATESESSIONID"):
+    def create_new_session(self, user_id, session_id="CREATESESSIONID"):
+        """Create a new session with thread-safe operations"""
+        if session_id == "CREATESESSIONID":
             session_id = self.new_session_id()
 
         new_session = {
             'session_id': session_id,
             'user_id': user_id,
-            'thread_id': client.beta.threads.create().id,
+            'thread_id': self.client.beta.threads.create().id,
             'instructions_prompt_file': 'step_zero_explain_process',
-            'user_input' : '',
-            'chat_history': blank_chat_history,
-            'data_state': blank_data_state,
-            'form_data': blank_form_data,
+            'user_input': '',
+            'chat_history': self.blank_chat_history.copy(),
+            'data_state': self.blank_data_state.copy(),
+            'form_data': self.blank_form_data.copy(),
             'special_notes': "",
             'last_prompt': ""
         }
-        
-        self.sessions.insert(new_session)
 
-        ## initialize the text file for display
-        with open('ux/userdata/chatTranscript_'+user_id+'.json', 'w') as file:
-            json.dump(blank_chat_history, file)
+        with self.get_db_connection() as db:
+            sessions = db.table('sessions')
+            sessions.insert(new_session)
 
+        # Thread-safe file operation
+        chat_transcript_path = f'ux/userdata/chatTranscript_{user_id}.json'
+        with filelock.FileLock(f"{chat_transcript_path}.lock"):
+            with open(chat_transcript_path, 'w') as file:
+                json.dump(self.blank_chat_history, file)
 
         return session_id
-    
-    def create_new_session_for_user(self, user_id):
+
+    def get_session(self, session_id):
+        """Thread-safe session retrieval"""
+        with self.get_db_connection() as db:
+            sessions = db.table('sessions')
+            Session = Query()
+            return sessions.get(Session.session_id == session_id)
+
+    def update_session(self, session_id, update_func):
+        """
+        Thread-safe session update using a callback function
+        
+        Args:
+            session_id: The ID of the session to update
+            update_func: Callback function that takes the session dict and returns modified session
+        """
+        with self.get_db_connection() as db:
+            sessions = db.table('sessions')
+            Session = Query()
+            session = sessions.get(Session.session_id == session_id)
+            if session:
+                updated_session = update_func(session)
+                sessions.update(updated_session, Session.session_id == session_id)
+                return True
+        return False
+
+    def update_chat_history(self, session_id, message):
+        """Thread-safe chat history update"""
+        def update_func(session):
+            session['chat_history'].append(message)
+            return session
+        return self.update_session(session_id, update_func)
+
+    def get_chat_history(self, session_id):
+        """Thread-safe chat history retrieval"""
+        session = self.get_session(session_id)
+        return session['chat_history'] if session else []
+
+    def set_planning_doc_data(self, user_id, planning_doc_data=None):
+        """Thread-safe planning document update"""
+        session_id = self.get_session_id_for_user(user_id)
+        
+        if planning_doc_data is None:
+            form_data_path = f'ux/userdata/formData_{user_id}.json'
+            if not os.path.exists(form_data_path):
+                with filelock.FileLock(f"{form_data_path}.lock"):
+                    with open(form_data_path, 'w') as f:
+                        json.dump(self.blank_form_data, f)
+        
+        def update_func(session):
+            session['form_data'] = planning_doc_data
+            return session
+        return self.update_session(session_id, update_func)
+
+    def get_session_id_for_user(self, user_id):
+        """Get or create session ID for user with thread safety"""
+        with self.get_db_connection() as db:
+            users = db.table('users')
+            User = Query()
+            user = users.get(User.user_id == user_id)
+            
+            if user:
+                # If user exists, return their session_id (create new if None)
+                if not user.get('session_id'):
+                    session_id = self.create_new_session(user_id)
+                    users.update({'session_id': session_id}, User.user_id == user_id)
+                    
+                    
+                session = self.get_session(user['session_id'])
+                with open('ux/userdata/chatTranscript_'+user_id+'.json', 'w') as file:
+                    json.dump(session['chat_history'], file)
+                
+                return user['session_id']
+                
+            else:
+                # If user doesn't exist, create new user and session
+                session_id = self.create_new_session(user_id)
+                users.insert({'user_id': user_id, 'session_id': session_id})
+                return session_id
+
+    def load_planning_doc_data(self, user_id):
+        """Load planning document data for user"""
+        session_id = self.get_session_id_for_user(user_id)
+        with self.get_db_connection() as db:
+            sessions = db.table('sessions')
+            Session = Query()
+            session = sessions.get(Session.session_id == session_id)
+            return session.get('form_data', self.blank_form_data) if session else self.blank_form_data
+
+    def get_special_notes(self, session_id):
+        """Get special notes for session"""
+        with self.get_db_connection() as db:
+            sessions = db.table('sessions')
+            Session = Query()
+            session = sessions.get(Session.session_id == session_id)
+            return session.get('special_notes', "") if session else ""
+
+    def get_data_state(self, session_id):
+        """Get data state for session"""
+        with self.get_db_connection() as db:
+            sessions = db.table('sessions')
+            Session = Query()
+            session = sessions.get(Session.session_id == session_id)
+            return session.get('data_state', self.blank_data_state) if session else self.blank_data_state
+
+    def get_instructions_prompt_file(self, session_id):
+        """Get instructions prompt file for session"""
+        with self.get_db_connection() as db:
+            sessions = db.table('sessions')
+            Session = Query()
+            session = sessions.get(Session.session_id == session_id)
+            return session.get('instructions_prompt_file', 'step_zero_explain_process') if session else 'step_zero_explain_process'
+
+    def get_thread_id(self, session_id):
+        """Get thread ID for session"""
+        with self.get_db_connection() as db:
+            sessions = db.table('sessions')
+            Session = Query()
+            session = sessions.get(Session.session_id == session_id)
+            return session.get('thread_id', '') if session else ''
+
+    def update_instructions_prompt_file(self, session_id, next_step):
+        """Update instructions prompt file for session"""
+        with self.get_db_connection() as db:
+            sessions = db.table('sessions')
+            Session = Query()
+            session = sessions.get(Session.session_id == session_id)
+            if session:
+                session['instructions_prompt_file'] = next_step
+                sessions.update(session, Session.session_id == session_id)
+
+    def update_data_state(self, session_id, new_data_state):
+        """Update data state for session"""
+        with self.get_db_connection() as db:
+            sessions = db.table('sessions')
+            Session = Query()
+            session = sessions.get(Session.session_id == session_id)
+            if session:
+                session['data_state'] = new_data_state
+                sessions.update(session, Session.session_id == session_id)
+
+    def create_new_session_for_user(self, user_id):        
         session_id = self.create_new_session(user_id)
         self.set_current_session_for_user(user_id, session_id)
         return session_id
+
     
-    def create_new_session_for_user_by_session_id(self, user_id, session_id):
-        session_id = self.create_new_session(user_id, session_id)
-        self.set_current_session_for_user(user_id, session_id)
-        return session_id
-
-    def get_session_id_for_user(self, user_id):
-        User = Query()
-        user = self.users.get(User.user_id == user_id)
-        if user:
-            # If user exists, return their session_id (create new if None)
-            if not user['session_id']:
-                user['session_id'] = self.create_new_session(user_id)
-                self.users.update({'session_id': user['session_id']}, User.user_id == user_id)
-
-            # ## initialize the text file for display
-            session = self.get_session(user['session_id'])
-            with open('ux/userdata/chatTranscript_'+user_id+'.json', 'w') as file:
-                json.dump(session['chat_history'], file)
-            
-            return user['session_id']
-        else:
-            # If user doesn't exist, create new user and session
-            new_session_id = self.create_new_session(user_id)
-            self.users.insert({'user_id': user_id, 'session_id': new_session_id})
-            return new_session_id
-        
-        
     def set_current_session_for_user(self, user_id, session_id):
-        User = Query()
-        user = self.users.get(User.user_id == user_id)
+        with self.get_db_connection() as db:
+            User = Query()
+            users = db.table('users')
+            sessions = db.table('sessions')
+            user = users.get(User.user_id == user_id)
 
-        Sessions = Query()
-        all_sessions = self.sessions.search(Sessions.user_id == user_id)
-        session_ids = [session['session_id'] for session in all_sessions]
-        session_exists = session_id in session_ids
+            Sessions = Query()
+            all_sessions = sessions.search(Sessions.user_id == user_id)
+            session_ids = [session['session_id'] for session in all_sessions]
+            session_exists = session_id in session_ids
 
 
-        # if user exists, load or create session
-        if user:
-            print('setting id to ' + session_id)
-            self.users.update({'session_id': session_id}, User.user_id == user_id)
-            # if session doesn't exist ...?
-            if(not session_exists):
-                self.create_new_session_for_user_by_session_id(user_id, session_id)
-                
-        else:
-            # If user doesn't exist, create new user and session
-            self.users.insert({'user_id': user_id, 'session_id': session_id})
+            # if user exists, load or create session
+            if user:
+                print('setting id to ' + session_id)
+                users.update({'session_id': session_id}, User.user_id == user_id)
+                # if session doesn't exist ...?
+                if(not session_exists):
+                    self.create_new_session_for_user_by_session_id(user_id, session_id)
+                    
+            else:
+                # If user doesn't exist, create new user and session
+                db.users.insert({'user_id': user_id, 'session_id': session_id})
 
 
         return True
 
-    def get_session(self, session_id):
-        Session = Query()
-        return self.sessions.get(Session.session_id == session_id)
+    def cleanup(self):
+        """Cleanup method to release locks if needed"""
+        try:
+            self.file_lock.release()
+        except:
+            pass
 
-
-    def get_chat_history(self, session_id):
-        session = self.get_session(session_id)
-        return session['chat_history'] if session else []
-
-    def update_chat_history(self, session_id, message):
-        Session = Query()
-        session = self.get_session(session_id)
-        if session:
-            session['chat_history'].append(message)
-            self.sessions.update(session, Session.session_id == session_id)
-
-    def get_last_prompt(self, session_id):
-        session = self.get_session(session_id)
-        return session['last_prompt'] if session else ""
-
-    def update_last_prompt(self, session_id, prompt):
-        Session = Query()
-        session = self.get_session(session_id)
-        if session:
-            session['last_prompt'] = prompt
-            self.sessions.update(session, Session.session_id == session_id)
-
-    def get_data_state(self, session_id):
-        session = self.get_session(session_id)
-        return session['data_state'] if session else {}
-
-    def update_data_state(self, session_id, new_state):
-        Session = Query()
-        session = self.get_session(session_id)
-        if session:
-            session['data_state'] = new_state
-            self.sessions.update(session, Session.session_id == session_id)
-
-    def get_special_notes(self, session_id):
-        session = self.get_session(session_id)
-        return session['special_notes'] if session else ""
-
-    def update_special_notes(self, session_id, content):
-        Session = Query()
-        session = self.get_session(session_id)
-        if session:
-            session['special_notes'] = content
-            self.sessions.update(session, Session.session_id == session_id)
-
-    def get_thread_id(self, session_id):
-        session = self.get_session(session_id)
-        return session['thread_id'] if session else ""
-
-    def set_thread_id(self, session_id, thread_id):
-        Session = Query()
-        session = self.get_session(session_id)
-        if session:
-            session['thread_id'] = thread_id
-            self.sessions.update(session, Session.session_id == session_id)
-        return thread_id
-
-    def get_instructions_prompt_file(self, session_id):
-        session = self.get_session(session_id)
-        return session['instructions_prompt_file'] if session else ""
-
-    def update_instructions_prompt_file(self, session_id, prompt_file):
-        Session = Query()
-        session = self.get_session(session_id)
-        if session:
-            session['instructions_prompt_file'] = prompt_file
-            self.sessions.update(session, Session.session_id == session_id)
-
-    def set_planning_doc_data(self, user_id, planning_doc_data=None):
-        print("line 198")
+    def __del__(self):
+        """Destructor to ensure cleanup"""
+        self.cleanup()
         
-        session_id = self.get_session_id_for_user(user_id)
-
-
-        session = self.get_session(session_id)
-        
-        print("line 201")
-
-        if planning_doc_data is None:
-            print("no planning doc data")
-            # Only perform file operations if planning_doc_data wasn't provided
-            if not os.path.exists('ux/userdata/formData_'+user_id+'.json'):
-                print("writing blank")
-                with open('ux/userdata/formData_'+session_id+'.json', 'w') as f:
-                    f.write(json.dumps(blank_form_data))
-
-            print("line 211")
-
-
-
-        session['form_data'] = planning_doc_data
-
-        Session = Query()
-        self.sessions.update(session, Session.session_id == session_id)
-        
-    def load_planning_doc_data(self, user_id):
-        print("loading planning doc")
-        session_id = self.get_session_id_for_user(user_id)
-        session = self.get_session(session_id)
-        
-        return session['form_data']
-        
-    def list_all_users(self):
-        return [user['user_id'] for user in self.users.all()]
-
-
-    def list_sessions_for_user(self, user_id):
-        User = Query()
-        user = self.users.get(User.user_id == user_id)
-        
-        if user:
-            # Get all sessions where this user's email is mentioned
-            Session = Query()
-            all_sessions = self.sessions.search(Session.user_id == user_id)
-            session_ids = [session['session_id'] for session in all_sessions]
-            
-            return session_ids
-        else:
-            return []
-        
-    def get_all_users(self):
-        return self.users.all()
     
-    def get_user(self, user_id):
-        Users = Query()
-        user = self.users.get(Users.user_id == user_id)
-        return user
 
-    def get_user_input(self, session_id):
-        session = self.get_session(session_id)
-        return session['user_input'] if session else ""
+# Error handling decorator for retrying failed operations
+def retry_on_error(max_retries=3, delay=0.1):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            attempts = 0
+            while attempts < max_retries:
+                try:
+                    return func(*args, **kwargs)
+                except (filelock.Timeout, TimeoutError) as e:
+                    attempts += 1
+                    if attempts == max_retries:
+                        raise
+                    time.sleep(delay * (2 ** attempts))  # Exponential backoff
+            return None
+        return wrapper
+    return decorator
 
-    def update_user_input(self, session_id, content):
-        Session = Query()
-        session = self.get_session(session_id)
-        if session:
-            session['user_input'] = content
-            self.sessions.update(session, Session.session_id == session_id)
+# Usage example:
+db = ThreadSafeDatabaseHandler()
 
-        
-    def copy_user(self, to_user_id, from_user_id, from_user_session=None):
-        """
-        Copy all data from an existing user's session to a new user.
-        If from_user_session is not specified, uses the user's current session.
-        
-        Args:
-            to_user_id (str): User ID to copy data to
-            from_user_id (str): User ID to copy data from
-            from_user_session (str, optional): Specific session ID to copy from
-        
-        Returns:
-            str: The new session ID created for to_user_id
-        """
-        # Get source session ID if not specified
-        if from_user_session is None:
-            Users = Query()
-            from_user = self.users.get(Users.user_id == from_user_id)
-            if not from_user or not from_user.get('session_id'):
-                raise ValueError(f"Source user {from_user_id} not found or has no active session")
-            from_user_session = self.get_session(self.get_session_id_for_user(from_user_id))
-        else: 
-            from_user_session = self.get_session(from_user_session)
-              
-        # Create new session for target user using existing method
-        new_session_id = self.get_session_id_for_user(to_user_id)
-        
-        # Copy chat history message by message
-        for message in from_user_session['chat_history']:
-            self.update_chat_history(new_session_id, message)
-        
-        # Copy data state
-        self.set_planning_doc_data(to_user_id, from_user_session['form_data'])
-
-        # update_instructions_prompt_file
-        self.update_instructions_prompt_file(new_session_id, from_user_session['instructions_prompt_file'])        
-
-        return self.get_session_id_for_user(to_user_id)
-
-
-
-# Initialize the database handler
-db = DatabaseHandler()
+# Example of using the retry decorator
+@retry_on_error(max_retries=3)
+def safe_update_chat(session_id, message):
+    return db.update_chat_history(session_id, message)

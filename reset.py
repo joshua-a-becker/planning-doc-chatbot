@@ -17,12 +17,15 @@ user_id = sys.argv[1]
 print("Resetting user: " + user_id)
 
 
-with open('storage/formData_blank.json', 'r') as file:
-    form_data = json.load(file)
-
+try:
+   os.remove("ux/userdata/formData_" + user_id + ".json")
+except FileNotFoundError:
+   pass
 
 new_session_id = db.create_new_session_for_user(user_id)
 
 chat_history = db.get_chat_history(new_session_id)
 with open('ux/userdata/chatTranscript_'+user_id+'.json', 'w') as file:
     json.dump(chat_history, file)
+
+

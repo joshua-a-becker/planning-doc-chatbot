@@ -55,6 +55,8 @@ def main():
     if user_input == "":
         return
 
+    print("user input: " + user_input)
+
     # Set up output redirection at the start
     tee = TeeStream("message.log")
     sys.stdout = tee
@@ -67,8 +69,12 @@ def main():
     session_id = db.get_session_id_for_user(user_id)
 
 
+    print("line 72")
+
     # update chat history with user input
     db.update_chat_history(session_id, {"role": user_id, "content": user_input})
+
+    print("line 77")
 
     # update chat display with user input
     chat_history = db.get_chat_history(session_id)

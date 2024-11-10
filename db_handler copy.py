@@ -1,0 +1,304 @@
+from openai import OpenAI
+import os
+from tinydb import TinyDB, Query
+import json
+import uuid
+
+with open('storage/chatTranscript_blank.json', 'r') as file:
+    blank_chat_history = json.load(file)['messages']
+
+with open('storage/formData_blank.json', 'r') as file:
+    blank_form_data = json.load(file)
+
+with open('storage/data_state_blank.txt', 'r') as file:
+    blank_data_state = json.load(file)
+
+my_key = open('key_to_gpt.txt','r').readline()
+client = OpenAI(api_key=my_key)
+
+class DatabaseHandler:
+    def __init__(self, db_path='storage/database.json'):
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        self.db = TinyDB(db_path)
+        self.sessions = self.db.table('sessions')
+        self.users = self.db.table('users') 
+
+    def new_session_id(self):
+        all_sessions = self.list_all_sessions()
+        candidate_id = str(uuid.uuid4())
+        if(candidate_id in all_sessions):
+            candidate_id = self.new_session_id()
+        return candidate_id
+    
+    def list_all_sessions(self):
+        return [sessions['session_id'] for sessions in self.sessions.all()]
+
+    def create_new_session(self, user_id, session_id = "CREATESESSIONID"):
+        if(session_id == "CREATESESSIONID"):
+            session_id = self.new_session_id()
+
+        new_session = {
+            'session_id': session_id,
+            'user_id': user_id,
+            'thread_id': client.beta.threads.create().id,
+            'instructions_prompt_file': 'step_zero_explain_process',
+            'user_input' : '',
+            'chat_history': blank_chat_history,
+            'data_state': blank_data_state,
+            'form_data': blank_form_data,
+            'special_notes': "",
+            'last_prompt': ""
+        }
+        
+        self.sessions.insert(new_session)
+
+        ## initialize the text file for display
+        with open('ux/userdata/chatTranscript_'+user_id+'.json', 'w') as file:
+            json.dump(blank_chat_history, file)
+
+
+        return session_id
+    
+    def create_new_session_for_user(self, user_id):
+        session_id = self.create_new_session(user_id)
+        self.set_current_session_for_user(user_id, session_id)
+        return session_id
+    
+    def create_new_session_for_user_by_session_id(self, user_id, session_id):
+        session_id = self.create_new_session(user_id, session_id)
+        self.set_current_session_for_user(user_id, session_id)
+        return session_id
+
+    def get_session_id_for_user(self, user_id):
+        User = Query()
+        user = self.users.get(User.user_id == user_id)
+        if user:
+            # If user exists, return their session_id (create new if None)
+            if not user['session_id']:
+                user['session_id'] = self.create_new_session(user_id)
+                self.users.update({'session_id': user['session_id']}, User.user_id == user_id)
+
+            # ## initialize the text file for display
+            session = self.get_session(user['session_id'])
+            with open('ux/userdata/chatTranscript_'+user_id+'.json', 'w') as file:
+                json.dump(session['chat_history'], file)
+            
+            return user['session_id']
+        else:
+            # If user doesn't exist, create new user and session
+            new_session_id = self.create_new_session(user_id)
+            self.users.insert({'user_id': user_id, 'session_id': new_session_id})
+            return new_session_id
+        
+        
+    def set_current_session_for_user(self, user_id, session_id):
+        User = Query()
+        user = self.users.get(User.user_id == user_id)
+
+        Sessions = Query()
+        all_sessions = self.sessions.search(Sessions.user_id == user_id)
+        session_ids = [session['session_id'] for session in all_sessions]
+        session_exists = session_id in session_ids
+
+
+        # if user exists, load or create session
+        if user:
+            print('setting id to ' + session_id)
+            self.users.update({'session_id': session_id}, User.user_id == user_id)
+            # if session doesn't exist ...?
+            if(not session_exists):
+                self.create_new_session_for_user_by_session_id(user_id, session_id)
+                
+        else:
+            # If user doesn't exist, create new user and session
+            self.users.insert({'user_id': user_id, 'session_id': session_id})
+
+
+        return True
+
+    def get_session(self, session_id):
+        Session = Query()
+        return self.sessions.get(Session.session_id == session_id)
+
+
+    def get_chat_history(self, session_id):
+        session = self.get_session(session_id)
+        return session['chat_history'] if session else []
+
+    def update_chat_history(self, session_id, message):
+        Session = Query()
+        session = self.get_session(session_id)
+        if session:
+            session['chat_history'].append(message)
+            self.sessions.update(session, Session.session_id == session_id)
+
+    def get_last_prompt(self, session_id):
+        session = self.get_session(session_id)
+        return session['last_prompt'] if session else ""
+
+    def update_last_prompt(self, session_id, prompt):
+        Session = Query()
+        session = self.get_session(session_id)
+        if session:
+            session['last_prompt'] = prompt
+            self.sessions.update(session, Session.session_id == session_id)
+
+    def get_data_state(self, session_id):
+        session = self.get_session(session_id)
+        return session['data_state'] if session else {}
+
+    def update_data_state(self, session_id, new_state):
+        Session = Query()
+        session = self.get_session(session_id)
+        if session:
+            session['data_state'] = new_state
+            self.sessions.update(session, Session.session_id == session_id)
+
+    def get_special_notes(self, session_id):
+        session = self.get_session(session_id)
+        return session['special_notes'] if session else ""
+
+    def update_special_notes(self, session_id, content):
+        Session = Query()
+        session = self.get_session(session_id)
+        if session:
+            session['special_notes'] = content
+            self.sessions.update(session, Session.session_id == session_id)
+
+    def get_thread_id(self, session_id):
+        session = self.get_session(session_id)
+        return session['thread_id'] if session else ""
+
+    def set_thread_id(self, session_id, thread_id):
+        Session = Query()
+        session = self.get_session(session_id)
+        if session:
+            session['thread_id'] = thread_id
+            self.sessions.update(session, Session.session_id == session_id)
+        return thread_id
+
+    def get_instructions_prompt_file(self, session_id):
+        session = self.get_session(session_id)
+        return session['instructions_prompt_file'] if session else ""
+
+    def update_instructions_prompt_file(self, session_id, prompt_file):
+        Session = Query()
+        session = self.get_session(session_id)
+        if session:
+            session['instructions_prompt_file'] = prompt_file
+            self.sessions.update(session, Session.session_id == session_id)
+
+    def set_planning_doc_data(self, user_id, planning_doc_data=None):
+        print("line 198")
+        
+        session_id = self.get_session_id_for_user(user_id)
+
+
+        session = self.get_session(session_id)
+        
+        print("line 201")
+
+        if planning_doc_data is None:
+            print("no planning doc data")
+            # Only perform file operations if planning_doc_data wasn't provided
+            if not os.path.exists('ux/userdata/formData_'+user_id+'.json'):
+                print("writing blank")
+                with open('ux/userdata/formData_'+session_id+'.json', 'w') as f:
+                    f.write(json.dumps(blank_form_data))
+
+            print("line 211")
+
+
+
+        session['form_data'] = planning_doc_data
+
+        Session = Query()
+        self.sessions.update(session, Session.session_id == session_id)
+        
+    def load_planning_doc_data(self, user_id):
+        print("loading planning doc")
+        session_id = self.get_session_id_for_user(user_id)
+        session = self.get_session(session_id)
+        
+        return session['form_data']
+        
+    def list_all_users(self):
+        return [user['user_id'] for user in self.users.all()]
+
+
+    def list_sessions_for_user(self, user_id):
+        User = Query()
+        user = self.users.get(User.user_id == user_id)
+        
+        if user:
+            # Get all sessions where this user's email is mentioned
+            Session = Query()
+            all_sessions = self.sessions.search(Session.user_id == user_id)
+            session_ids = [session['session_id'] for session in all_sessions]
+            
+            return session_ids
+        else:
+            return []
+        
+    def get_all_users(self):
+        return self.users.all()
+    
+    def get_user(self, user_id):
+        Users = Query()
+        user = self.users.get(Users.user_id == user_id)
+        return user
+
+    def get_user_input(self, session_id):
+        session = self.get_session(session_id)
+        return session['user_input'] if session else ""
+
+    def update_user_input(self, session_id, content):
+        Session = Query()
+        session = self.get_session(session_id)
+        if session:
+            session['user_input'] = content
+            self.sessions.update(session, Session.session_id == session_id)
+
+        
+    def copy_user(self, to_user_id, from_user_id, from_user_session=None):
+        """
+        Copy all data from an existing user's session to a new user.
+        If from_user_session is not specified, uses the user's current session.
+        
+        Args:
+            to_user_id (str): User ID to copy data to
+            from_user_id (str): User ID to copy data from
+            from_user_session (str, optional): Specific session ID to copy from
+        
+        Returns:
+            str: The new session ID created for to_user_id
+        """
+        # Get source session ID if not specified
+        if from_user_session is None:
+            Users = Query()
+            from_user = self.users.get(Users.user_id == from_user_id)
+            if not from_user or not from_user.get('session_id'):
+                raise ValueError(f"Source user {from_user_id} not found or has no active session")
+            from_user_session = self.get_session(self.get_session_id_for_user(from_user_id))
+        else: 
+            from_user_session = self.get_session(from_user_session)
+              
+        # Create new session for target user using existing method
+        new_session_id = self.get_session_id_for_user(to_user_id)
+        
+        # Copy chat history message by message
+        for message in from_user_session['chat_history']:
+            self.update_chat_history(new_session_id, message)
+        
+        # Copy data state
+        self.set_planning_doc_data(to_user_id, from_user_session['form_data'])
+
+        # update_instructions_prompt_file
+        self.update_instructions_prompt_file(new_session_id, from_user_session['instructions_prompt_file'])        
+
+        return self.get_session_id_for_user(to_user_id)
+
+
+
+# Initialize the database handler
+db = DatabaseHandler()
