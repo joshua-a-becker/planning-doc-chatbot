@@ -257,48 +257,26 @@ const App = () => {
     };
   }, [isAutoChatting]);
 
-
-  const saveFormData = async (newData) => {
-    try {
-      await fetch(SERVER_URL+'/save/'+userId, {
+  const debouncedSaveFormData = useCallback(
+    debounce((newData) => {
+      fetch(SERVER_URL+'/save/'+userId, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newData),
+      }).catch(error => {
+        console.error('Error saving form data:', error);
       });
-    } catch (error) {
-      console.error('Error saving form data:', error);
-    }
-  };
-
-
-  const debouncedSaveFormData = useCallback(
-    debounce(saveFormData, 3000),
-    []
+    }, 3000),
+    [userId]
   );
-
-
-  const updateData = (newData) => {
+  
+  const updateData = useCallback((newData) => {
+    // Immediate local update
     setFormData(newData);
+    
+    // Debounced server update - remove the .catch() here
     debouncedSaveFormData(newData);
-  }
-
-  // useEffect(() => {
-  //   const saveFormData = async () => {
-  //     try {
-  //       await fetch(SERVER_URL+'/save', {
-  //         method: 'POST',
-  //         headers: { 'Content-Type': 'application/json' },
-  //         body: JSON.stringify(formData),
-  //       });
-  //     } catch (error) {
-  //       console.error('Error saving form data:', error);
-  //     }
-  //   };
-  //   saveFormData();
-  // }, [formData]);
-
-
-
+  }, [debouncedSaveFormData]);
 
   const debouncedSaveUserInput = useCallback(
     debounce((input) => {
