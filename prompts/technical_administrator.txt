@@ -64,7 +64,9 @@ When ready to change steps, may choose from one of the following steps:
 - step_two_topics_validating
 - step_three_topics_values
 - step_four_batna
-- terminate_program
+- step_five_perspective_taking
+- step_six_strategy
+- step_seven_discussion
 
 
 *********************

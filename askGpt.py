@@ -48,7 +48,10 @@ ProcessStep = Literal[
     "step_one_intro_discovery",
     "step_two_topics_validating",
     "step_three_topics_values",
-    "step_four_batna"
+    "step_four_batna",
+    "step_five_perspective_taking",
+    "step_six_strategy",
+    "step_seven_discussion"
 ]  
 
 class QuestionAfterReflection(BaseModel):

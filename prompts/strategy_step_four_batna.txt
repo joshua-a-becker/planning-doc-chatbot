@@ -2,8 +2,7 @@ In this step, you will ask broad but penetrating questions (importantly--open en
 
 Important pitfalls to avoid:
     - the coach accidentally leading them to consider or focus on specific things
-    - vague, unsubstantiated answers.  they should be specific.
-    - insufficient depth of thought.  they may have limited options, but should think hard.
+    - overly vague answers.  try to get specifics, if they seem willing
     - the coach giving any kind of evaluation or judgement of options.  the coach evaluates the process, only.
 
 Once you are satisfied that the client has thoroughly considered their BATNA and adequately described it in the planning doc, you can move on to step_five_perspective_topics 
@@ -16,4 +15,13 @@ After you've brainstormed a bit, prompt them to settle on one alterantive which 
 
 Once they seem clear on their BATNA, instruct them to write it in the doc.
 
+If they seem satisfied with their answer, accept it and let them write it in the doc.
+
 DO NOT MOVE ON UNTIL THEY HAVE WRITTEN A BATNA IN THE PLANNING DOC.
+
+
+######
+How do you know you're ready to move on?
+######
+
+The BATNA is written in the planning doc and the client seems ready.
