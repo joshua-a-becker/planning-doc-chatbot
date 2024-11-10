@@ -281,7 +281,7 @@ const App = () => {
 
 
   const debouncedSaveFormData = useCallback(
-    debounce(saveFormData, 2000),
+    debounce(saveFormData, 3000),
     []
   );
 
@@ -352,18 +352,18 @@ const App = () => {
   };
 
   const handleResetSystem = () => {
+
+
     fetch(SERVER_URL+'/reset/'+userId, { method: 'POST' });
+    updateData({
+      person1: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
+      person2: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
+      strategy: { sourcesOfPower: '', plan: '', additionalNotes: '' }
+    })
     console.log("reset ok")
   }
 
-  // const autoChatOnce = () => {
-  //   fetch(SERVER_URL+'/auto-chat', { method: 'POST' });
-  //   console.log("reset")
-  // }
 
-  const handleSetForm = () => {
-    setFormClosed(prevState => prevState === 0 ? 1 : 0);
-  }
 
   // First, add this function near your other handlers in App.js
   const handleExport = () => {
@@ -576,15 +576,15 @@ const App = () => {
           ? 'w-1/5 opacity-50 filter blur-sm'
           : 'w-3/5 opacity-100 filter-none'
       }`}>
-        <div className="h-full p-6 overflow-y-auto">
-          <h1 className="text-3xl font-bold text-[#4E2A84] border-b border-slate-200 pb-4 mb-6">
+        <div className="h-full p-5 overflow-y-auto">
+          <h1 className="text-3xl font-bold text-[#4E2A84] border-b border-slate-000 pb-4 mb-6">
             Planning Document
           </h1>
           <PersonForm personNumber={1} data={formData} updateData={updateData} />
           <PersonForm personNumber={2} data={formData} updateData={updateData} />
           
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-slate-200">
-            <h2 className="text-2xl font-bold text-[#4E2A84] mb-6">
+          <div className="bg-white rounded-lg shadow-sm p-3 mb-6 border border-[#d3c7fc]">
+            <h2 className="text-xl font-bold text-[#4E2A84] m-0 mb-3 leading-none pt-2 pl-0">
               Strategy
             </h2>
             
@@ -608,7 +608,7 @@ const App = () => {
 
                 <div>
                   <label className="block font-medium text-[#4E2A84] mb-2">
-                    What is your strategy?
+                    What is your first offer?
                   </label>
                   <input
                     type="text"
@@ -622,7 +622,7 @@ const App = () => {
                 </div>
                 <div>
                   <label className="block font-medium text-[#4E2A84] mb-2">
-                    Additional Notes
+                    Additional Notes (strategy, etc.)
                   </label>
                   <textarea
                     value={formData.strategy.additionalNotes}
@@ -652,7 +652,6 @@ const App = () => {
   );
 };
 
-
 const PersonForm = ({ personNumber, data, updateData }) => {
   const person = `person${personNumber}`;
 
@@ -665,6 +664,12 @@ const PersonForm = ({ personNumber, data, updateData }) => {
   };
 
   const updateTopic = (index, field, value) => {
+    // For priority field, ensure value is between 0 and 100
+    if (field === 'priority') {
+      // Remove leading zeros and ensure value is between 0 and 100
+      value = value.replace(/^0+/, '') || '0';  // Replace leading zeros but keep single '0'
+      value = Math.min(100, Math.max(0, Number(value) || 0));
+    }    
     const newData = {
       ...data,
       [person]: {
@@ -682,7 +687,7 @@ const PersonForm = ({ personNumber, data, updateData }) => {
       ...data,
       [person]: {
         ...data[person],
-        topics: [...(data[person].topics || []), { topic: '', position: '', needsInterests: '' }]
+        topics: [...(data[person].topics || []), { topic: '', priority: 0, position: '', needsInterests: '' }]
       }
     };
     updateData(newData);
@@ -700,23 +705,32 @@ const PersonForm = ({ personNumber, data, updateData }) => {
   };
 
   return (
-    // Update the main form container
-    <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-slate-200">
-      <h2 className="text-2xl font-bold text-[#4E2A84] mb-6">
+    <div className="bg-white rounded-lg shadow-sm p-3 mb-6 border border-[#d3c7fc]">
+      <h2 className="text-xl font-bold text-[#4E2A84] m-0 mb-3 leading-none pt-2 pl-2">
         {personNumber === 1 ? "Self" : "Counterpart"}
       </h2>
-      
-      <div className="space-y-6">
+      <div className="space-y-3">
         {data[person].topics.map((topic, index) => (
-          <div key={index} className="bg-[#F8F7FA] rounded-lg p-5 space-y-4 border border-slate-200">
+          <div key={index} className="bg-[#F8F7FA] rounded-lg p-3 space-y-4 border border-slate-200">
             <div className="flex items-center space-x-3">
               <span className="min-w-[80px] font-medium text-[#4E2A84]">Topic:</span>
               <input
                 type="text"
                 value={topic.topic}
                 onChange={(e) => updateTopic(index, 'topic', e.target.value)}
-                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
+                className="flex-1 px-1.5 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
               />
+              <span className="min-w-[80px] font-medium text-[#4E2A84] ml-4 text-right">Priority:</span>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={topic.priority}
+                onChange={(e) => updateTopic(index, 'priority', e.target.value)}
+                className="w-[5rem] px-1.5 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                placeholder="0-100"
+              />
+              <span className="text-slate-500">%</span>
             </div>
             
             <div className="flex items-center space-x-3">
@@ -725,7 +739,7 @@ const PersonForm = ({ personNumber, data, updateData }) => {
                 type="text"
                 value={topic.position}
                 onChange={(e) => updateTopic(index, 'position', e.target.value)}
-                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
+                className="flex-1 px-1.5 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
               />
             </div>
             
@@ -735,7 +749,7 @@ const PersonForm = ({ personNumber, data, updateData }) => {
                 type="text"
                 value={topic.needsInterests}
                 onChange={(e) => updateTopic(index, 'needsInterests', e.target.value)}
-                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
+                className="flex-1 px-1.5 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
               />
               <button
                 onClick={() => deleteTopic(index)}
@@ -755,7 +769,7 @@ const PersonForm = ({ personNumber, data, updateData }) => {
           Add Topic
         </button>
 
-        <div className="space-y-6 mt-6">
+        <div className="space-y-4 mt-6">
           <div>
             <label className="block font-medium text-[#4E2A84] mb-2" htmlFor={`alternative-${personNumber}`}>
               BATNA (Best Alternative to Negotiated Agreement)
@@ -786,5 +800,6 @@ const PersonForm = ({ personNumber, data, updateData }) => {
     </div>
   );
 };
+
 
 export default App;
