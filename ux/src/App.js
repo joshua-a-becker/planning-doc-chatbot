@@ -111,28 +111,20 @@ const App = () => {
     if(prevMessageRef.current !== currentLastMessage) {
       scrollToBottom();      
       requestAnimationFrame(() => {
-        console.log("focus");
-        userInputFieldRef.current?.focus();
+        // Check if any form element has focus
+        const activeElement = document.activeElement;
+        const isFormElement = activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA';
+        
+        // Only focus chat input if no form element is focused
+        if (!isFormElement) {
+          console.log("focus");
+          userInputFieldRef.current?.focus();
+        }
       });    
     }
 
     prevMessageRef.current = currentLastMessage;
-    // return () => {      
-    //   const currentLastMessage = chatTranscript.at(-1)?.content
-    //   console.log("ChatTranscript updated: ", previousLastMessage!=currentLastMessage);
-    //   console.log("Current : ", currentLastMessage)
-    //   console.log("Previous: ", previousLastMessage)
 
-    //   // only run if chat Transcript is actually updated
-    //   if(previousLastMessage!=currentLastMessage) {
-    //     scrollToBottom();      
-    //     // console.log("Before focus, active element:", document.activeElement);
-    //     requestAnimationFrame(() => {
-    //       console.log("focus")
-    //       userInputFieldRef.current?.focus();
-    //     });    
-    //   }
-    // };
   }, [chatTranscript]);
   
 
