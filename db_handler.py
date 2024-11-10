@@ -262,6 +262,50 @@ class ThreadSafeDatabaseHandler:
 
 
         return True
+    
+    def copy_user(self, from_user_id, new_user_id):
+        """
+        Copy all data from an existing user to a new user.
+        
+        Args:
+            new_user_id (str): User ID to copy data to
+            from_user_id (str): User ID to copy data from
+        """
+        with self.get_db_connection() as db:
+            users = db.table('users')
+            sessions = db.table('sessions')
+
+            # Get source user's current session
+            User = Query()
+            from_user = users.get(User.user_id == from_user_id)
+            if not from_user:
+                raise ValueError(f"Source user {from_user_id} not found")
+                
+            # Get source session data
+            Session = Query()
+            from_session = sessions.get(Session.session_id == from_user['session_id'])
+            if not from_session:
+                raise ValueError(f"Source session not found")
+
+            # Create new session with copied data
+            new_session = from_session.copy()
+            new_session['session_id'] = str(uuid.uuid4())  # New unique session ID
+            new_session['user_id'] = new_user_id
+            new_session['thread_id'] = self.client.beta.threads.create().id  # New OpenAI thread
+            
+            # Insert new session
+            sessions.insert(new_session)
+            
+            # Create or update new user with new session
+            new_user = {
+                'user_id': new_user_id,
+                'session_id': new_session['session_id']
+            }
+            users.upsert(new_user, User.user_id == new_user_id)
+            print(from_session['form_data'])
+            print('ok')
+            self.set_planning_doc_data(new_user_id, from_session['form_data'])
+            return new_session['session_id']
 
     def cleanup(self):
         """Cleanup method to release locks if needed"""
@@ -273,6 +317,8 @@ class ThreadSafeDatabaseHandler:
     def __del__(self):
         """Destructor to ensure cleanup"""
         self.cleanup()
+
+
         
     
 

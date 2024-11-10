@@ -108,8 +108,8 @@ def main():
     with open(("prompts/strategy_intro.txt"), 'r') as file:
             strategy_intro = file.read()
 
-    with open(("prompts/skills_trainer.txt"), 'r') as file:
-            skills_trainer = file.read()
+    with open(("prompts/strategy_skills_trainer.txt"), 'r') as file:
+            strategy_skills_trainer = file.read()
 
     with open(("prompts/technical_administrator.txt"), 'r') as file:
             technical_administrator = file.read()
@@ -129,8 +129,8 @@ def main():
         {"role": "user", "name": "self_conversation_history", "content" : str(chat_history)},
         {"role": "user", "name": "user_planning_doc", "content" : str(planning_doc_data)},
         {"role": "system", "name": "self_notes_so_far", "content": str(data_state)},
+        {"role": "system", "name": "instructor_skills_trainer", "content": str(strategy_skills_trainer)},
         {"role": "system", "name": "instructor_instructions", "content": str(strategy_prompt)},
-        {"role": "system", "name": "instructor_skills_trainer", "content": str(skills_trainer)},
         {"role": "system", "name": "instructor_technical_administrator", "content": str(technical_administrator)}
     ]
 
