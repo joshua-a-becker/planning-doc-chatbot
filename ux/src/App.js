@@ -500,13 +500,13 @@ const App = () => {
                 <div
                   key={index}
                   className={`rounded-lg p-4 mb-4 max-w-[80%] shadow-sm ${
-                    message.role === userName
+                    message.role !== "Negotiation Coach"
         ? 'bg-[#F6F4F9] border border-slate-200 ml-auto'  // Light blue tint
         : 'bg-[#F0F2FF] border border-slate-200 mr-auto'  // Light purple tint
                   }`}
                 >
                   <div className={`font-medium text-sm mb-1 ${
-                    message.role === userId ? 'text-[#4E2A84]' : 'text-[#4E2A84]'
+                    message.role !== "Negotiation Coach" ? 'text-[#4E2A84]' : 'text-[#4E2A84]'
                   }`}>
                     <b>{message.role}</b>
                   </div>
