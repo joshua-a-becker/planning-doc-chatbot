@@ -68,6 +68,8 @@ const App = () => {
 
   const prevMessageRef = useRef(null);
 
+  const [showResetConfirmation, setShowResetConfirmation] = useState(false);
+
 
   const [formClosed, setFormClosed] = useState(1);
 
@@ -304,7 +306,7 @@ const App = () => {
 
   const handleResetSystem = () => {
 
-
+    setShowResetConfirmation(false);
     fetch(SERVER_URL+'/reset/'+userId, { method: 'POST' });
     updateData({
       person1: { topics: [{ topic: '', priority:'', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
@@ -433,6 +435,32 @@ const App = () => {
     return(<NewUserForm />)
   }
 
+
+  // Confirm before resetting
+  const resetModal = 
+    <Modal isOpen={showResetConfirmation} onClose={() => setShowResetConfirmation(false)}>
+      <h2 className="text-2xl font-bold text-[#4E2A84] mb-6">Start New Chat</h2>
+      
+      <div className="space-y-4">
+        <p>Are you sure you want to start a new chat? This will clear all your current data.</p>
+        
+        <div className="flex justify-end space-x-4 mt-8">
+          <button 
+            onClick={() => setShowResetConfirmation(false)}
+            className="px-6 py-2 text-[#4E2A84] border border-[#4E2A84] rounded-lg hover:bg-slate-100 transition-all duration-200"
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={handleResetSystem}
+            className="px-6 py-2 bg-[#4E2A84] text-white rounded-lg hover:bg-[#836EAA] transition-all duration-200"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </Modal>
+
   const myModal = 
     <>
       <Modal isOpen={showInstructions} onClose={() => setShowInstructions(false)}>
@@ -470,7 +498,7 @@ const App = () => {
 
   return (
     <>
-      {myModal}
+      {myModal}{resetModal}
       <div className="flex flex-col lg:flex-row h-screen bg-slate-50 overflow-hidden">
         {/* Chat Section */}
         <div className={`relative transition-all duration-300 ease-in-out border-b lg:border-b-0 lg:border-r border-slate-200
@@ -488,7 +516,7 @@ const App = () => {
                     Instructions
                   </button>
                   <button 
-                    onClick={handleResetSystem}
+                    onClick={() => setShowResetConfirmation(true)}
                     className="hidden sm:block px-4 py-2 text-sm font-medium text-[#4E2A84] bg-white rounded-lg hover:bg-slate-100 border border-[#4E2A84] transition-all duration-200"
                   >
                     Start New Chat
