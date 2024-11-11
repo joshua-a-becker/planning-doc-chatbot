@@ -491,7 +491,7 @@ const App = () => {
                     onClick={handleResetSystem}
                     className="hidden sm:block px-4 py-2 text-sm font-medium text-[#4E2A84] bg-white rounded-lg hover:bg-slate-100 border border-[#4E2A84] transition-all duration-200"
                   >
-                    Start New
+                    Start New Chat
                   </button>
                 </div>
               </div>
