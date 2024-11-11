@@ -631,11 +631,13 @@ const App = () => {
 </button>
         
         {/* Form Section */}
-        <div className={`transition-all duration-300 overflow-y-auto
-          ${formClosed 
-            ? 'h-[15vh] lg:h-screen lg:w-1/5 opacity-50 filter blur-sm'
-            : 'h-[85vh] lg:h-screen lg:w-3/5 opacity-100 filter-none'
-          }`}>
+        <div 
+          onClick={() => formClosed && setFormClosed(false)}
+          className={`transition-all duration-300 overflow-y-auto
+            ${formClosed 
+              ? 'h-[15vh] lg:h-screen w-full lg:w-1/5 opacity-50 filter blur-sm cursor-pointer'
+              : 'h-[85vh] lg:h-screen w-full lg:w-3/5 opacity-100 filter-none'
+            }`}>
             
           <div className="h-full p-5 overflow-y-auto">
             <div className="flex justify-between items-center border-b border-slate-200 pb-4 mb-6">
