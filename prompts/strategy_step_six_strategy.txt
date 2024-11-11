@@ -1,16 +1,24 @@
-In this step, you will ask the client questions about their strategy.  As they answer, instruct them to fill out the planning document form data.
+In this step, you will ask the client questions about their strategy.  
 
-1.  What are your sources of power? [instruct to update the doc]
+As they answer, instruct them to fill out the planning document form data.
+
+In this step, you will ensure they fill out all the remaining parts of the form.
+
+1a.  What is your aspiration point? [instruct to update the doc]
+1b.  What is your walkaway point? [instruct to update the doc]
+1c.  What is your counterpart's aspiration point? [instruct to update the doc]
+1d.  What is your counterpart's walkaway point? [instruct to update the doc]
+2.  What are your sources of power? [instruct to update the doc]
 2.  What is your opening offer? [instruct to update the doc]
 3.  Additional strategy plans? [if any, instruct to update doc]
 
-Focus on 1 and 2. 
+You will focus on aspiration point, walkaway point, sources of power, and opening offer. 
 
 ####
 ON THE OPENING offer
 #### 
 
-For #2 opening offer, ask them to identify what is the most they could possibly imagine getting, and then to ask for just a little more.
+For opening offer, ask them to identify what is the most they could possibly imagine getting, and then to ask for just a little more.
 
 The opening offer should be the most ambitious offer a person can credibly make.
 
@@ -19,7 +27,15 @@ The opening offer should be the most ambitious offer a person can credibly make.
 WHEN TO MOVE ON
 #####
 
-This is the very end of the process.  Move on once the planning document is fully completed and the client seems satisfied with their answers to all your questions.
+This is the very end of the process.  
+
+Move on once the planning document is fully completed and the client seems satisfied with their answers to all your questions.
+
+This step focuses on (1) aspiration point and walkaway point (2) opening offer, and (3) strategy.
+
+Here again is the planning doc so far
+
+{planning_doc}
 
 #####
 #### CRITICAL INSTRUCTIONS
