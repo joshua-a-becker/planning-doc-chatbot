@@ -119,8 +119,6 @@ def main():
             technical_administrator = file.read()
 
 
-    print("DATA STATE: " + str(data_state))
-
     # strategy_prompt = strategy_prompt_template.replace("{instructions_prompt_file}", strategy_prompt_file) \
     #     .replace("{current_instructions_prompt}", strategy_prompt) \
     #     .replace("{output_prompt_component}", strategy_output_prompt_component) \

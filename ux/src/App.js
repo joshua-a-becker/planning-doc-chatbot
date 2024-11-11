@@ -477,8 +477,8 @@ const App = () => {
           <div className="bg-[#F6F3FB] p-4 rounded-lg mt-6">
             <h3 className="font-semibold text-[#4E2A84] mb-2">How to use this tool:</h3>
             <ol className="list-decimal pl-6 space-y-2">
-              <li>Chat with the AI coach on the left</li>
-              <li>Fill out the form on the right</li>
+              <li>Chat with the AI coach on the left (top on mobile)</li>
+              <li>Fill out the form on the right (bottom on mobile)</li>
               <li>Toggle the form view using the arrow button in the middle</li>
               <li>Export your completed plan using the "Export to PDF" button</li>
             </ol>
