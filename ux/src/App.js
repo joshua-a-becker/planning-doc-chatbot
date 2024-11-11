@@ -499,8 +499,8 @@ const App = () => {
                   key={index}
                   className={`rounded-lg p-4 mb-4 max-w-[80%] shadow-sm ${
                     message.role === userId
-        ? 'bg-[#F0F7FF] border border-slate-200 ml-auto'  // Light blue tint
-        : 'bg-[#F6F4F9] border border-slate-200 mr-auto'  // Light purple tint
+        ? 'bg-[#F6F4F9] border border-slate-200 ml-auto'  // Light blue tint
+        : 'bg-[#F0F2FF] border border-slate-200 mr-auto'  // Light purple tint
                   }`}
                 >
                   <div className={`font-medium text-sm mb-1 ${
@@ -523,7 +523,7 @@ const App = () => {
             </div>
     
             {/* Chat Input */}
-            <div className="bg-[#d3d3e3] border-t border-slate-200 p-4">
+            <div className="bg-[#FAFBFF] border-t border-slate-200 p-4">
               <div className="flex space-x-2">
                 <input
                   ref={userInputFieldRef}
