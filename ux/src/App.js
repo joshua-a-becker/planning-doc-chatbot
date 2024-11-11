@@ -569,9 +569,17 @@ const App = () => {
             : 'w-3/5 opacity-100 filter-none'
         }`}>
           <div className="h-full p-5 overflow-y-auto">
-            <h1 className="text-3xl font-bold text-[#4E2A84] border-b border-slate-000 pb-4 mb-6">
-              Planning Document
-            </h1>
+            <div className="flex justify-between items-center border-b border-slate-000 pb-4 mb-6">
+              <h1 className="text-3xl font-bold text-[#4E2A84]">
+                Planning Document
+              </h1>
+              <button
+                onClick={handleExport}
+                className="px-6 py-3 bg-[white] text-[#4E2A84] rounded-lg hover:bg-slate-100 transition-all duration-200 flex items-center justify-center space-x-2 shadow"
+              >
+                <span><b>Export to PDF</b></span>
+              </button>
+            </div>
             <PersonForm personNumber={1} data={formData} updateData={updateData} />
             <PersonForm personNumber={2} data={formData} updateData={updateData} />
             
@@ -629,14 +637,6 @@ const App = () => {
                 </div>
               
               </div>
-            </div>
-            <div className="flex justify-end mb-6">
-              <button
-                onClick={handleExport}
-                className="px-6 py-3 bg-[#4E2A84] text-white rounded-lg hover:bg-[#836EAA] transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm"
-              >
-                <span>Export to PDF</span>
-              </button>
             </div>
           </div>
         </div>
