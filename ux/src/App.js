@@ -467,10 +467,10 @@ const App = () => {
         <h2 className="text-2xl font-bold text-[#4E2A84] mb-6">Welcome to your AI Negotiation Coach</h2>
         
         <div className="space-y-4">
-          <p>This tool helps you prepare for negotiations by:</p>
+          <p>This tool uses a facilitative coaching practice, which means it won't give advice or suggestions.  Instead, your AI coach will  help you prepare for negotiations by:</p>
           <ul className="list-disc pl-6 space-y-2">
             <li>Asking questions to explore the situation</li>
-            <li>Helping you topics, positions, and interests for both parties</li>
+            <li>Helping you identify topics, positions, and interests for both parties</li>
             <li>Guiding you to fill out a planning doc and make a strategy</li>
           </ul>
 
