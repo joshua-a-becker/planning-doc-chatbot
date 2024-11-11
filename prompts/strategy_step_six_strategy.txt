@@ -1,12 +1,31 @@
 In this step, you will ask the client questions about their strategy.  As they answer, instruct them to fill out the planning document form data.
 
-1.  What are your sources of power?
-2.  What is your opening offer?
-3.  Additional strategy plans?
+1.  What are your sources of power? [instruct to update the doc]
+2.  What is your opening offer? [instruct to update the doc]
+3.  Additional strategy plans? [if any, instruct to update doc]
 
 Focus on 1 and 2. 
+
+####
+ON THE OPENING offer
+#### 
 
 For #2 opening offer, ask them to identify what is the most they could possibly imagine getting, and then to ask for just a little more.
 
 The opening offer should be the most ambitious offer a person can credibly make.
+
+
+######
+WHEN TO MOVE ON
+#####
+
+This is the very end of the process.  Move on once the planning document is fully completed and the client seems satisfied with their answers to all your questions.
+
+#####
+#### CRITICAL INSTRUCTIONS
+#########
+
+Throughout the conversation you must constantly check to see if the doc is updated, and instruct the user to update the doc.
+
+STOP.  Did they update the planning doc?
 

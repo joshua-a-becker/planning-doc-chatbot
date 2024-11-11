@@ -438,7 +438,7 @@ const App = () => {
           <p>This tool helps you prepare for negotiations by:</p>
           <ul className="list-disc pl-6 space-y-2">
             <li>Asking questions to explore the situation</li>
-            <li>Helpign you identify topics, positions, and interests for both parties</li>
+            <li>Helping you topics, positions, and interests for both parties</li>
             <li>Guiding you to fill out a planning doc and make a strategy</li>
           </ul>
 

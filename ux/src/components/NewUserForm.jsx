@@ -1,8 +1,27 @@
 import React, { useState } from 'react';
-import { Send } from 'lucide-react';
+import { Send, MessageSquare, Brain, Target, Glasses } from 'lucide-react';
+
+const FeatureCard = ({ icon: Icon, title, description }) => (
+  <div className="group bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200 hover:border-[#d3c7fc] transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+    <div className="flex items-start space-x-4">
+      <div className="p-3 bg-[#F6F4F9] rounded-xl group-hover:bg-[#4E2A84] transition-colors duration-300">
+        <Icon className="w-6 h-6 text-[#4E2A84] group-hover:text-white transition-colors duration-300" />
+      </div>
+      <div className="space-y-1">
+        <h3 className="font-semibold text-[#4E2A84] group-hover:text-[#4E2A84]/90 transition-colors duration-300">
+          {title}
+        </h3>
+        <p className="text-sm text-slate-600 group-hover:text-slate-700 transition-colors duration-300">
+          {description}
+        </p>
+      </div>
+    </div>
+  </div>
+);
 
 const NewUserForm = () => {
   const [username, setUsername] = useState('');
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -13,70 +32,84 @@ const NewUserForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="absolute inset-0" style={{ 
-        backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(203 213 225 / 0.2) 1px, transparent 0)',
-        backgroundSize: '40px 40px'
-      }}></div>
-      
-      <div className="container mx-auto px-4 py-16 relative">
-        <div className="max-w-2xl mx-auto space-y-8">
-          {/* Hero Section */}
-          <div className="text-center space-y-4">
-            <div className="inline-block mb-2 text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
-              AI-Powered Negotiation Platform
-            </div>
-            <h1 className="text-4xl font-bold text-slate-900">
-              Your Personal Negotiation Coach
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-[#F6F4F9] to-slate-50 flex items-center justify-center relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_500px_at_50%_200px,#4E2A8408,transparent)]" />
+
+      <div className="container max-w-6xl mx-auto px-4 py-8 grid lg:grid-cols-2 gap-16 items-center relative">
+        {/* Left side - Content */}
+        <div className="space-y-10">
+          <div className="space-y-4">
+            <span className="inline-block text-sm font-medium text-[#4E2A84] bg-[#F6F4F9] px-4 py-1.5 rounded-full border border-[#d3c7fc] shadow-sm">
+              Beta Access
+            </span>
+            <h1 className="text-4xl font-bold text-[#4E2A84] tracking-tight">
+              AI Negotiation Coach
             </h1>
-            <p className="text-xl text-slate-600">
-              Master the art of negotiation with AI-powered guidance
+            <p className="text-lg text-slate-600">
+              Your personal strategist for mastering the art of negotiation
             </p>
           </div>
 
-          {/* Main Content Block */}
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-slate-200">
-            <div className="p-8">
-              <div className="prose text-slate-700">
-                <p className="mb-4">
-                  Think of me as your personal negotiation strategist, available 24/7 through a familiar chat interface. Rather than offering pre-made solutions, I guide you through proven frameworks to develop your own winning strategy.
-                </p>
-                <p className="mb-4">
-                  Through our interactive dialogue, we'll analyze your position, articulate your priorities, and work together on your planning document. Instead of filling out the document for you, I'll ask targeted questions to help you determine your own strategy. I'll help you refine your issues list, identify core needs, and master the art of perspective-taking to anticipate other parties' positions.
-                </p>
-                <p className="mb-4">
-                  Currently in beta testing and available only to students at Kellogg, this interactive tool transforms theoretical knowledge into practical preparation skills.
-                </p>
-                <p className="mb-4">
-                  <br/><center><i>Your strategy. My guidance. Real results.</i></center>
-                </p>
-              </div>
-            </div>
+          <div className="grid gap-5">
+            <FeatureCard 
+              icon={MessageSquare}
+              title="Interactive Guidance"
+              description="Get real-time coaching through natural conversation"
+            />
+            <FeatureCard 
+              icon={Brain}
+              title="Strategic Framework"
+              description="Build your approach using proven negotiation methods"
+            />
+            <FeatureCard 
+              icon={Target}
+              title="Interest-Based Planning"
+              description="Identify core interests and develop strong positions"
+            />
+            <FeatureCard 
+              icon={Glasses}
+              title="Perspective Analysis"
+              description="Understand and anticipate your counterpart's moves"
+            />
           </div>
+        </div>
 
-          {/* Username Input Card */}
-          <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden border border-slate-200">
-            <div className="p-6">
-              <h2 className="text-2xl font-semibold text-center mb-4 text-slate-900">
-                Tell me your name to start.
+        {/* Right side - Form */}
+        <div className="lg:pl-12">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-[#d3c7fc] shadow-lg relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/50 rounded-2xl" />
+            <div className="relative">
+              <h2 className="text-2xl font-semibold text-[#4E2A84] mb-8">
+                Start Your Session
               </h2>
-              <form onSubmit={handleSubmit}>
-                <div className="flex rounded-lg overflow-hidden border border-slate-200 bg-white">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div 
+                  className="relative group"
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                >
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="flex-1 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter user name"
+                    className="w-full px-4 py-3 bg-white rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200 pr-12 shadow-sm"
+                    placeholder="Enter your name"
                     required
                   />
                   <button 
-                    type="submit" 
-                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                    type="submit"
+                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md transition-all duration-300 ${
+                      isHovered ? 'bg-[#4E2A84] text-white' : 'text-[#4E2A84]'
+                    }`}
                   >
-                    <Send size={18} />
+                    <Send size={20} />
                   </button>
                 </div>
+                <p className="text-sm text-slate-500 text-center">
+                  Your AI coach is ready to help you prepare
+                </p>
               </form>
             </div>
           </div>
