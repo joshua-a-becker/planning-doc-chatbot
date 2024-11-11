@@ -303,8 +303,8 @@ const App = () => {
 
     fetch(SERVER_URL+'/reset/'+userId, { method: 'POST' });
     updateData({
-      person1: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
-      person2: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
+      person1: { topics: [{ topic: '', priority:'', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
+      person2: { topics: [{ topic: '', priority:'', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
       strategy: { sourcesOfPower: '', plan: '', additionalNotes: '' }
     })
     console.log("reset ok")
@@ -450,8 +450,9 @@ const App = () => {
               <li>Toggle the form view using the arrow button in the middle</li>
               <li>Export your completed plan using the "Export to PDF" button</li>
             </ol>
-            This app is in beta testing as of 10th 
           </div>
+          <div className="pt-2">This app is in beta testing as of Nov 12th.
+            <br/><br/><b>Send all feedback to:</b> joshua.becker@ucl.ac.uk</div>
         </div>
 
         <button 
@@ -679,7 +680,7 @@ const PersonForm = ({ personNumber, data, updateData }) => {
       ...data,
       [person]: {
         ...data[person],
-        topics: [...(data[person].topics || []), { topic: '', priority: 0, position: '', needsInterests: '' }]
+        topics: [...(data[person].topics || []), { topic: '', priority: '', position: '', needsInterests: '' }]
       }
     };
     updateData(newData);
