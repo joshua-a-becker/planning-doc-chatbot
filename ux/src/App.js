@@ -6,17 +6,20 @@ import NewUserForm from './components/NewUserForm';
 
 const SERVER_URL = "https://planning.negotiation.solutions/data"
 
+
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div 
         className="fixed inset-0 backdrop-blur-sm bg-white/50" 
         onClick={onClose}
       />
-      <div className="relative bg-white p-12 rounded-lg max-w-2xl mx-4 border-2 border-[#4E2A84] shadow-lg">
-        {children}
+      <div className="relative bg-white rounded-lg border-2 border-[#4E2A84] shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 md:p-8">
+          {children}
+        </div>
       </div>
     </div>
   );
