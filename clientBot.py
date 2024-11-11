@@ -1,4 +1,4 @@
-from openai import OpenAI
+# from openai import OpenAI
 import os
 import time
 localdir = open('localdir.txt', 'r').read()

@@ -496,8 +496,42 @@ const App = () => {
       </Modal>
     </>
 
+
+
+  const MobileBlocker = () => {
+    const [showBlocker, setShowBlocker] = useState(false);
+    
+    useEffect(() => {
+      const checkScreenSize = () => {
+        setShowBlocker(window.innerWidth < 500); // 768px is typical tablet breakpoint
+      };
+      
+      checkScreenSize();
+      window.addEventListener('resize', checkScreenSize);
+      return () => window.removeEventListener('resize', checkScreenSize);
+    }, []);
+    
+    if (!showBlocker) return null;
+    
+    return (
+      <div className="fixed inset-0 z-[9999] bg-[#4E2A84] text-white flex flex-col items-center justify-center p-6 text-center">
+        <div className="max-w-md space-y-4">
+          <h2 className="text-2xl font-bold mb-6">
+            Please use a larger device
+          </h2>
+          <p className="text-lg leading-relaxed">
+            Sorry, this app is not designed for small devices. Take the time and space you need to carefully plan your negotiation.
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+
+
   return (
     <>
+      <MobileBlocker />
       {myModal}{resetModal}
       <div className="flex flex-col lg:flex-row h-screen bg-slate-50 overflow-hidden">
         {/* Chat Section */}
@@ -732,6 +766,8 @@ const PersonForm = ({ personNumber, data, updateData }) => {
     updateData(newData);
   };
 
+
+  
   return (
     <div className="bg-white rounded-lg shadow-sm p-3 mb-6 border border-[#d3c7fc]">
       <h2 className="text-xl font-bold text-[#4E2A84] m-0 mb-3 leading-none pt-2 pl-2">

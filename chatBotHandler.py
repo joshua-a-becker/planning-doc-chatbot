@@ -173,7 +173,8 @@ def main():
     with open('prompts/coach_response_instructions.txt', 'r') as file:
         coach_response_instructions = file.read(). \
             replace("{strategy_output}", strategy_content_txt). \
-            replace("{instructions_prompt_file}", instructions_step)
+            replace("{instructions_prompt_file}", instructions_step). \
+            replace("{planning_doc}", str(planning_doc_data))
 
 
     with open('prompts/coach_response_skills_training.txt', 'r') as file:
