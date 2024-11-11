@@ -810,10 +810,21 @@ const PersonForm = ({ personNumber, data, updateData }) => {
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
             />
           </div>
-
+          <div>
+            <label className="block font-medium text-[#4E2A84] mb-2" htmlFor={`aspiration-${personNumber}`}>
+              Aspiration Point (Target)
+            </label>
+            <input
+              id={`aspiration-${personNumber}`}
+              type="text"
+              value={data[person].aspiration}
+              onChange={(e) => updateField('aspiration', e.target.value)}
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200"
+            />
+          </div>
           <div>
             <label className="block font-medium text-[#4E2A84] mb-2" htmlFor={`bottomLine-${personNumber}`}>
-              Reservation Point
+              Reservation Point (Walkaway Point)
             </label>
             <input
               id={`bottomLine-${personNumber}`}
