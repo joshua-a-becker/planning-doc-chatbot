@@ -234,14 +234,15 @@ async function readFileText(filepath) {
 }
 
 
-app.post('/initialize/:userId/:sessionId', async (req, res) => {
+app.post('/initialize/:userId/:sessionId/:userName', async (req, res) => {
   console.log("Initialize");
   const userId = req.params.userId;
+  const userName = req.params.userName;
   const sessionId = req.params.sessionId;
   let sessionIdReturned = null;
 
   try {
-    const { stdout, stderr } = await execPromise(`python3 ../getSessionId.py ${userId} ${sessionId}`);
+    const { stdout, stderr } = await execPromise(`python3 ../getSessionId.py ${userId} ${sessionId} ${userName}`);
     console.log("User initialized in DB");
     sessionIdReturned = stdout.trim();
     res.status(200).send(`${sessionIdReturned}`);
@@ -348,11 +349,13 @@ app.get('/auto-chat/:userId/:sessionId', (req, res) => {
 app.post('/runChatBot/:userId', async (req, res) => {
 
   console.log("RUNNING CHATBOT")
+  
 
   const userId = req.params.userId;
   const sessionId = "THIS_IS_NOT_USED"
   const userInput = req.body.userInput
   
+  console.log("userid " + userId)
   console.log(userInput)
 
   const command = `python3 ../chatBotHandler.py ${userId} ${sessionId} "${userInput}" &`;

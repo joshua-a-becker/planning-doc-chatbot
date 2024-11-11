@@ -48,6 +48,15 @@ class ThreadSafeDatabaseHandler:
                     raise TimeoutError("Could not acquire database lock")
                 time.sleep(0.1)
 
+    def get_user(self, user_id):
+        with self.get_db_connection() as db:
+            users = db.table('users')
+            User = Query()
+            user = users.get(User.user_id == user_id)
+
+            return user;
+            
+
     def new_session_id(self):
         """Generate a unique session ID"""
         with self.memory_lock:
@@ -142,7 +151,7 @@ class ThreadSafeDatabaseHandler:
             return session
         return self.update_session(session_id, update_func)
 
-    def get_session_id_for_user(self, user_id):
+    def get_session_id_for_user(self, user_id, user_name=None):
         """Get or create session ID for user with thread safety"""
         with self.get_db_connection() as db:
             users = db.table('users')
@@ -165,7 +174,7 @@ class ThreadSafeDatabaseHandler:
             else:
                 # If user doesn't exist, create new user and session
                 session_id = self.create_new_session(user_id)
-                users.insert({'user_id': user_id, 'session_id': session_id})
+                users.insert({'user_id': user_id, 'session_id': session_id, 'user_name': user_name})
                 return session_id
 
     def load_planning_doc_data(self, user_id):
@@ -235,7 +244,7 @@ class ThreadSafeDatabaseHandler:
         return session_id
 
     
-    def set_current_session_for_user(self, user_id, session_id):
+    def set_current_session_for_user(self, user_id, session_id, user_name):
         with self.get_db_connection() as db:
             User = Query()
             users = db.table('users')
@@ -258,10 +267,17 @@ class ThreadSafeDatabaseHandler:
                     
             else:
                 # If user doesn't exist, create new user and session
-                db.users.insert({'user_id': user_id, 'session_id': session_id})
+                db.users.insert({'user_id': user_id, 'session_id': session_id, 'user_name': user_name})
 
 
         return True
+    
+    def get_user_name(self, user_id):
+        with self.get_db_connection() as db:
+            users = db.table('users')
+            User = Query()
+            user = users.get(User.user_id == user_id)
+            return user.get('user_name') if user else None
     
     def copy_user(self, from_user_id, new_user_id):
         """

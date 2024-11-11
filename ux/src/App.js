@@ -50,6 +50,7 @@ const App = () => {
 
   const urlParams = new URLSearchParams(window.location.search);
   const userId  = urlParams.get('userId')
+  const userName = urlParams.get('userName')
   const sessionId  = urlParams.get('sessionId') || "UNSPECIFIED"
   //console.log("Session ID from URL: " + sessionId)
 
@@ -91,7 +92,7 @@ const App = () => {
     const currentLastMessage = chatTranscript.at(-1)?.content;
 
     const shouldBeIsSubmitting = 
-      (chatTranscript.at(-1).role==userId) ||
+      (chatTranscript.at(-1).role==userName) ||
       chatTranscript.at(-1).content.trim().includes("<THINKING/>")
 
     setIsSubmitting(shouldBeIsSubmitting);
@@ -148,7 +149,7 @@ const App = () => {
         console.log("running initialization")
         try {
           console.log("trying initialization")
-          const fetchUrl = SERVER_URL + '/initialize/' + userId + '/' + sessionId;
+          const fetchUrl = SERVER_URL + '/initialize/' + userId + '/' + sessionId + '/' + userName;
           console.log("Fetch URL: " + fetchUrl)
           initializationPromise.current = fetch(fetchUrl, { method: 'POST' });
           
@@ -425,7 +426,7 @@ const App = () => {
     }, 250);
   };
 
-  if(userId===null) {
+  if(userId===null || userName===null) {
     return(<NewUserForm />)
   }
 
@@ -499,7 +500,7 @@ const App = () => {
                 <div
                   key={index}
                   className={`rounded-lg p-4 mb-4 max-w-[80%] shadow-sm ${
-                    message.role === userId
+                    message.role === userName
         ? 'bg-[#F6F4F9] border border-slate-200 ml-auto'  // Light blue tint
         : 'bg-[#F0F2FF] border border-slate-200 mr-auto'  // Light purple tint
                   }`}

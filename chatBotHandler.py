@@ -14,10 +14,11 @@ print("startup chatbothandler")
 
 
 user_id = sys.argv[1]
+print("User: " + user_id)
 user_session_id = sys.argv[2]
 user_input = sys.argv[3]
 
-print("User: " + user_id)
+
 
 
 
@@ -72,7 +73,9 @@ def main():
     print("line 72")
 
     # update chat history with user input
-    db.update_chat_history(session_id, {"role": user_id, "content": user_input})
+    print("USER ID: " + user_id)
+    print("USER NAME: " + db.get_user_name(user_id))
+    db.update_chat_history(session_id, {"role": db.get_user_name(user_id), "content": user_input})
 
     print("line 77")
 

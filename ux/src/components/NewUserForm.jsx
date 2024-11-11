@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, MessageSquare, Brain, Target, Glasses } from 'lucide-react';
+import { Send, MessageSquare, Brain, Target, Glasses, AlertCircle } from 'lucide-react';
 
 const FeatureCard = ({ icon: Icon, title, description }) => (
   <div className="group bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200 hover:border-[#d3c7fc] transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
@@ -20,14 +20,54 @@ const FeatureCard = ({ icon: Icon, title, description }) => (
 );
 
 const NewUserForm = () => {
-  const [username, setUsername] = useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    email: ''
+  });
   const [isHovered, setIsHovered] = useState(false);
+  const [errors, setErrors] = useState({
+    email: '',
+    username: ''
+  });
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      return 'Email is required';
+    }
+    if (!emailRegex.test(email)) {
+      return 'Please enter a valid email address';
+    }
+    return '';
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    if (name === 'email') {
+      setErrors(prev => ({
+        ...prev,
+        email: validateEmail(value)
+      }));
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (username.trim()) {
-      const formattedUsername = username.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-      window.location.href = `${window.location.pathname}?userId=${encodeURIComponent(formattedUsername)}`;
+    
+    const emailError = validateEmail(formData.email);
+    setErrors(prev => ({
+      ...prev,
+      email: emailError
+    }));
+
+    if (!emailError && formData.username.trim()) {
+      const formattedUsername = formData.username.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+      window.location.href = `${window.location.pathname}?userName=${encodeURIComponent(formattedUsername)}&userId=${encodeURIComponent(formData.email)}`;
     }
   };
 
@@ -85,27 +125,49 @@ const NewUserForm = () => {
                 Start Your Session
               </h2>
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div 
-                  className="relative group"
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                >
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="w-full px-4 py-3 bg-white rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200 pr-12 shadow-sm"
-                    placeholder="Enter your name"
-                    required
-                  />
-                  <button 
-                    type="submit"
-                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md transition-all duration-300 ${
-                      isHovered ? 'bg-[#4E2A84] text-white' : 'text-[#4E2A84]'
-                    }`}
+                <div className="space-y-4">
+                  <div className="relative">
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3 bg-white rounded-lg border ${
+                        errors.email ? 'border-red-500' : 'border-slate-200'
+                      } focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200 shadow-sm`}
+                      placeholder="Enter your email"
+                      required
+                    />
+                    {errors.email && (
+                      <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                        <AlertCircle size={14} />
+                        {errors.email}
+                      </p>
+                    )}
+                  </div>
+                  <div 
+                    className="relative group"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
                   >
-                    <Send size={20} />
-                  </button>
+                    <input
+                      type="text"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-white rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200 pr-12 shadow-sm"
+                      placeholder="Enter your username"
+                      required
+                    />
+                    <button 
+                      type="submit"
+                      className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md transition-all duration-300 ${
+                        isHovered ? 'bg-[#4E2A84] text-white' : 'text-[#4E2A84]'
+                      }`}
+                    >
+                      <Send size={20} />
+                    </button>
+                  </div>
                 </div>
                 <p className="text-sm text-slate-500 text-center">
                   Your AI coach is ready to help you prepare
