@@ -584,25 +584,25 @@ const App = () => {
             </div>
           </div>
         </div>
-    
-        {/* Toggle Button */}
-        <button 
-          onClick={() => setFormClosed(prev => !prev)}
-          className={`absolute z-10 w-10 h-10 bg-[#4E2A84] text-white rounded-full flex items-center justify-center hover:bg-[#836EAA] transition-all duration-200 shadow-lg 
-            ${formClosed 
-              ? 'top-[calc(85vh-1.25rem)] left-1/2 -translate-x-1/2 rotate-90 lg:rotate-0 lg:left-[calc(80%-1.25rem)] lg:top-1/2 lg:-translate-y-1/2' 
-              : 'top-[calc(15vh-1.25rem)] left-1/2 -translate-x-1/2 rotate-90 lg:rotate-0 lg:left-[calc(40%-1.25rem)] lg:top-1/2 lg:-translate-y-1/2'
-            }`}
-        >
-          {formClosed ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
-        </button>
-    
+    {/* Toggle Button - Now between panels */}
+<button 
+  onClick={() => setFormClosed(prev => !prev)}
+  className={`fixed z-10 w-10 h-10 bg-[#4E2A84] text-white rounded-full flex items-center justify-center hover:bg-[#836EAA] transition-all duration-300 ease-in-out shadow-lg
+    ${formClosed 
+      ? 'lg:left-[80%] lg:top-1/2 lg:-translate-y-1/2 top-[85vh] left-1/2 -translate-x-1/2 -translate-y-5 rotate-90 lg:rotate-0'
+      : 'lg:left-[40%] lg:top-1/2 lg:-translate-y-1/2 top-[15vh] left-1/2 -translate-x-1/2 -translate-y-5 rotate-90 lg:rotate-0'
+    }`}
+>
+  {formClosed ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
+</button>
+        
         {/* Form Section */}
         <div className={`transition-all duration-300 overflow-y-auto
           ${formClosed 
             ? 'h-[15vh] lg:h-screen lg:w-1/5 opacity-50 filter blur-sm'
             : 'h-[85vh] lg:h-screen lg:w-3/5 opacity-100 filter-none'
           }`}>
+            
           <div className="h-full p-5 overflow-y-auto">
             <div className="flex justify-between items-center border-b border-slate-200 pb-4 mb-6">
               <h1 className="text-3xl font-bold text-[#4E2A84]">

@@ -123,6 +123,11 @@ STOP and check.  Is the doc filled out?
 
 BEFORE YOU MOVE ON:  is the doc filled out?
 
+Here is their planning doc form data again for reference--let them know to add things:
+
+{planning_doc}
+
+
 #########################
 ### NARRATIVE FRAME #####
 #########################

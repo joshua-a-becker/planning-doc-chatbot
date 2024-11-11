@@ -106,7 +106,8 @@ def main():
     print("PROMPT: " + strategy_prompt_file)
 
     with open(("prompts/"+strategy_prompt_file+".txt"), 'r') as file:
-        strategy_prompt = file.read()
+        strategy_prompt = file.read(). \
+        replace("{planning_doc}", json.dumps(planning_doc_data))
     
     with open(("prompts/strategy_intro.txt"), 'r') as file:
             strategy_intro = file.read()

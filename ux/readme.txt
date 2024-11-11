@@ -17,3 +17,5 @@ pm2 restart server # restart
 pm2 monit            # Shows real-time monitoring
 
 $ pm2 unstartup systemd
+
+while true; do python3 clientBot.py; done
