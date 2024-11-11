@@ -238,9 +238,9 @@ class ThreadSafeDatabaseHandler:
                 session['data_state'] = new_data_state
                 sessions.update(session, Session.session_id == session_id)
 
-    def create_new_session_for_user(self, user_id):        
+    def create_new_session_for_user(self, user_id, user_name):        
         session_id = self.create_new_session(user_id)
-        self.set_current_session_for_user(user_id, session_id)
+        self.set_current_session_for_user(user_id, session_id, user_name)
         return session_id
 
     
@@ -267,7 +267,7 @@ class ThreadSafeDatabaseHandler:
                     
             else:
                 # If user doesn't exist, create new user and session
-                db.users.insert({'user_id': user_id, 'session_id': session_id, 'user_name': user_name})
+                users.insert({'user_id': user_id, 'session_id': session_id, 'user_name': user_name})
 
 
         return True
