@@ -125,6 +125,14 @@ def main():
     #     .replace("{planning_doc_data}", json.dumps(planning_doc_data)) \
     #     .replace("{special_notes}", special_notes)
 
+    advice_note = """
+    If a user asks for advice, you will inform them:  
+    
+    "This process is based on facilitative coaching, which guides you to determine your own strategy.  As a general rule I do not give advice as a coach.  Notably, a future version of this app will include the ability to give stanrd best-practice guidelines such as how to pick a strong first offer.  However, giving advice is tricky business for anybody in a position of influence-which brings responsibility-and so we will be implementing that feature very carefully."
+
+    And then you will redirect the conversation back to the topic at hand as per strategy.
+    """
+
     strategy_messages = [
         {"role": "system", "name": "instructor_general_instructions", "content": strategy_intro},
         {"role": "system", "name": "self_current_step", "content": "CURRENT STEP " + strategy_prompt_file},
@@ -132,6 +140,7 @@ def main():
         {"role": "user", "name": "user_planning_doc", "content" : str(planning_doc_data)},
         {"role": "system", "name": "self_notes_so_far", "content": str(data_state)},
         {"role": "system", "name": "instructor_skills_trainer", "content": str(strategy_skills_trainer)},
+        {"role": "system", "name": "instructor_skills_trainer", "content": str(advice_note)},
         {"role": "system", "name": "instructor_instructions", "content": str(strategy_prompt)},
         {"role": "system", "name": "instructor_technical_administrator", "content": str(technical_administrator)}
     ]
