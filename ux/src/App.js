@@ -468,31 +468,32 @@ const App = () => {
   return (
     <>
       {myModal}
-      <div className="flex h-screen bg-slate-50 overflow-hidden">
+      <div className="flex flex-col lg:flex-row h-screen bg-slate-50 overflow-hidden">
         {/* Chat Section */}
-        <div className={`relative transition-all duration-300 ease-in-out border-r border-slate-200
-          ${formClosed ? 'w-4/5' : 'w-2/5'}`}>
+        <div className={`relative transition-all duration-300 ease-in-out border-b lg:border-b-0 lg:border-r border-slate-200
+          ${formClosed ? 'h-[85vh] lg:h-screen lg:w-4/5' : 'h-[15vh] lg:h-screen lg:w-2/5'}`}>
           <div className="flex flex-col h-full">
             {/* Chat Header - Kellogg Purple */}
             <div className="bg-[#4E2A84] px-6 py-4 shadow-sm">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-semibold text-white">Negotiation Coach</h2>
-              <div className="flex gap-2">  {/* Added this div with flex and gap */}
-                <button 
-                  onClick={() => setShowInstructions(true)}
-                  className="px-4 py-2 text-sm font-medium text-[#4E2A84] bg-white rounded-lg hover:bg-slate-100 border border-[#4E2A84] transition-all duration-200"
-                >
-                  Instructions
-                </button>
-                <button 
-                  onClick={handleResetSystem}
-                  className="px-4 py-2 text-sm font-medium text-[#4E2A84] bg-white rounded-lg hover:bg-slate-100 border border-[#4E2A84] transition-all duration-200"
-                >
-                  Start New Conversation
-                </button>
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-semibold text-white">Negotiation Coach</h2>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => setShowInstructions(true)}
+                    className="px-4 py-2 text-sm font-medium text-[#4E2A84] bg-white rounded-lg hover:bg-slate-100 border border-[#4E2A84] transition-all duration-200"
+                  >
+                    Instructions
+                  </button>
+                  <button 
+                    onClick={handleResetSystem}
+                    className="hidden sm:block px-4 py-2 text-sm font-medium text-[#4E2A84] bg-white rounded-lg hover:bg-slate-100 border border-[#4E2A84] transition-all duration-200"
+                  >
+                    Start New
+                  </button>
+                </div>
               </div>
             </div>
-            </div>
+    
     
             {/* Messages Container */}
             <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
@@ -556,21 +557,23 @@ const App = () => {
         {/* Toggle Button */}
         <button 
           onClick={() => setFormClosed(prev => !prev)}
-          className={`absolute top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-[#4E2A84] text-white rounded-full flex items-center justify-center hover:bg-[#836EAA] transition-all duration-200 shadow-lg ${
-            formClosed ? 'left-[calc(80%-1.25rem)]' : 'left-[calc(40%-1.25rem)]'
-          }`}
+          className={`absolute z-10 w-10 h-10 bg-[#4E2A84] text-white rounded-full flex items-center justify-center hover:bg-[#836EAA] transition-all duration-200 shadow-lg 
+            ${formClosed 
+              ? 'top-[calc(85vh-1.25rem)] left-1/2 -translate-x-1/2 rotate-90 lg:rotate-0 lg:left-[calc(80%-1.25rem)] lg:top-1/2 lg:-translate-y-1/2' 
+              : 'top-[calc(15vh-1.25rem)] left-1/2 -translate-x-1/2 rotate-90 lg:rotate-0 lg:left-[calc(40%-1.25rem)] lg:top-1/2 lg:-translate-y-1/2'
+            }`}
         >
           {formClosed ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
         </button>
     
         {/* Form Section */}
-        <div className={`transition-all duration-300 ${
-          formClosed 
-            ? 'w-1/5 opacity-50 filter blur-sm'
-            : 'w-3/5 opacity-100 filter-none'
-        }`}>
+        <div className={`transition-all duration-300 overflow-y-auto
+          ${formClosed 
+            ? 'h-[15vh] lg:h-screen lg:w-1/5 opacity-50 filter blur-sm'
+            : 'h-[85vh] lg:h-screen lg:w-3/5 opacity-100 filter-none'
+          }`}>
           <div className="h-full p-5 overflow-y-auto">
-            <div className="flex justify-between items-center border-b border-slate-000 pb-4 mb-6">
+            <div className="flex justify-between items-center border-b border-slate-200 pb-4 mb-6">
               <h1 className="text-3xl font-bold text-[#4E2A84]">
                 Planning Document
               </h1>
