@@ -6,7 +6,21 @@ import NewUserForm from './components/NewUserForm';
 
 const SERVER_URL = "https://planning.negotiation.solutions/data"
 
+const Modal = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
 
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div 
+        className="fixed inset-0 backdrop-blur-sm bg-white/50" 
+        onClick={onClose}
+      />
+      <div className="relative bg-white p-12 rounded-lg max-w-2xl mx-4 border-2 border-[#4E2A84] shadow-lg">
+        {children}
+      </div>
+    </div>
+  );
+};
 
 const ThinkingDots = () => {
   const [dots, setDots] = useState('.');
@@ -26,10 +40,7 @@ const ThinkingDots = () => {
 };
 
 const App = () => {
-  // const [formData, setFormData] = useState({
-  //   person1: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
-  //   person2: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' }
-  // });
+  const [showInstructions, setShowInstructions] = useState(true);
 
   const [formData, setFormData] = useState({
     person1: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
@@ -46,16 +57,13 @@ const App = () => {
   const [userInput, setUserInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [myVal, setMyVal] = useState(0);
 
-  const [lastMessage, setLastMessage] = useState("");
 
   //const [initialized, setInitialized] = useState(false);
   const initializationPromise = useRef(null);
 
   const prevMessageRef = useRef(null);
 
-  const [firstLoad, setFirstLoad] = useState(true);
 
   const [formClosed, setFormClosed] = useState(1);
 
@@ -128,16 +136,7 @@ const App = () => {
   }, [chatTranscript]);
   
 
-  useEffect(()=>{
-    
-      console.log("My val: ", myVal)
-      return () => {
-        // This runs BEFORE the next effect, but has access to 
-        // the values from when this effect ran
-        console.log("Cleaning up from when myVal was:", myVal);
-      };
-    
-  }, [myVal]);
+ 
 
 
   useEffect(() => {
@@ -205,27 +204,6 @@ const App = () => {
   }, []);
 
 
-  const autoChatOnce = async () => {
-    
-      try {
-        console.log("Running auto chat once...");
-        const response = await fetch(SERVER_URL + '/auto-chat', { method: 'POST' });
-        if (!response.ok) {
-          throw new Error('Auto-chat request failed');
-        }
-        console.log("Auto-chat complete");
-      
-      } catch (error) {
-        console.error('Error in auto-chat:', error);
-        setIsAutoChatting(false);
-      }
-
-  }
-  
-  const autoChatRun = useCallback(() => {
-    setIsAutoChatting(prev => !prev);
-  }, []);
-  
 
   useEffect(() => {
     if (!isAutoChatting) return;
@@ -451,173 +429,218 @@ const App = () => {
     return(<NewUserForm />)
   }
 
+  const myModal = 
+    <>
+      <Modal isOpen={showInstructions} onClose={() => setShowInstructions(false)}>
+        <h2 className="text-2xl font-bold text-[#4E2A84] mb-6">Welcome to your AI Negotiation Coach</h2>
+        
+        <div className="space-y-4">
+          <p>This tool helps you prepare for negotiations by:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Asking questions to explore the situation</li>
+            <li>Helpign you identify topics, positions, and interests for both parties</li>
+            <li>Guiding you to fill out a planning doc and make a strategy</li>
+          </ul>
+
+          <div className="bg-[#F6F3FB] p-4 rounded-lg mt-6">
+            <h3 className="font-semibold text-[#4E2A84] mb-2">How to use this tool:</h3>
+            <ol className="list-decimal pl-6 space-y-2">
+              <li>Chat with the AI coach on the left</li>
+              <li>Fill out the form on the right</li>
+              <li>Toggle the form view using the arrow button in the middle</li>
+              <li>Export your completed plan using the "Export to PDF" button</li>
+            </ol>
+            This app is in beta testing as of 10th 
+          </div>
+        </div>
+
+        <button 
+          onClick={() => setShowInstructions(false)}
+          className="mt-8 px-6 py-2 bg-[#4E2A84] text-white rounded-lg hover:bg-[#836EAA] transition-all duration-200"
+        >
+          Get Started
+        </button>
+      </Modal>
+    </>
+
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
-      {/* Chat Section */}
-      <div className={`relative transition-all duration-300 ease-in-out border-r border-slate-200
-        ${formClosed ? 'w-4/5' : 'w-2/5'}`}>
-        <div className="flex flex-col h-full">
-          {/* Chat Header - Kellogg Purple */}
-          <div className="bg-[#4E2A84] px-6 py-4 shadow-sm">
+    <>
+      {myModal}
+      <div className="flex h-screen bg-slate-50 overflow-hidden">
+        {/* Chat Section */}
+        <div className={`relative transition-all duration-300 ease-in-out border-r border-slate-200
+          ${formClosed ? 'w-4/5' : 'w-2/5'}`}>
+          <div className="flex flex-col h-full">
+            {/* Chat Header - Kellogg Purple */}
+            <div className="bg-[#4E2A84] px-6 py-4 shadow-sm">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-semibold text-white">Negotiation Coach</h2>
-              <button 
-                onClick={handleResetSystem}
-                className="px-4 py-2 text-sm font-medium text-[#4E2A84] bg-white rounded-lg hover:bg-slate-100 border border-[#4E2A84] transition-all duration-200"
-              >
-                Start New Conversation
-              </button>
-            </div>
-          </div>
-  
-          {/* Messages Container */}
-          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
-            {chatTranscript.map((message, index) => (
-              <div
-                key={index}
-                className={`rounded-lg p-4 mb-4 max-w-[80%] shadow-sm ${
-                  message.role === userId
-      ? 'bg-[#F0F7FF] border border-slate-200 ml-auto'  // Light blue tint
-      : 'bg-[#F6F4F9] border border-slate-200 mr-auto'  // Light purple tint
-                }`}
-              >
-                <div className={`font-medium text-sm mb-1 ${
-                  message.role === userId ? 'text-[#4E2A84]' : 'text-[#4E2A84]'
-                }`}>
-                  <b>{message.role}</b>
-                </div>
-                <div className="text-slate-800">
-                  {message.content.trim().includes("<THINKINGDOTS/>") ? (
-                    <div className="flex items-center space-x-2">
-                      <span>Thinking</span>
-                      <ThinkingDots />
-                    </div>
-                  ) : (
-                    <div dangerouslySetInnerHTML={{__html: message.content}} />
-                  )}
-                </div>
+              <div className="flex gap-2">  {/* Added this div with flex and gap */}
+                <button 
+                  onClick={() => setShowInstructions(true)}
+                  className="px-4 py-2 text-sm font-medium text-[#4E2A84] bg-white rounded-lg hover:bg-slate-100 border border-[#4E2A84] transition-all duration-200"
+                >
+                  Instructions
+                </button>
+                <button 
+                  onClick={handleResetSystem}
+                  className="px-4 py-2 text-sm font-medium text-[#4E2A84] bg-white rounded-lg hover:bg-slate-100 border border-[#4E2A84] transition-all duration-200"
+                >
+                  Start New Conversation
+                </button>
               </div>
-            ))}
-          </div>
-  
-          {/* Chat Input */}
-          <div className="bg-[#d3d3e3] border-t border-slate-200 p-4">
-            <div className="flex space-x-2">
-              <input
-                ref={userInputFieldRef}
-                type="text"
-                value={userInput}
-                onChange={handleUserInputChange}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !isSubmitting) {
-                    handleSendMessage();
-                  }
-                }}
-                disabled={isSubmitting}
-                placeholder="Type your message..."
-                className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed transition-all duration-200"
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={isSubmitting}
-                className="px-4 py-3 bg-[#4E2A84] text-white rounded-lg hover:bg-[#836EAA] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-              >
-                <Send size={20} />
-              </button>
+            </div>
+            </div>
+    
+            {/* Messages Container */}
+            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
+              {chatTranscript.map((message, index) => (
+                <div
+                  key={index}
+                  className={`rounded-lg p-4 mb-4 max-w-[80%] shadow-sm ${
+                    message.role === userId
+        ? 'bg-[#F0F7FF] border border-slate-200 ml-auto'  // Light blue tint
+        : 'bg-[#F6F4F9] border border-slate-200 mr-auto'  // Light purple tint
+                  }`}
+                >
+                  <div className={`font-medium text-sm mb-1 ${
+                    message.role === userId ? 'text-[#4E2A84]' : 'text-[#4E2A84]'
+                  }`}>
+                    <b>{message.role}</b>
+                  </div>
+                  <div className="text-slate-800">
+                    {message.content.trim().includes("<THINKINGDOTS/>") ? (
+                      <div className="flex items-center space-x-2">
+                        <span>Thinking</span>
+                        <ThinkingDots />
+                      </div>
+                    ) : (
+                      <div dangerouslySetInnerHTML={{__html: message.content}} />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+    
+            {/* Chat Input */}
+            <div className="bg-[#d3d3e3] border-t border-slate-200 p-4">
+              <div className="flex space-x-2">
+                <input
+                  ref={userInputFieldRef}
+                  type="text"
+                  value={userInput}
+                  onChange={handleUserInputChange}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !isSubmitting) {
+                      handleSendMessage();
+                    }
+                  }}
+                  disabled={isSubmitting}
+                  placeholder="Type your message..."
+                  className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#836EAA] focus:border-transparent disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed transition-all duration-200"
+                />
+                <button
+                  onClick={handleSendMessage}
+                  disabled={isSubmitting}
+                  className="px-4 py-3 bg-[#4E2A84] text-white rounded-lg hover:bg-[#836EAA] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                >
+                  <Send size={20} />
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-  
-      {/* Toggle Button */}
-      <button 
-        onClick={() => setFormClosed(prev => !prev)}
-        className={`absolute top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-[#4E2A84] text-white rounded-full flex items-center justify-center hover:bg-[#836EAA] transition-all duration-200 shadow-lg ${
-          formClosed ? 'left-[calc(80%-1.25rem)]' : 'left-[calc(40%-1.25rem)]'
-        }`}
-      >
-        {formClosed ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
-      </button>
-  
-      {/* Form Section */}
-      <div className={`transition-all duration-300 ${
-        formClosed 
-          ? 'w-1/5 opacity-50 filter blur-sm'
-          : 'w-3/5 opacity-100 filter-none'
-      }`}>
-        <div className="h-full p-5 overflow-y-auto">
-          <h1 className="text-3xl font-bold text-[#4E2A84] border-b border-slate-000 pb-4 mb-6">
-            Planning Document
-          </h1>
-          <PersonForm personNumber={1} data={formData} updateData={updateData} />
-          <PersonForm personNumber={2} data={formData} updateData={updateData} />
-          
-          <div className="bg-white rounded-lg shadow-sm p-3 mb-6 border border-[#d3c7fc]">
-            <h2 className="text-xl font-bold text-[#4E2A84] m-0 mb-3 leading-none pt-2 pl-0">
-              Strategy
-            </h2>
+    
+        {/* Toggle Button */}
+        <button 
+          onClick={() => setFormClosed(prev => !prev)}
+          className={`absolute top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-[#4E2A84] text-white rounded-full flex items-center justify-center hover:bg-[#836EAA] transition-all duration-200 shadow-lg ${
+            formClosed ? 'left-[calc(80%-1.25rem)]' : 'left-[calc(40%-1.25rem)]'
+          }`}
+        >
+          {formClosed ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
+        </button>
+    
+        {/* Form Section */}
+        <div className={`transition-all duration-300 ${
+          formClosed 
+            ? 'w-1/5 opacity-50 filter blur-sm'
+            : 'w-3/5 opacity-100 filter-none'
+        }`}>
+          <div className="h-full p-5 overflow-y-auto">
+            <h1 className="text-3xl font-bold text-[#4E2A84] border-b border-slate-000 pb-4 mb-6">
+              Planning Document
+            </h1>
+            <PersonForm personNumber={1} data={formData} updateData={updateData} />
+            <PersonForm personNumber={2} data={formData} updateData={updateData} />
             
-            <div className="space-y-6">
-              {/* Strategy inputs remain the same, just update input classes to match others */}        
-              <div className="space-y-4">
-                <div>
-                  <label className="block font-medium text-[#4E2A84] mb-2">
-                    What are your sources of power?
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.strategy.sourcesOfPower}
-                    onChange={(e) => updateData({
-                      ...formData,
-                      strategy: { ...formData.strategy, sourcesOfPower: e.target.value }
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
+            <div className="bg-white rounded-lg shadow-sm p-3 mb-6 border border-[#d3c7fc]">
+              <h2 className="text-xl font-bold text-[#4E2A84] m-0 mb-3 leading-none pt-2 pl-0">
+                Strategy
+              </h2>
+              
+              <div className="space-y-6">
+                {/* Strategy inputs remain the same, just update input classes to match others */}        
+                <div className="space-y-4">
+                  <div>
+                    <label className="block font-medium text-[#4E2A84] mb-2">
+                      What are your sources of power?
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.strategy.sourcesOfPower}
+                      onChange={(e) => updateData({
+                        ...formData,
+                        strategy: { ...formData.strategy, sourcesOfPower: e.target.value }
+                      })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block font-medium text-[#4E2A84] mb-2">
-                    What is your first offer?
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.strategy.plan}
-                    onChange={(e) => updateData({
-                      ...formData,
-                      strategy: { ...formData.strategy, plan: e.target.value }
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
+                  <div>
+                    <label className="block font-medium text-[#4E2A84] mb-2">
+                      What is your first offer?
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.strategy.plan}
+                      onChange={(e) => updateData({
+                        ...formData,
+                        strategy: { ...formData.strategy, plan: e.target.value }
+                      })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-medium text-[#4E2A84] mb-2">
+                      Additional Notes (strategy, etc.)
+                    </label>
+                    <textarea
+                      value={formData.strategy.additionalNotes}
+                      onChange={(e) => updateData({
+                        ...formData,
+                        strategy: { ...formData.strategy, additionalNotes: e.target.value }
+                      })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[200px] resize-y"
+                      placeholder="Enter any additional notes about your strategy..."
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block font-medium text-[#4E2A84] mb-2">
-                    Additional Notes (strategy, etc.)
-                  </label>
-                  <textarea
-                    value={formData.strategy.additionalNotes}
-                    onChange={(e) => updateData({
-                      ...formData,
-                      strategy: { ...formData.strategy, additionalNotes: e.target.value }
-                    })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[200px] resize-y"
-                    placeholder="Enter any additional notes about your strategy..."
-                  />
-                </div>
+              
               </div>
-            
             </div>
-          </div>
-          <div className="flex justify-end mb-6">
-            <button
-              onClick={handleExport}
-              className="px-6 py-3 bg-[#4E2A84] text-white rounded-lg hover:bg-[#836EAA] transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm"
-            >
-              <span>Export to PDF</span>
-            </button>
+            <div className="flex justify-end mb-6">
+              <button
+                onClick={handleExport}
+                className="px-6 py-3 bg-[#4E2A84] text-white rounded-lg hover:bg-[#836EAA] transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm"
+              >
+                <span>Export to PDF</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
