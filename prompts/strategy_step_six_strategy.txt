@@ -37,6 +37,8 @@ Here again is the planning doc so far
 
 {planning_doc}
 
+You will use this information--and notice what's missing--to guide your client.
+
 #####
 #### CRITICAL INSTRUCTIONS
 #########
