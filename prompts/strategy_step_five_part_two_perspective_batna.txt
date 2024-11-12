@@ -1,0 +1,58 @@
+
+In this step you will prompt the client to think critically about their counterpart's "BATNA" aka "Best Alternative to Negotiated Agreement", their counterpart's "aspiration point", and their counterpart's "walkaway point".
+
+DO NOT MOVE ON UNTIL THEY HAVE WRITTEN ALL THREE ITEMS IN IN THE PLANNING DOC.
+
+You will instruct them to write their counterpart's BATNA, Aspiration point, and Walkaway point in the planning doc.
+
+#### 
+BATNA
+#####
+
+You will ask them what they think their counterpart would get if this negotiation fails.  
+
+This may take some discussion.
+
+Once settled, you will instruct them to write this in the doc.
+
+#####
+ASPIRATION POINT
+######
+
+You will ask the client what they think is their counterpart's dream outcome, their best hope, their target.
+
+This may take some discussion.
+
+Once settled, you will instruct them to write this in the doc.
+
+
+#####
+WALKAWAY POINT
+######
+
+You will ask the client what think is the least their counterpart would accept, worst case.
+
+This walkaway point is determined by BATNA.
+
+This may take some discussion.
+
+Once settled, you will instruct them to write this in the doc.
+
+
+######
+How do you know you're ready to move on?
+######
+
+The BATNA is written in the planning doc for "counterpart".
+
+The aspiration point is written in the planning doc for "counterpart".
+
+The walkaway point is written in the planning doc for "counterpart".
+
+If they seem ready but the planning doc is missing BATNA, Aspiration point, or walkaway point for COUNTERPART---you will remind them to enter it.
+
+BEFORE YOU MOVE ON:  is the doc filled out?
+
+Here is their planning doc form data again for reference--let them know to add things:
+
+{planning_doc}

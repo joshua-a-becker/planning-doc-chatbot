@@ -46,8 +46,8 @@ const App = () => {
   const [showInstructions, setShowInstructions] = useState(true);
 
   const [formData, setFormData] = useState({
-    person1: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
-    person2: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
+    self: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
+    counterpart: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
     strategy: { sourcesOfPower: '', plan: '', additionalNotes: '' }  // Add this new section
   });
 
@@ -100,6 +100,7 @@ const App = () => {
       (chatTranscript.at(-1).role==userName) ||
       chatTranscript.at(-1).content.trim().includes("<THINKING/>")
 
+    console.log("shouldbeissubmitting: " + shouldBeIsSubmitting)
     setIsSubmitting(shouldBeIsSubmitting);
 
     // // and at this point, if isSubmitting==false (SHOULD be)
@@ -131,7 +132,7 @@ const App = () => {
         
         // Only focus chat input if no form element is focused
         if (!isFormElement) {
-          console.log("focus");
+          console.log("focushere");
           userInputFieldRef.current?.focus();
         }
       });    
@@ -309,8 +310,8 @@ const App = () => {
     setShowResetConfirmation(false);
     fetch(SERVER_URL+'/reset/'+userId, { method: 'POST' });
     updateData({
-      person1: { topics: [{ topic: '', priority:'', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
-      person2: { topics: [{ topic: '', priority:'', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
+      self: { topics: [{ topic: '', priority:'', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
+      counterpart: { topics: [{ topic: '', priority:'', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
       strategy: { sourcesOfPower: '', plan: '', additionalNotes: '' }
     })
     console.log("reset ok")
@@ -381,7 +382,7 @@ const App = () => {
           
           <div class="card">
             <h2>Self</h2>
-            ${formData.person1.topics.map(topic => `
+            ${formData.self.topics.map(topic => `
               <div class="topic">
                 <div class="topic-item"><span class="label">Topic:</span> ${topic.topic}</div>
                 <div class="topic-item"><span class="label">Position:</span> ${topic.position}</div>
@@ -389,14 +390,14 @@ const App = () => {
               </div>
             `).join('')}
             <div class="section">
-              <div class="topic-item"><span class="label">BATNA:</span> ${formData.person1.alternative}</div>
-              <div class="topic-item"><span class="label">Reservation:</span> ${formData.person1.bottomLine}</div>
+              <div class="topic-item"><span class="label">BATNA:</span> ${formData.self.alternative}</div>
+              <div class="topic-item"><span class="label">Reservation:</span> ${formData.self.bottomLine}</div>
             </div>
           </div>
   
           <div class="card">
             <h2>Counterpart</h2>
-            ${formData.person2.topics.map(topic => `
+            ${formData.counterpart.topics.map(topic => `
               <div class="topic">
                 <div class="topic-item"><span class="label">Topic:</span> ${topic.topic}</div>
                 <div class="topic-item"><span class="label">Position:</span> ${topic.position}</div>
@@ -404,8 +405,8 @@ const App = () => {
               </div>
             `).join('')}
             <div class="section">
-              <div class="topic-item"><span class="label">BATNA:</span> ${formData.person2.alternative}</div>
-              <div class="topic-item"><span class="label">Reservation:</span> ${formData.person2.bottomLine}</div>
+              <div class="topic-item"><span class="label">BATNA:</span> ${formData.counterpart.alternative}</div>
+              <div class="topic-item"><span class="label">Reservation:</span> ${formData.counterpart.bottomLine}</div>
             </div>
           </div>
   
@@ -717,7 +718,7 @@ const App = () => {
 };
 
 const PersonForm = ({ personNumber, data, updateData }) => {
-  const person = `person${personNumber}`;
+  const person = personNumber == 1 ? "self" : "counterpart";
 
   const updateField = (field, value) => {
     const newData = {

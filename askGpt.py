@@ -50,6 +50,7 @@ ProcessStep = Literal[
     "step_three_topics_values",
     "step_four_batna",
     "step_five_perspective_taking",
+    "step_five_part_two_perspective_batna"
     "step_six_strategy",
     "step_seven_discussion"
 ]  

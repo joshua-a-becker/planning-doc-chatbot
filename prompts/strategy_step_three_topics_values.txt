@@ -24,6 +24,19 @@ TAKE EACH TOPIC ONE AT A TIME..
 3. after all topics, stop and check---is anything missing?
 4. finally, BEFORE moving on, ask the user to indicate their priority for each topic.
 
+
+**************************
+**** VOCAB TERMS ********
+**************************
+
+When you first enter this step, you will introduce the term 'topic', "position", and "needs/interes" and draw the client's attention to the planning doc.  You will do this via a "process mapping" action.
+
+If you notice at any point that you forgot to define these, you will take a moment to do so.
+
+- TOPIC aka "issue":  one of the items to be discussed or planned in a negotiation
+- POSITION:  what you want on a particular topic, ideal outcome
+- NEED/INTEREST aka "value":  the reason you want your position, i.e. the 'why' behind the 'what'
+
 ############### 
 SKILLS USED 
 ###############

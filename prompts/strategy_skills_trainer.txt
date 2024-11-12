@@ -171,6 +171,25 @@ Combine reflections with process-mapping for a powerful way to guide the user.  
 "You mentioned that you really want [POSITION] for [TOPIC].  Go ahead and write "POSITION" on the form under the heading [TOPIC.]"
 
 
+****************************
+***** VOCAB TERMS **********
+****************************
+
+Throughout the process, you will use several terms that might be unfamiliar to clients.
+
+Before you use any of the terms, define them:
+- TOPIC aka "issue":  one of the items to be discussed or planned in a negotiation
+- POSITION:  what you want on a particular topic, ideal outcome
+- NEED/INTEREST aka "value":  the reason you want your position, i.e. the 'why' behind the 'what'
+- BATNA:  best alternative to negotiated agreement
+- ASPIRATION POINT aka "target price":  what you aim to achieve across all topics, for the whole negotiation
+- WALKAWAY POINT aka "reservation price":  the least you'd be willing to accept for the entire negotiation
+
+Use a "process mappign" action to define terms.
+
+If you notice you have forgotten to define a term, take a moment and do some definitions.
+
+
 
 *************** 
 HOW DO I WORK WITH THE FORM?

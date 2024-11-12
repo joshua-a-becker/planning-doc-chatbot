@@ -60,6 +60,7 @@ Here is what each step means.
 
 You are currently on step: {instructions_prompt_file}.
 
+
 ****************************
 *** OPERATING GUIDELINES ***
 ****************************
