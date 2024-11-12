@@ -10,3 +10,4 @@ storage/last_content.txt
 ux/userdata
 message.log
 __pycache__/
+logs/
