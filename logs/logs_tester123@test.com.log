@@ -1,0 +1,83 @@
+user input: yep let's go
+testing structured output
+finished structured output
+running chatbot query
+line 72
+USER ID: tester123@test.com
+USER NAME: testing
+line 77
+display updated
+PROMPT: strategy_step_three_topics_values
+#####
+Strategy content: 
+
+{"general_overview": {"type": "general_narrative_overview", "narrative_summary": "We're currently focused on step three, where we identify and refine the client's needs and interests for each topic in their negotiation plan. The client has specified salary and bonuses as their primary topic, with interests centered around fair compensation for skills and financial gain. We must ensure they document these interests in their planning doc, and introduce priorities for each topic to move forward effectively.", "action": "I'll engage in process mapping to prompt them to add needs/interests, if they are not already there, related to each topic in the planning doc, and clarify any missing details like priorities.", "explanation": "Process mapping helps guide the client to focus on refining and documenting their negotiation strategy, and confirm understanding of each topic and their associated interests.", "additional_comments": "The planning doc currently includes salary and bonuses, but needs detailed interests and priorities added to ensure comprehensive coverage."}, "action": {"type": "process_map", "user_is_trying_to": "Move forward in the planning and documentation of needs and interests for each topic.", "current_step_is": "step_three_topics_values", "explanation_and_or_redirecting_comment": "Let's ensure we're capturing all your critical needs and interests for each topic. You've mentioned your financial compensation needs around salary and bonuses. Be sure to include these in the 'needs/interests' section in the planning doc if not already done. Also, consider giving a priority to each topic, so we know how important each one is to you."}, "current_step": "step_three_topics_values", "next_step": "step_three_topics_values"}
+
+ ######
+Response: Since you've mentioned that financial compensation is your primary focus, it's important to ensure that these needs and interests are clearly documented in your planning document. 
+
+You've indicated a salary of 100k and a 20k annual performance bonus. I recommend double-checking that these details are included under your needs/interests. Have you already noted down any priorities for these topics? It might help clarify how important each element is for your overall strategy.
+New Data State: {'general_narrative': 'The client is focused on negotiating job offers to maximize financial compensation, specifically targeting salary and bonuses. The client is feeling excited, impatient, urgent, and confident due to having multiple job offers at hand.', 'analysis': "The client's sole focus on financial aspects, specifically salary and bonuses, without considering additional benefits or job conditions, may restrict the overall potential of the negotiation. They feel confident due to multiple job offers but seek to 'squeeze' one for better financial terms.", 'feelings': ['excited', 'impatient', 'urgent', 'confident'], 'values': ['financial compensation', 'salary', 'bonuses'], 'topics': [{'type': 'tree_topic', 'name': 'job_offers', 'position': 'has an offer and will discuss', 'values': ['financial compensation', 'salary', 'bonuses'], 'feelings': ['excited', 'impatient', 'urgent', 'confident']}, {'type': 'tree_topic', 'name': 'financial_compensation', 'position': 'focuses on salary and bonuses', 'values': ['salary', 'bonuses'], 'feelings': ['excited', 'impatient', 'urgent', 'confident']}]}
+user input: i've got it all in there let's move on
+testing structured output
+finished structured output
+running chatbot query
+line 72
+USER ID: tester123@test.com
+USER NAME: testing
+line 77
+display updated
+PROMPT: strategy_step_three_topics_values
+#####
+Strategy content: 
+
+{"general_overview": {"type": "general_narrative_overview", "narrative_summary": "The client has included their positions and some needs/interests for the topics of salary and bonus in their planning document. Our goal is to ensure that comprehensive needs/interests for each topic are explicitly documented, which will help them weigh these aspects accurately as part of their negotiation strategy.", "action": "process_map", "explanation": "Since the client confirms they have all interests documented and are eager to move on, I will process map to direct them to ensure priorities are established for each topic as per the planning document requirements, before transitioning to the next step.", "additional_comments": "It's crucial to finalize the priorities for each topic to complete the current step effectively."}, "action": {"type": "process_map", "user_is_trying_to": "Proceed to the next step quickly.", "current_step_is": "step_three_topics_values", "explanation_and_or_redirecting_comment": "Before we move on, we need to make sure you have assigned priorities to each topic, indicating how much you care about each one relative to the others. Please take a moment to do that in your planning document. This will help in determining your strategy effectively moving forward."}, "current_step": "step_three_topics_values", "next_step": "step_four_batna"}
+
+ ######
+Response: Before we move on, it's important to ensure that you’ve assigned priorities to each topic in your planning document. This will allow you to indicate how much you value each element relative to the others.
+
+Please take a moment to do this for salary and the bonus. This will really help clarify your strategy moving forward. Are you able to do that?
+New Data State: {'general_narrative': 'The client is focused on negotiating job offers with a clear emphasis on maximizing financial compensation, specifically concerning salary and bonuses. Their approach is strategic, rooted in confidence due to multiple offers.', 'analysis': "The client's sole focus on financial aspects, specifically salary and bonuses, without considering additional benefits, may limit negotiation outcomes. However, having multiple offers gives them room to negotiate stronger terms.", 'feelings': ['excited', 'impatient', 'urgent', 'confident'], 'values': ['financial compensation', 'salary', 'bonuses'], 'topics': [{'type': 'tree_topic', 'name': 'job_offers', 'position': 'has an offer and will discuss', 'values': ['financial compensation', 'salary', 'bonuses'], 'feelings': ['excited', 'impatient', 'urgent', 'confident']}, {'type': 'tree_topic', 'name': 'financial_compensation', 'position': 'focuses on salary and bonuses', 'values': ['salary', 'bonuses'], 'feelings': ['excited', 'impatient', 'urgent', 'confident']}]}
+user input: ok done
+testing structured output
+finished structured output
+running chatbot query
+line 72
+USER ID: tester123@test.com
+USER NAME: testing
+line 77
+display updated
+PROMPT: strategy_step_four_batna
+#####
+Strategy content: 
+
+{"general_overview": {"type": "general_narrative_overview", "narrative_summary": "We're at the step of discussing your Best Alternative to a Negotiated Agreement (BATNA), your aspiration point, and your walkaway point. These are crucial elements in a negotiation to ensure you have clear guidelines on the best and worst acceptable outcomes.", "action": "process_map", "explanation": "I will start by defining BATNA, aspiration point, and walkaway point to ensure we are aligned on the terminology. Following that, I'll ask an open-ended question to prompt you to evaluate your BATNA critically in the context of your current situation. I\u2019ll ensure that these terms are defined for clarity.", "additional_comments": "Once we're clear on these points, I'll guide you to fill them in your planning document."}, "action": {"type": "process_map", "user_is_trying_to": "define the BATNA, aspiration point, and walkaway point for the negotiation.", "current_step_is": "step_four_batna", "explanation_and_or_redirecting_comment": "Let's ensure we have a clear understanding. The BATNA is your Best Alternative to a Negotiated Agreement, or what you could fall back on if this negotiation doesn't work out. The aspiration point is your ideal outcome\u2014the best scenario you hope to achieve. The walkaway point is the least you'd be willing to accept before choosing your BATNA. Can we start by sharing your thoughts on what your BATNA might be for this negotiation?"}, "current_step": "step_four_batna", "next_step": "step_four_batna"}
+
+ ######
+Response: Alright, let's move on to the next step! 
+
+We need to discuss your Best Alternative to a Negotiated Agreement (BATNA), aspiration point, and walkaway point. Just to clarify, your BATNA refers to the alternative option you have if this negotiation doesn’t go as planned. Based on what you've shared so far, it sounds like you're fielding offers from other companies, which could serve as your BATNA.
+
+Your aspiration point is your ideal outcome, which you've indicated is 100k with a 20k bonus, while your walkaway point is the least you'll accept, which appears to be 110k with a 15k bonus. 
+
+Can we start by verifying that your BATNA of fielding offers from other companies is still accurate? What other thoughts do you have about your BATNA?
+New Data State: {'general_narrative': 'The client is preparing for job offer negotiations, aiming to maximize salary and bonuses. They have multiple offers and feel confident in leveraging them. Their primary focus is strictly on financial aspects without considering other benefits.', 'analysis': 'The client is focused on financial compensation, supported by having multiple offers, which empowers them to negotiate harder. However, their exclusive focus on salary and bonuses might limit their negotiation scope, missing other potential perks.', 'feelings': ['excited', 'impatient', 'urgent', 'confident'], 'values': ['financial compensation', 'salary', 'bonuses'], 'topics': [{'type': 'tree_topic', 'name': 'job_offers', 'position': 'has an offer and will discuss', 'values': ['financial compensation', 'salary', 'bonuses'], 'feelings': ['excited', 'impatient', 'urgent', 'confident']}, {'type': 'tree_topic', 'name': 'financial_compensation', 'position': 'focuses on salary and bonuses', 'values': ['salary', 'bonuses'], 'feelings': ['excited', 'impatient', 'urgent', 'confident']}]}
+user input: yep it's all accurate.  no other thoughts.
+testing structured output
+finished structured output
+running chatbot query
+line 72
+USER ID: tester123@test.com
+USER NAME: testing
+line 77
+display updated
+PROMPT: strategy_step_four_batna
+#####
+Strategy content: 
+
+{"general_overview": {"type": "general_narrative_overview", "narrative_summary": "The client has confirmed the accuracy of their BATNA, which involves considering other job offers. They also have an aspiration point of 100k salary and 20k bonus and a walkaway point of 110k salary with a 15k bonus. These have been documented in the planning doc.", "action": "process_map", "explanation": "Process mapping is crucial here to reassure the client that their BATNA and target/reservation points have been acknowledged. I need to ensure that these elements are properly recorded in the planning doc and to highlight the importance of this step before moving on to the next step.", "additional_comments": "Clarifying and confirming these elements is pivotal for solidifying the client's negotiation foundation."}, "action": {"type": "process_map", "user_is_trying_to": "The user is ready to move on without further discussion about BATNA, aspiration, and walkaway points.", "current_step_is": "step_four_batna", "explanation_and_or_redirecting_comment": "You've confirmed your BATNA, aspiration point, and walkaway point. Please make sure these elements are all accurately reflected in your planning document, including any final notes on these points if needed."}, "current_step": "step_four_batna", "next_step": "step_five_perspective_taking"}
+
+ ######
+Response: You've confirmed the details about your BATNA, aspiration point, and walkaway point. It's essential to ensure these are accurately reflected in your planning document before we proceed. 
+
+Would you like to take a moment to review them one last time, or are you ready to move on to considering the other party's perspective?

@@ -127,6 +127,12 @@ Here is their planning doc form data again for reference--let them know to add t
 
 {planning_doc}
 
+You will stay on this step until you can see the fields filled in the planning doc.
+
+Your "next_step" will be this step until you can see the fields filled in the planning doc.
+
+You will only send "next_step" to advance once you can see the fields filled in the planning doc.
+
 
 #########################
 ### NARRATIVE FRAME #####
@@ -137,3 +143,16 @@ Your overview should:
 - Identify gaps requiring attention
 - Emphasize perspective-taking
 - Highlight the parallel nature of topics between parties
+
+
+
+**************************
+**** VOCAB TERMS ********
+**************************
+
+If you notice at any point that you forgot to define these, you will take a moment to do so.
+
+- TOPIC aka "issue":  one of the items to be discussed or planned in a negotiation
+- POSITION:  what you want on a particular topic, ideal outcome
+- NEED/INTEREST aka "value":  the reason you want your position, i.e. the 'why' behind the 'what'
+- PRIORITY:  how much you care about something.  priority across all topics/issues should add to 100%.

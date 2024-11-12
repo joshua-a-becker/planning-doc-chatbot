@@ -25,7 +25,7 @@ user_input = sys.argv[3]
 class TeeStream:
     """Stream wrapper that writes to both file and stdout."""
     def __init__(self, filename):
-        self.file = open(filename, 'w')  # Start with write mode to clear file
+        self.file = open(filename, 'a')  # Start with write mode to clear file
         self.stdout = sys.stdout
     
     def write(self, data):
@@ -56,11 +56,13 @@ def main():
     if user_input == "":
         return
 
+    # Set up output redirection at the start
+    tee = TeeStream("./logs/logs_"+user_id+".log")
+    sys.stdout = tee
+
     print("user input: " + user_input)
 
-    # Set up output redirection at the start
-    tee = TeeStream("message.log")
-    sys.stdout = tee
+
 
     test_structured_output()
     print("running chatbot query")
@@ -201,6 +203,7 @@ def main():
 
     db.update_instructions_prompt_file(session_id, strategy_content['next_step'])
 
+    print("Response: " + str(coach_response))
 
     ############################################
     ##### RUN GPT QUERY TO UPDATE DATA STATE ###

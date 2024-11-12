@@ -80,3 +80,9 @@ BEFORE YOU MOVE ON:  is the doc filled out?
 Here is their planning doc form data again for reference--let them know to add things:
 
 {planning_doc}
+
+You will stay on this step until you can see the fields filled in the planning doc.
+
+Your "next_step" will be this step until you can see the fields filled in the planning doc.
+
+You will only send "next_step" to advance once you can see the fields filled in the planning doc.
