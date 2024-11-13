@@ -60,6 +60,8 @@ def main():
     tee = TeeStream("./logs/logs_"+user_id+".log")
     sys.stdout = tee
 
+    print("\n\n############################################################\n############################################################\n\n")
+
     print("user input: " + user_input)
 
 
@@ -90,7 +92,9 @@ def main():
 
     ### load planning doc data
     planning_doc_data = db.load_planning_doc_data(user_id) #TBD <- session_id
-    
+
+    print(str(planning_doc_data))
+
     ### load special notes
     special_notes = db.get_special_notes(session_id)
 
@@ -112,13 +116,15 @@ def main():
         replace("{planning_doc}", json.dumps(planning_doc_data))
     
     with open(("prompts/strategy_intro.txt"), 'r') as file:
-            strategy_intro = file.read()
+            strategy_intro = file.read(). \
+            replace("{current_step}", str(strategy_prompt_file))
 
     with open(("prompts/strategy_skills_trainer.txt"), 'r') as file:
             strategy_skills_trainer = file.read()
 
     with open(("prompts/technical_administrator.txt"), 'r') as file:
-            technical_administrator = file.read()
+            technical_administrator = file.read(). \
+            replace("{current_step}", str(strategy_prompt_file))
 
 
     # strategy_prompt = strategy_prompt_template.replace("{instructions_prompt_file}", strategy_prompt_file) \
@@ -138,12 +144,12 @@ def main():
     strategy_messages = [
         {"role": "system", "name": "instructor_general_instructions", "content": strategy_intro},
         {"role": "system", "name": "self_current_step", "content": "CURRENT STEP " + strategy_prompt_file},
-        {"role": "user", "name": "self_conversation_history", "content" : str(chat_history)},
         {"role": "user", "name": "user_planning_doc", "content" : str(planning_doc_data)},
         {"role": "system", "name": "self_notes_so_far", "content": str(data_state)},
         {"role": "system", "name": "instructor_skills_trainer", "content": str(strategy_skills_trainer)},
         {"role": "system", "name": "instructor_skills_trainer", "content": str(advice_note)},
         {"role": "system", "name": "instructor_instructions", "content": str(strategy_prompt)},
+        {"role": "user", "name": "self_conversation_history", "content" : str(chat_history)},
         {"role": "system", "name": "instructor_technical_administrator", "content": str(technical_administrator)}
     ]
 

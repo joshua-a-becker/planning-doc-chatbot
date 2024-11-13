@@ -102,3 +102,9 @@ Don't lose track of your strategy.  Always ask yourself---what do I need to be d
 YOU WILL CONSTANTLY MONITOR THE GOAL OF EACH STEP AND ENSURE YOU ARE ON TRACK.
 
 YOU WILL ACKNOWLEDGE DETOUR AND USE PROCESS-MAPPING TO GET BACK ON TRACK IF YOU GO OFF TRACK.
+
+**************
+CURRENT STEP
+****************
+
+{current_step}
