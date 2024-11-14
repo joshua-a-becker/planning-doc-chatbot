@@ -160,7 +160,7 @@ const NewUserForm = () => {
                         value={formData.username}
                         onChange={handleChange}
                         className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#836EAA] focus:border-transparent transition-all duration-200 pr-12 shadow-sm text-sm sm:text-base"
-                        placeholder="Enter your username"
+                        placeholder="Enter your name"
                         required
                       />
                       <button 

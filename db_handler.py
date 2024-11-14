@@ -334,8 +334,25 @@ class ThreadSafeDatabaseHandler:
         """Destructor to ensure cleanup"""
         self.cleanup()
 
-
+    def remove_last_messages(self, session_id, count=2):
+        """
+        Thread-safe removal of the last N messages from chat history
         
+        Args:
+            session_id: The ID of the session to update
+            count: Number of messages to remove (default=1)
+            
+        Returns:
+            bool: True if update was successful, False otherwise
+        """
+        def update_func(session):
+            if session['chat_history'] and len(session['chat_history']) > 0:
+                # Make sure we don't try to remove more messages than exist
+                count_to_remove = min(count, len(session['chat_history']))
+                for _ in range(count_to_remove):
+                    session['chat_history'].pop()
+            return session
+        return self.update_session(session_id, update_func)
     
 
 # Error handling decorator for retrying failed operations
