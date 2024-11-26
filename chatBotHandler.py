@@ -176,7 +176,9 @@ def main():
 
     # load prompt content
     with open('prompts/coach_response_intro.txt', 'r') as file:
-        coach_response_intro = file.read()
+        coach_response_intro = file.read(). \
+            replace("{planning_doc}", str(planning_doc_data)). \
+            replace("{strategy_output}", strategy_content_txt)
 
     with open('prompts/coach_response_instructions.txt', 'r') as file:
         coach_response_instructions = file.read(). \

@@ -20,3 +20,8 @@ $ pm2 unstartup systemd
 
 
 while true; do python3 clientBot.py; done
+
+
+from db_handler import db
+session_id=db.get_session_id_for_user("autobot")
+db.remove_last_messages(session_id)
