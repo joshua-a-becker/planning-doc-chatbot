@@ -1,10 +1,13 @@
 import debounce from 'lodash/debounce';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Send } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import NewUserForm from './components/NewUserForm';
 //import { useParams } from 'react-router-dom';
 
-const SERVER_URL = "https://planning.negotiation.solutions/data"
+const SERVER_URL = process.env.NODE_ENV === 'production'
+  ? `${window.location.origin}/data`
+  : 'http://localhost:3001/data'
 
 
 const Modal = ({ isOpen, onClose, children }) => {
@@ -46,9 +49,14 @@ const App = () => {
   const [showInstructions, setShowInstructions] = useState(true);
 
   const [formData, setFormData] = useState({
+    description: '',
+    participants: [
+      { name: '', isSelf: true },
+      { name: '', isSelf: false }
+    ],
     self: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
     counterpart: { topics: [{ topic: '', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
-    strategy: { sourcesOfPower: '', plan: '', additionalNotes: '' }  // Add this new section
+    strategy: { sourcesOfPower: '', plan: '', additionalNotes: '' }
   });
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -306,14 +314,10 @@ const App = () => {
   };
 
   const handleResetSystem = () => {
-
     setShowResetConfirmation(false);
     fetch(SERVER_URL+'/reset/'+userId, { method: 'POST' });
-    updateData({
-      self: { topics: [{ topic: '', priority:'', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
-      counterpart: { topics: [{ topic: '', priority:'', position: '', needsInterests: '' }], alternative: '', bottomLine: '' },
-      strategy: { sourcesOfPower: '', plan: '', additionalNotes: '' }
-    })
+    // Don't clear the planning doc - keep it across chat resets
+    // The backend will reset the chat history only
     console.log("reset ok")
   }
 
@@ -379,9 +383,29 @@ const App = () => {
         </head>
         <body>
           <h1>Negotiation Planning Document</h1>
-          
+
+          ${formData.participants && formData.participants.length > 0 ? `
           <div class="card">
-            <h2>Self</h2>
+            <h2>Participants</h2>
+            <div class="section">
+              ${formData.participants.map((p, idx) => `
+                <div class="topic-item">
+                  <span class="label">${idx === 0 ? 'Self' : 'Counterpart'}</span> ${p.name || '(not specified)'}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+
+          ${formData.description ? `
+          <div class="card">
+            <h2>Description</h2>
+            <p>${formData.description}</p>
+          </div>
+          ` : ''}
+
+          <div class="card">
+            <h2>Self${formData.participants && formData.participants[0]?.name ? ': ' + formData.participants[0].name : ''}</h2>
             ${formData.self.topics.map(topic => `
               <div class="topic">
                 <div class="topic-item"><span class="label">Topic:</span> ${topic.topic}</div>
@@ -396,7 +420,7 @@ const App = () => {
           </div>
   
           <div class="card">
-            <h2>Counterpart</h2>
+            <h2>Counterpart${formData.participants && formData.participants[1]?.name ? ': ' + formData.participants[1].name : ''}</h2>
             ${formData.counterpart.topics.map(topic => `
               <div class="topic">
                 <div class="topic-item"><span class="label">Topic:</span> ${topic.topic}</div>
@@ -578,13 +602,15 @@ const App = () => {
                     <b>{message.role}</b>
                   </div>
                   <div className="text-slate-800">
-                    {message.content.trim().includes("<THINKINGDOTS/>") ? (
+                    {message.content.trim().includes("<THINKING") ? (
                       <div className="flex items-center space-x-2">
                         <span>Thinking</span>
                         <ThinkingDots />
                       </div>
                     ) : (
-                      <div dangerouslySetInnerHTML={{__html: message.content}} />
+                      <div className="markdown-content">
+                        <ReactMarkdown>{message.content}</ReactMarkdown>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -652,6 +678,57 @@ const App = () => {
                 <span><b>Export to PDF</b></span>
               </button>
             </div>
+
+            {/* Participants */}
+            <div className="bg-white rounded-lg shadow-sm p-3 mb-6 border border-[#d3c7fc]">
+              <h2 className="text-xl font-bold text-[#4E2A84] m-0 mb-3 leading-none pt-2 pl-2">
+                Participants
+              </h2>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <span className="text-sm text-[#4E2A84] font-medium min-w-[100px]">Self</span>
+                  <input
+                    type="text"
+                    value={formData.participants[0].name}
+                    onChange={(e) => {
+                      const newParticipants = [...formData.participants];
+                      newParticipants[0] = { ...newParticipants[0], name: e.target.value };
+                      updateData({ ...formData, participants: newParticipants });
+                    }}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Your name or role..."
+                  />
+                </div>
+                <div className="flex items-center space-x-3">
+                  <span className="text-sm text-[#4E2A84] font-medium min-w-[100px]">Counterpart</span>
+                  <input
+                    type="text"
+                    value={formData.participants[1].name}
+                    onChange={(e) => {
+                      const newParticipants = [...formData.participants];
+                      newParticipants[1] = { ...newParticipants[1], name: e.target.value };
+                      updateData({ ...formData, participants: newParticipants });
+                    }}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Counterpart name or role..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="bg-white rounded-lg shadow-sm p-3 mb-6 border border-[#d3c7fc]">
+              <h2 className="text-xl font-bold text-[#4E2A84] m-0 mb-3 leading-none pt-2 pl-2">
+                Description
+              </h2>
+              <textarea
+                value={formData.description}
+                onChange={(e) => updateData({ ...formData, description: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[80px] resize-y"
+                placeholder="Brief 5-10 word description of negotiation..."
+              />
+            </div>
+
             <PersonForm personNumber={1} data={formData} updateData={updateData} />
             <PersonForm personNumber={2} data={formData} updateData={updateData} />
             
@@ -771,10 +848,13 @@ const PersonForm = ({ personNumber, data, updateData }) => {
 
 
   
+  const participantName = data.participants && data.participants[personNumber - 1]?.name;
+  const displayName = participantName ? `: ${participantName}` : '';
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-3 mb-6 border border-[#d3c7fc]">
       <h2 className="text-xl font-bold text-[#4E2A84] m-0 mb-3 leading-none pt-2 pl-2">
-        {personNumber === 1 ? "Self" : "Counterpart"}
+        {personNumber === 1 ? "Self" : "Counterpart"}{displayName}
       </h2>
       <div className="space-y-3">
         {data[person].topics.map((topic, index) => (

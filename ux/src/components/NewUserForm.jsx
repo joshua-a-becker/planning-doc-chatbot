@@ -69,7 +69,7 @@ const NewUserForm = () => {
 
     if (!emailError && formData.username.trim()) {
       const formattedUsername = formData.username.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-      window.location.href = `https://planning.negotiation.solutions?userName=${encodeURIComponent(formattedUsername)}&userId=${encodeURIComponent(formData.email)}`;
+      window.location.href = `${window.location.origin}?userName=${encodeURIComponent(formattedUsername)}&userId=${encodeURIComponent(formData.email)}`;
     }
   };
   
