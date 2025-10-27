@@ -93,7 +93,7 @@ class Overview(BaseModel):
 
 class StrategyFormat(BaseModel):
     general_overview: Overview
-    action: Reflection | OpenQuestion | QuestionAfterReflection | ProcessMap
+    action: Union[Reflection, OpenQuestion, QuestionAfterReflection, ProcessMap]
     current_step: ProcessStep
     next_step: ProcessStep
 

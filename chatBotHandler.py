@@ -1,251 +1,153 @@
 import os
-import time
-localdir = open('../localdir.txt', 'r').read()
+import sys
+import json
+from openai import OpenAI
+
+# Change to project directory
+localdir = open('../localdir.txt', 'r').read().strip()
 os.chdir(localdir)
 
-import sys
-from askGpt import *
 from db_handler import db
-import json
 
 print("startup chatbothandler")
 
-
-
-
+# Get arguments
 user_id = sys.argv[1]
-print("User: " + user_id)
-user_session_id = sys.argv[2]
+user_session_id = sys.argv[2]  # Not used but kept for compatibility
 user_input = sys.argv[3]
 
+print("User: " + user_id)
+print("User input: " + user_input)
 
-
+# Initialize OpenAI client
+my_key = open('key_to_gpt.txt', 'r').readline().strip()
+client = OpenAI(api_key=my_key)
 
 
 class TeeStream:
     """Stream wrapper that writes to both file and stdout."""
     def __init__(self, filename):
-        self.file = open(filename, 'a')  # Start with write mode to clear file
+        self.file = open(filename, 'a')
         self.stdout = sys.stdout
-    
+
     def write(self, data):
         self.file.write(data)
         self.stdout.write(data)
-        # Flush after each write to see updates immediately
         self.file.flush()
         self.stdout.flush()
-    
+
     def flush(self):
         try:
             self.file.flush()
             self.stdout.flush()
-        except ValueError:  # Handle already closed file
+        except ValueError:
             pass
 
-        self.stdout.flush()
-    
     def close(self):
         self.file.close()
 
 
+def update_chat_display(content, user_id):
+    """Update the chat transcript file that the frontend watches"""
+    session_id = db.get_session_id_for_user(user_id)
+    chat_history = db.get_chat_history(session_id)
+
+    # chat_history is already a list of messages
+    # Wrap it for the frontend
+    with open(f'ux/userdata/chatTranscript_{user_id}.json', 'w') as file:
+        json.dump({"messages": chat_history + [{"role": "Negotiation Coach", "content": content}]}, file)
+
+
 def main():
-
-    
-
-    # only run with user input
+    # Skip if no input
     if user_input == "":
         return
 
-    # Set up output redirection at the start
-    tee = TeeStream("./logs/logs_"+user_id+".log")
+    # Set up logging
+    tee = TeeStream(f"./logs/logs_{user_id}.log")
     sys.stdout = tee
 
-    print("\n\n############################################################\n############################################################\n\n")
+    print("\n\n" + "="*60)
+    print("NEW CHAT MESSAGE")
+    print("="*60 + "\n")
 
-    print("user input: " + user_input)
+    try:
+        # Get session and update chat history with user input
+        session_id = db.get_session_id_for_user(user_id)
+        user_name = db.get_user_name(user_id)
 
+        print(f"Session ID: {session_id}")
+        print(f"User name: {user_name}")
 
+        # Add user message to chat history
+        db.update_chat_history(session_id, {"role": user_name, "content": user_input})
 
-    test_structured_output()
-    print("running chatbot query")
-    
-    
+        # Update the display with user input
+        chat_history = db.get_chat_history(session_id)
+        with open(f'ux/userdata/chatTranscript_{user_id}.json', 'w') as file:
+            json.dump({"messages": chat_history}, file)
 
-    session_id = db.get_session_id_for_user(user_id)
+        print("User message added to chat history")
 
+        # Load planning doc data
+        planning_doc_data = db.load_planning_doc_data(user_id)
+        print(f"Planning doc loaded: {json.dumps(planning_doc_data, indent=2)}")
 
-    print("line 72")
+        # Load the simple prompt
+        with open("prompts/simple_class_prompt.txt", 'r') as file:
+            prompt_template = file.read()
 
-    # update chat history with user input
-    print("USER ID: " + user_id)
-    print("USER NAME: " + db.get_user_name(user_id))
-    db.update_chat_history(session_id, {"role": db.get_user_name(user_id), "content": user_input})
+        # Replace placeholders (chat_history is already a list)
+        prompt = prompt_template.replace(
+            "{insert_planning_doc}",
+            json.dumps(planning_doc_data, indent=2)
+        ).replace(
+            "{insert_conversation_history}",
+            json.dumps(chat_history, indent=2)
+        )
 
-    print("line 77")
+        print("Prompt prepared, calling GPT...")
 
-    # update chat display with user input
-    chat_history = db.get_chat_history(session_id)
-    with open('ux/userdata/chatTranscript_'+user_id+'.json', 'w') as file:
-        json.dump(chat_history, file)
+        # Show thinking indicator
+        update_chat_display("<THINKING/>", user_id)
 
-    print("display updated")
+        # Call GPT with streaming
+        messages = [
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": user_input}
+        ]
 
-    ### load planning doc data
-    planning_doc_data = db.load_planning_doc_data(user_id) #TBD <- session_id
+        stream = client.chat.completions.create(
+            model="gpt-5-nano-2025-08-07",
+            messages=messages,
+            stream=True,
+        )
 
-    print(str(planning_doc_data))
+        # Stream the response
+        full_response = ""
+        for chunk in stream:
+            if chunk.choices[0].delta.content:
+                content = chunk.choices[0].delta.content
+                full_response += content
 
-    ### load special notes
-    special_notes = db.get_special_notes(session_id)
+                # Update display with accumulated response
+                update_chat_display(full_response, user_id)
 
+        print(f"\nGPT Response: {full_response}")
 
-    # get notes data state
-    data_state = db.get_data_state(session_id)
-        
-    
-    #####################
-    # run strategy prompt 
-    #####################
-    instructions_step = db.get_instructions_prompt_file(session_id)
-    strategy_prompt_file = "strategy_" + instructions_step
+        # Save final response to database
+        db.update_chat_history(session_id, {"role": "Negotiation Coach", "content": full_response})
 
-    print("PROMPT: " + strategy_prompt_file)
+        print("Response saved to database")
 
-    with open(("prompts/"+strategy_prompt_file+".txt"), 'r') as file:
-        strategy_prompt = file.read(). \
-        replace("{planning_doc}", json.dumps(planning_doc_data))
-    
-    with open(("prompts/strategy_intro.txt"), 'r') as file:
-            strategy_intro = file.read(). \
-            replace("{current_step}", str(strategy_prompt_file))
+    except Exception as e:
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
 
-    with open(("prompts/strategy_skills_trainer.txt"), 'r') as file:
-            strategy_skills_trainer = file.read()
-
-    with open(("prompts/technical_administrator.txt"), 'r') as file:
-            technical_administrator = file.read(). \
-            replace("{current_step}", str(strategy_prompt_file))
-
-
-    # strategy_prompt = strategy_prompt_template.replace("{instructions_prompt_file}", strategy_prompt_file) \
-    #     .replace("{current_instructions_prompt}", strategy_prompt) \
-    #     .replace("{output_prompt_component}", strategy_output_prompt_component) \
-    #     .replace("{planning_doc_data}", json.dumps(planning_doc_data)) \
-    #     .replace("{special_notes}", special_notes)
-
-    advice_note = """
-    If a user asks for advice, you will inform them:  
-    
-    "This process is based on facilitative coaching, which guides you to determine your own strategy.  As a general rule I do not give advice as a coach.  Notably, a future version of this app will include the ability to give stanrd best-practice guidelines such as how to pick a strong first offer.  However, giving advice is tricky business for anybody in a position of influence-which brings responsibility-and so we will be implementing that feature very carefully."
-
-    And then you will redirect the conversation back to the topic at hand as per strategy.
-    """
-
-    strategy_messages = [
-        {"role": "system", "name": "instructor_general_instructions", "content": strategy_intro},
-        {"role": "system", "name": "self_current_step", "content": "CURRENT STEP " + strategy_prompt_file},
-        {"role": "user", "name": "user_planning_doc", "content" : str(planning_doc_data)},
-        {"role": "system", "name": "self_notes_so_far", "content": str(data_state)},
-        {"role": "system", "name": "instructor_skills_trainer", "content": str(strategy_skills_trainer)},
-        {"role": "system", "name": "instructor_skills_trainer", "content": str(advice_note)},
-        {"role": "system", "name": "instructor_instructions", "content": str(strategy_prompt)},
-        {"role": "user", "name": "self_conversation_history", "content" : str(chat_history)},
-        {"role": "system", "name": "instructor_technical_administrator", "content": str(technical_administrator)}
-    ]
-
-    strategy_content = ask_gpt_strategy(strategy_messages, session_id, user_id)
-    strategy_content_txt = json.dumps(strategy_content)
-
-    # print("Strategy prompt: " + strategy_prompt)
-    print("#####\nStrategy content: \n\n" + strategy_content_txt + "\n\n ######")
-    
+    finally:
+        tee.close()
 
 
-
-    #######################################
-    # ask GPT to determine response to user
-    #######################################
-
-    # add user input to thread
-    thread_id = db.get_thread_id(session_id)
-    client.beta.threads.messages.create(
-        thread_id=thread_id,
-        role="user",
-        content=user_input
-    )
-
-    # load prompt content
-    with open('prompts/coach_response_intro.txt', 'r') as file:
-        coach_response_intro = file.read(). \
-            replace("{planning_doc}", str(planning_doc_data)). \
-            replace("{strategy_output}", strategy_content_txt)
-
-    with open('prompts/coach_response_instructions.txt', 'r') as file:
-        coach_response_instructions = file.read(). \
-            replace("{strategy_output}", strategy_content_txt). \
-            replace("{instructions_prompt_file}", instructions_step). \
-            replace("{planning_doc}", str(planning_doc_data))
-
-
-    with open('prompts/coach_response_skills_training.txt', 'r') as file:
-        coach_response_skills_training = file.read()
-
-    all_messages = []
-    for message in chat_history:
-        role = "assistant" if message['role']=="Negotiation Coach" else "user"
-        content=message['content']
-        all_messages.append({'role':role, 'content':content})
-    
-
-    coach_response_prompt_messages = []
-    coach_response_prompt_messages.extend([{"role":"system", "content" : coach_response_intro}])
-    coach_response_prompt_messages.extend([{"role":"system", "content" : coach_response_skills_training}])
-    coach_response_prompt_messages.extend(all_messages)
-    coach_response_prompt_messages.extend([{"role": "system", "content" : coach_response_instructions}])
-
-    coach_response = ask_gpt_response(coach_response_prompt_messages, thread_id, user_id, chat_history)
-
-    # update database with final response
-    db.update_chat_history(session_id, {"role": "Negotiation Coach", "content": coach_response})
-
-
-    db.update_instructions_prompt_file(session_id, strategy_content['next_step'])
-
-    print("Response: " + str(coach_response))
-
-    ############################################
-    ##### RUN GPT QUERY TO UPDATE DATA STATE ###
-    ############################################
-
-    with open("prompts/notes_prompt_template.txt", 'r') as file:
-        notes_prompt_template = file.read()
-
-    with open("prompts/notes_prompt_header.txt", 'r') as file:
-        notes_prompt_header = file.read()
-    # Prepare prompt
-    notes_prompt = notes_prompt_template.replace("{instructions_prompt_file}", instructions_step) \
-        .replace("{current_data_state}", str(data_state)) \
-        .replace("{conversation_thread}", str(chat_history))
-
-    notes_messages=[
-        {"role":"system", "name":"header","content":notes_prompt_header},
-        {"role":"user", "name":"conversation_history","content":str(chat_history)},
-        {"role":"system", "name":"current_data_state","content":str(data_state)},
-        {"role":"system", "name":"instructions","content":notes_prompt},
-        
-    ]
-
-    new_data_state = ask_gpt_data(notes_messages)
-
-    print("New Data State: " + str(new_data_state))
-
-    db.update_data_state(session_id, new_data_state)
-
-
-    ################
-    ### CLEAN UP ###
-    ################
-    tee.close()
-  
 if __name__ == "__main__":
     main()

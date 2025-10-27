@@ -11,7 +11,7 @@ activate.negotiation.solutions {
 }
 
 
-167.172.55.65 {
+167.172.203.32 {
         route /* {
                 reverse_proxy localhost:3001
         }

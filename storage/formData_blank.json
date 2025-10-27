@@ -1,5 +1,16 @@
 {
-  "person1": {
+  "description": "",
+  "participants": [
+    {
+      "name": "",
+      "isSelf": true
+    },
+    {
+      "name": "",
+      "isSelf": false
+    }
+  ],
+  "self": {
     "topics": [
       {
         "topic": "",
@@ -10,7 +21,7 @@
     "alternative": "",
     "bottomLine": ""
   },
-  "person2": {
+  "counterpart": {
     "topics": [
       {
         "topic": "",
@@ -20,5 +31,10 @@
     ],
     "alternative": "",
     "bottomLine": ""
+  },
+  "strategy": {
+    "sourcesOfPower": "",
+    "plan": "",
+    "additionalNotes": ""
   }
 }
