@@ -1,3 +1,4 @@
+node_modules/
 key_to_gpt.txt
 chat_history.txt
 data_state.txt
