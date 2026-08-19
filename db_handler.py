@@ -263,7 +263,7 @@ class ThreadSafeDatabaseHandler:
                 users.update({'session_id': session_id}, User.user_id == user_id)
                 # if session doesn't exist ...?
                 if(not session_exists):
-                    self.create_new_session_for_user_by_session_id(user_id, session_id)
+                    self.create_new_session(user_id, session_id)
                     
             else:
                 # If user doesn't exist, create new user and session

@@ -3,10 +3,22 @@ const fs = require('fs').promises;
 const path = require('path');
 const cors = require('cors');
 const chokidar = require('chokidar');
-const { exec, execSync } = require('child_process');
+const { execFile, spawn } = require('child_process');
 const hljs = require('highlight.js');
 const util = require('util');
-const execPromise = util.promisify(exec);
+const execFilePromise = util.promisify(execFile);
+
+// Python deps are installed in the repo's virtualenv; fall back to system
+// python3 if the venv doesn't exist.
+const VENV_PYTHON = path.join(__dirname, '..', '.venv', 'bin', 'python3');
+const PYTHON = require('fs').existsSync(VENV_PYTHON) ? VENV_PYTHON : 'python3';
+
+// userIds are email addresses; sessionIds/userNames are simple tokens.
+// Reject anything else before it reaches a child process.
+const SAFE_ID = /^[A-Za-z0-9@._+-]+$/;
+function isSafeId(s) {
+  return typeof s === 'string' && s.length > 0 && s.length <= 256 && SAFE_ID.test(s);
+}
 
 console.log("startup server")
 
@@ -126,6 +138,9 @@ app.get('/events/:userId/:sessionId', async (req, res) => {
   const sessionId = req.params.sessionId
   console.log("RUNNING: Events/:"+userId+"/:"+sessionId)
   console.log(`New SSE connection for user ${userId}`);
+  if (!isSafeId(userId) || !isSafeId(sessionId)) {
+    return res.status(400).send('Invalid userId/sessionId');
+  }
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -241,8 +256,12 @@ app.post('/initialize/:userId/:sessionId/:userName', async (req, res) => {
   const sessionId = req.params.sessionId;
   let sessionIdReturned = null;
 
+  if (![userId, sessionId, userName].every(isSafeId)) {
+    return res.status(400).send('Invalid userId/sessionId/userName');
+  }
+
   try {
-    const { stdout, stderr } = await execPromise(`python3 ../getSessionId.py ${userId} ${sessionId} ${userName}`);
+    const { stdout, stderr } = await execFilePromise(PYTHON, ['../getSessionId.py', userId, sessionId, userName], { cwd: __dirname });
     console.log("User initialized in DB");
     sessionIdReturned = stdout.trim();
     res.status(200).send(`${sessionIdReturned}`);
@@ -278,8 +297,12 @@ async function sendUpdates(userId, sessionId) {
 
 app.post('/save/:userId', async (req, res) => {
   const userId = req.params.userId;
-  
+
   console.log("save event")
+
+  if (!isSafeId(userId)) {
+    return res.status(400).send('Invalid userId');
+  }
 
   try {
     console.log("saving to text file...")
@@ -287,17 +310,16 @@ app.post('/save/:userId', async (req, res) => {
     await fs.writeFile(dataFilePath(userId), JSON.stringify(req.body, null, 2));
     const scriptPath = path.join(__dirname, '..', 'saveFormData.py');
     console.log("saving to text database...")
-    const command = `python3 "${scriptPath}" "${userId}"`;
 
     console.log("running command...")
-    await exec(command, { detached: true }, (error, stdout, stderr) => {
+    execFile(PYTHON, [scriptPath, userId], { cwd: __dirname }, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
       }
       console.log(`stdout: ${stdout}`);
       console.error(`stderr: ${stderr}`);
     });
-  
+
     res.status(200).send('Data saved successfully');
   } catch (error) {
     console.error('Error saving data:', error);
@@ -308,13 +330,15 @@ app.post('/save/:userId', async (req, res) => {
 app.post('/saveUserInput/:userId', async (req, res) => {
 
   const userId = req.params.userId;
-  userInput = req.body.userInput
+  const userInput = req.body.userInput
+
+  if (!isSafeId(userId)) {
+    return res.status(400).send('Invalid userId');
+  }
 
   const scriptPath = path.join(__dirname, '..', 'saveUserInput.py');
-  const command = `python3 "${scriptPath}" "${userId}" "${userInput}"`;
 
-
-  await exec(command, { detached: true }, (error, stdout, stderr) => {
+  execFile(PYTHON, [scriptPath, userId, String(userInput ?? '')], { cwd: __dirname }, (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       return res.status(500).send('Error running saveUserInput.py');
@@ -323,7 +347,7 @@ app.post('/saveUserInput/:userId', async (req, res) => {
     console.error(`stderr: ${stderr}`);
     res.status(200).send('script saveUserInput.py executed successfully');
   });
-  
+
 });
 
 app.get('/test', (req, res) => {
@@ -335,14 +359,22 @@ app.get('/auto-chat/:userId/:sessionId', (req, res) => {
   const userId = req.params.userId;
   const sessionId = userId; // req.params.sessionId
 
-  exec('python3 ../clientBot.py; python3 ../chatBotHandler.py', { detached: true }, (error, stdout, stderr) => {
+  execFile(PYTHON, ['../clientBot.py'], { cwd: __dirname }, (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       return res.status(500).send('Error running reset script');
     }
     console.log(`stdout: ${stdout}`);
     console.error(`stderr: ${stderr}`);
-    res.status(200).send('autochat command executed successfully');
+    execFile(PYTHON, ['../chatBotHandler.py'], { cwd: __dirname }, (error2, stdout2, stderr2) => {
+      if (error2) {
+        console.error(`exec error: ${error2}`);
+        return res.status(500).send('Error running reset script');
+      }
+      console.log(`stdout: ${stdout2}`);
+      console.error(`stderr: ${stderr2}`);
+      res.status(200).send('autochat command executed successfully');
+    });
   });
 });
 
@@ -354,28 +386,30 @@ app.post('/runChatBot/:userId', async (req, res) => {
   const userId = req.params.userId;
   const sessionId = "THIS_IS_NOT_USED"
   const userInput = req.body.userInput
-  
+
   console.log("userid " + userId)
   console.log(userInput)
 
-  const command = `python3 ../chatBotHandler.py ${userId} ${sessionId} "${userInput}" &`;
-  // const command = "echo hello"
+  if (!isSafeId(userId)) {
+    return res.status(400).send('Invalid userId');
+  }
 
-  console.log('Run chatbot Executing command:', command); // Debug output
+  console.log('Run chatbot for user:', userId); // Debug output
 
-  console.log("run command")
-  
-
-  await exec(command, { detached: true }, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`exec error: ${error}`);
-      return res.status(500).send('Error running chatbothandler script');
-    }
-    console.log(`stdout: ${stdout}`);
-    console.error(`stderr: ${stderr}`);
-    res.status(200).send('chatbothandler script executed successfully');
+  // Fire-and-forget: the bot writes its output to the watched files,
+  // which reach the client over SSE. userInput is a single argv element,
+  // so arbitrary content is safe.
+  const child = spawn(PYTHON, ['../chatBotHandler.py', userId, sessionId, String(userInput ?? '')], {
+    cwd: __dirname,
+    detached: true,
+    stdio: 'ignore'
   });
+  child.on('error', (error) => {
+    console.error(`spawn error: ${error}`);
+  });
+  child.unref();
 
+  res.status(200).send('chatbothandler script executed successfully');
 
 });
 
@@ -383,15 +417,16 @@ app.post('/reset/:userId', (req, res) => {
   
   const userId = req.params.userId;
   console.log("/reset/:"+userId)
-  
+
   console.log("resetting usr " + userId)
-  
+
+  if (!isSafeId(userId)) {
+    return res.status(400).send('Invalid userId');
+  }
+
   const scriptPath = path.join(__dirname, '..', 'reset.py');
-  const command = `python3 "${scriptPath}" "${userId}"`;
 
-  console.log('Executing command:', command); // Debug output
-
-  exec(command, { detached: true }, (error, stdout, stderr) => {
+  execFile(PYTHON, [scriptPath, userId], { cwd: __dirname }, (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       return res.status(500).send('Error running reset script');
